@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260227151619 extends AbstractMigration
+final class Version20260301095507 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20260227151619 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE address (id INT AUTO_INCREMENT NOT NULL, house_number VARCHAR(50) DEFAULT NULL, street_name VARCHAR(255) NOT NULL, postcode VARCHAR(15) NOT NULL, city VARCHAR(255) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
-        $this->addSql('CREATE TABLE boat (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, used TINYINT NOT NULL, day_price DOUBLE PRECISION NOT NULL, week_price DOUBLE PRECISION NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, is_active TINYINT NOT NULL, boatinfo_id INT NOT NULL, boat_type_id INT NOT NULL, boat_model_id INT NOT NULL, address_id INT NOT NULL, rental_id INT NOT NULL, INDEX IDX_D86E834AE036D5E3 (boatinfo_id), INDEX IDX_D86E834A3BDC1916 (boat_type_id), INDEX IDX_D86E834AE45950DD (boat_model_id), INDEX IDX_D86E834AF5B7AF75 (address_id), INDEX IDX_D86E834AA7CF2329 (rental_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
+        $this->addSql('CREATE TABLE boat (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, used TINYINT NOT NULL, day_price DOUBLE PRECISION NOT NULL, week_price DOUBLE PRECISION NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, is_active TINYINT NOT NULL, boatinfo_id INT NOT NULL, boat_type_id INT NOT NULL, boat_model_id INT NOT NULL, address_id INT NOT NULL, rental_id INT DEFAULT NULL, INDEX IDX_D86E834AE036D5E3 (boatinfo_id), INDEX IDX_D86E834A3BDC1916 (boat_type_id), INDEX IDX_D86E834AE45950DD (boat_model_id), INDEX IDX_D86E834AF5B7AF75 (address_id), INDEX IDX_D86E834AA7CF2329 (rental_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE boat_info (id INT AUTO_INCREMENT NOT NULL, max_user INT NOT NULL, length DOUBLE PRECISION NOT NULL, width DOUBLE PRECISION NOT NULL, draught DOUBLE PRECISION NOT NULL, cabine_number INT NOT NULL, beds_number INT NOT NULL, fuel VARCHAR(255) DEFAULT NULL, power_engine VARCHAR(255) NOT NULL, irc DOUBLE PRECISION NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE crew (id INT AUTO_INCREMENT NOT NULL, crew_name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE crew_statistic (crew_id INT NOT NULL, statistic_id INT NOT NULL, INDEX IDX_56CAC9655FE259F6 (crew_id), INDEX IDX_56CAC96553B6268F (statistic_id), PRIMARY KEY (crew_id, statistic_id)) DEFAULT CHARACTER SET utf8');
