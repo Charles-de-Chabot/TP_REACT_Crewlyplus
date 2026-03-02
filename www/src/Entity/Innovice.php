@@ -5,20 +5,27 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\InnoviceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: InnoviceRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['innovice:read']],
+    denormalizationContext: ['groups' => ['innovice:write']]
+)]
 class Innovice
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['innovice:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['innovice:read', 'innovice:write'])]
     private ?string $innovice_path = null;
 
     #[ORM\Column]
+    #[Groups(['innovice:read'])]
     private ?\DateTime $created_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'innovices')]

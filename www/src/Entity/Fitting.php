@@ -7,20 +7,27 @@ use App\Repository\FittingRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: FittingRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['fitting:read']],
+    denormalizationContext: ['groups' => ['fitting:write']]
+)]
 class Fitting
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['fitting:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['fitting:read', 'fitting:write'])]
     private ?string $label = null;
 
     #[ORM\Column]
+    #[Groups(['fitting:read', 'fitting:write'])]
     private ?float $fittingPrice = null;
 
     /**

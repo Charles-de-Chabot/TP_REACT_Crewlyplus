@@ -5,23 +5,31 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['notification:read']],
+    denormalizationContext: ['groups' => ['notification:write']]
+)]
 class Notification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['notification:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['notification:read', 'notification:write'])]
     private ?string $label = null;
 
     #[ORM\Column]
+    #[Groups(['notification:read', 'notification:write'])]
     private ?bool $is_open = null;
 
     #[ORM\Column]
+    #[Groups(['notification:read'])]
     private ?\DateTime $created_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'notification')]

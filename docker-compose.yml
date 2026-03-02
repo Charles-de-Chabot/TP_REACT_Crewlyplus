@@ -65,6 +65,22 @@ services:
     mem_reservation: 512m
     cpus: 2.0
 
+  frontend_crewlyplus:
+    image: node:20-alpine
+    container_name: ${FRONTEND_CONTAINER:-frontend_crewlyplus}
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173" # Port par défaut de Vite
+    volumes:
+      - ./frontend:/app
+    networks:
+      - app_network
+    # Commande pour garder le container en vie si pas de projet, ou lancer le dev server
+    command: sh -c "if [ -f package.json ]; then npm run dev -- --host; else tail -f /dev/null; fi"
+    mem_limit: 1g
+    cpus: 1.0
+
 networks:
   app_network:
     # réseau personnalisé pour isoler les services

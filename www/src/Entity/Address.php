@@ -3,30 +3,46 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\AddressRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['address:read']],
+    denormalizationContext: ['groups' => ['address:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'city' => 'ipartial',       // Recherche large sur la ville
+    'postcode' => 'exact',      // Recherche exacte sur le code postal
+    'streetName' => 'ipartial'
+])]
 class Address
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['address:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['address:read', 'address:write'])]
     private ?string $houseNumber = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['address:read', 'address:write'])]
     private ?string $streetName = null;
 
     #[ORM\Column(length: 15)]
+    #[Groups(['address:read', 'address:write'])]
     private ?string $postcode = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['address:read', 'address:write'])]
     private ?string $city = null;
 
     /**

@@ -3,27 +3,41 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\RentalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RentalRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['rental:read']],
+    denormalizationContext: ['groups' => ['rental:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'user.email' => 'exact',    // Retrouver les réservations d'un utilisateur précis
+    'boat.name' => 'ipartial'   // Retrouver les réservations liées à un bateau
+])]
 class Rental
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['rental:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['rental:read', 'rental:write'])]
     private ?\DateTime $rentalStart = null;
 
     #[ORM\Column]
+    #[Groups(['rental:read', 'rental:write'])]
     private ?\DateTime $rentalEnd = null;
 
     #[ORM\Column]
+    #[Groups(['rental:read', 'rental:write'])]
     private ?float $rentalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'rentals')]

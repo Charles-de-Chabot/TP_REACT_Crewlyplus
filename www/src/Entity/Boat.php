@@ -3,43 +3,65 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use App\Repository\BoatRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BoatRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['boat:read']],
+    denormalizationContext: ['groups' => ['boat:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'name' => 'ipartial',           // Recherche partielle insensible à la casse sur le nom
+    'boatType' => 'exact',          // Filtre sur la relation Type 
+    'boatModel' => 'exact'          // Filtre sur la relation Model 
+])]
+#[ApiFilter(BooleanFilter::class, properties: ['is_active', 'used'])]
 class Boat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['boat:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?bool $used = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?float $dayPrice = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?float $weekPrice = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read'])]
     private ?\DateTime $created_at = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read'])]
     private ?\DateTime $updated_at = null;
 
     #[ORM\Column]
+    #[Groups(['boat:read', 'boat:write'])]
     private ?bool $is_active = null;
 
     #[ORM\ManyToOne(inversedBy: 'boats')]

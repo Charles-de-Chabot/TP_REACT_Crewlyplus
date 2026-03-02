@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,6 +18,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'firstname' => 'ipartial',      // Recherche par prénom (partiel)
+    'lastname' => 'ipartial',       // Recherche par nom (partiel)
+    'email' => 'ipartial',          // Recherche par email
+    'role.label' => 'exact'         // Filtrer par rôle exact (ex: ROLE_ADMIN)
+])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]

@@ -7,41 +7,55 @@ use App\Repository\BoatInfoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BoatInfoRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['boatinfo:read']],
+    denormalizationContext: ['groups' => ['boatinfo:write']]
+)]
 class BoatInfo
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['boatinfo:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?int $maxUser = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?float $length = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?float $width = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?float $draught = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?int $cabineNumber = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?int $bedsNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?string $fuel = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?string $powerEngine = null;
 
     #[ORM\Column]
+    #[Groups(['boatinfo:read', 'boatinfo:write'])]
     private ?float $irc = null;
 
     /**
