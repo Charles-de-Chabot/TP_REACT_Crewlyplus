@@ -1,18 +1,29 @@
 import React from 'react'
-import { useAuthContext } from '../../contexts/AuthContext'
+import { useAuthContext } from '../../contexts/authContext'
+import { IMAGE_URL } from '../../constants/apiConstant';
 
 const Topbar = () => {
-    const {nickname} = useAuthContext();
+    // On récupère firstname et signOut
+    const { firstname, email, signOut } = useAuthContext();
 
     return (
         <div className='h-16 flex items-center shadow-md'>
             <div className="flex-1 text-white text-lg font-semibold ml-2">
-                Bienvenue {user?.email}
+                {/* On affiche le firstname ou l'email si pas de pseudo */}
+                Bienvenue {firstname || email}
             </div>
             <div className="">
-                <img src="/images/logo.png" alt="Crewly" />
+                <img src={`${IMAGE_URL}/logo.png`} alt="Crewly" />
             </div>
-            
+            <div className="">
+                <button onClick = {() => {
+                    if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) signOut();
+                }}
+                className="link-sidebar"
+                >
+                    Déconnexion
+                </button>
+            </div>
         </div>
     )
 }

@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Permet de passer le header Authorization à PHP (nécessaire pour JWT)
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Rediriger toutes les requêtes vers index.php sauf les fichiers existants
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

@@ -229,7 +229,7 @@ class AppFixtures extends Fixture
             'Kawasaki',
             'Perception',
             'Ocean',
-            // Modèles Régate ajoutés
+            // Modèles Régate 
             'Beneteau First 31.7',
             'JPK 10.10',
             'J/Boats J/99',

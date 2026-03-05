@@ -15,5 +15,6 @@ export const API_URL = `${API_ROOT}/api`;
 //================================
 
 //Images générales
-export const IMAGE_URL = `${API_ROOT}/media`
+export const IMAGE_URL = `${API_ROOT}/images`
 
+export const BOAT_URL = `${API_ROOT}/uploads/boats`
