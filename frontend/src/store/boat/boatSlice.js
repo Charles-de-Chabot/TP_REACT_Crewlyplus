@@ -11,6 +11,8 @@ const boatSlice = createSlice({
         types: [],
         models: [],
         cities: [],
+        // Pour conserver les dates entre les pages
+        searchDates: { start: '', end: '' }
     },
     reducers: {
         setLoading: (state, action) => {
@@ -26,11 +28,14 @@ const boatSlice = createSlice({
             state.types = action.payload.types;
             state.models = action.payload.models;
             state.cities = action.payload.cities;
+        },
+        setSearchDates: (state, action) => {
+            state.searchDates = action.payload;
         }
     }
 });
 
-export const { setLoading, setBoats, setBoatDetail, setFiltersData } = boatSlice.actions;
+export const { setLoading, setBoats, setBoatDetail, setFiltersData, setSearchDates } = boatSlice.actions;
 
 /**=============================
  * PARTIE DES REQUETES SUR L'API
@@ -77,7 +82,16 @@ export const fetchBoats = () => async (dispatch) => {
 
 // Méthode qui récupère le détail d'un bateau (Pour la future page BoatShow)
 export const fetchBoatDetail = (id) => async (dispatch) => {
-    // Nous implémenterons l'appel API du détail ici plus tard
+    try {
+        dispatch(setLoading(true));
+        // Requête vers API Platform pour un seul bateau
+        const response = await api.get(`/api/boats/${id}`);
+        dispatch(setBoatDetail(response.data));
+    } catch (error) {
+        console.error(`Erreur lors de la récupération du détail du bateau: ${error}`);
+    } finally {
+        dispatch(setLoading(false));
+    }
 };
 
 export default boatSlice.reducer;

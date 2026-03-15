@@ -27,35 +27,35 @@ class BoatInfo
     private ?int $maxUser = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?float $length = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?float $width = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?float $draught = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?int $cabineNumber = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?int $bedsNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?string $fuel = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?string $powerEngine = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
     private ?float $irc = null;
 
     /**

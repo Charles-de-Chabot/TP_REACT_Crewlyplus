@@ -12,6 +12,7 @@ import Home from '../screens/OnlineScreens/Home';
 import Boats from '../screens/OnlineScreens/Boats';
 import Login from '../screens/OfflineScreens/Login';
 import Register from '../screens/OfflineScreens/Register';
+import DetailBoat from '../screens/OnlineScreens/DetailBoat';
 
 const AppRouter = () => {
     const { userId, loading } = useAuthContext();
@@ -31,6 +32,7 @@ const AppRouter = () => {
                 <Route element={<App />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/boats" element={<Boats />} />
+                    <Route path="/boats/:id" element={<DetailBoat />} />
                 </Route>
 
                 {/* 

@@ -4,7 +4,7 @@ import { useAuthContext } from '../../contexts/authContext';
 import BoatCard from '../../components/Boat/BoatCard';
 import BoatCalendar from '../../components/Boat/BoatCalendar';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBoats } from '../../store/boat/boatSlice';
+import { fetchBoats, setSearchDates } from '../../store/boat/boatSlice';
 import selectBoatData from '../../store/boat/boatSelector';
 
 const Boats = () => {
@@ -12,15 +12,16 @@ const Boats = () => {
     const dispatch = useDispatch();
 
     // --- RÉCUPÉRATION DEPUIS REDUX ---
-    const { loading: isLoading, boats, types, models, cities } = useSelector(selectBoatData);
+    const { loading: isLoading, boats, types, models, cities, searchDates } = useSelector(selectBoatData);
 
     // État pour stocker les filtres sélectionnés
+    // On initialise les dates avec celles de Redux (pratique si on fait un retour arrière depuis DetailBoat)
     const [filters, setFilters] = useState({
         type: '0',
         model: '0',
         city: '0',
-        start: '',
-        end: ''
+        start: searchDates?.start || '',
+        end: searchDates?.end || ''
     });
 
     useEffect(() => {
@@ -44,11 +45,14 @@ const Boats = () => {
 
     const resetFilters = () => {
         setFilters({ type: '0', model: '0', city: '0', start: '', end: '' });
+        dispatch(setSearchDates({ start: '', end: '' }));
     };
 
     // Gestionnaire spécifique pour les dates du calendrier
     const handleDateChange = (start, end) => {
         setFilters(prev => ({ ...prev, start, end }));
+        // On sauvegarde aussi dans Redux pour la page DetailBoat
+        dispatch(setSearchDates({ start, end }));
     };
 
     const availableModels = useMemo(() => {
