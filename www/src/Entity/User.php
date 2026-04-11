@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email')]
 #[ApiResource(
@@ -83,9 +84,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?Address $address = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    #[Groups(['user:read', 'user:write'])]
-    private ?Media $media = null;
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
+    #[Groups(['user:read'])]
+    private Collection $media;
+
 
     /**
      * @var Collection<int, Message>
@@ -111,8 +116,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'user')]
     private Collection $rentals;
 
+
+
     public function __construct()
     {
+        $this->media = new ArrayCollection();
         $this->message = new ArrayCollection();
         $this->notification = new ArrayCollection();
         $this->innovices = new ArrayCollection();
@@ -272,14 +280,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMedia(): ?Media
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
     {
         return $this->media;
     }
-
-    public function setMedia(?Media $media): static
+    public function addMedia(Media $media): static
     {
-        $this->media = $media;
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $media): static
+    {
+        if ($this->media->removeElement($media)) {
+            // set the owning side to null (unless already changed)
+            if ($media->getUser() === $this) {
+                $media->setUser(null);
+            }
+        }
 
         return $this;
     }

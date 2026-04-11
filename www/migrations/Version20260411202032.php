@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260307090350 extends AbstractMigration
+final class Version20260411202032 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,7 +30,7 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('CREATE TABLE formula_boat (formula_id INT NOT NULL, boat_id INT NOT NULL, INDEX IDX_8613FF9A50A6386 (formula_id), INDEX IDX_8613FF9A1E84A29 (boat_id), PRIMARY KEY (formula_id, boat_id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE formula_rental (formula_id INT NOT NULL, rental_id INT NOT NULL, INDEX IDX_1B2610AEA50A6386 (formula_id), INDEX IDX_1B2610AEA7CF2329 (rental_id), PRIMARY KEY (formula_id, rental_id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE innovice (id INT AUTO_INCREMENT NOT NULL, innovice_path VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, user_id INT NOT NULL, INDEX IDX_22C97FABA76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
-        $this->addSql('CREATE TABLE media (id INT AUTO_INCREMENT NOT NULL, media_path VARCHAR(255) NOT NULL, boat_id INT DEFAULT NULL, INDEX IDX_6A2CA10CA1E84A29 (boat_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
+        $this->addSql('CREATE TABLE media (id INT AUTO_INCREMENT NOT NULL, media_path VARCHAR(255) NOT NULL, type VARCHAR(50) DEFAULT NULL, user_id INT DEFAULT NULL, boat_id INT DEFAULT NULL, INDEX IDX_6A2CA10CA76ED395 (user_id), INDEX IDX_6A2CA10CA1E84A29 (boat_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, content LONGTEXT NOT NULL, read_at DATETIME NOT NULL, created_at DATETIME NOT NULL, user_id INT DEFAULT NULL, INDEX IDX_B6BD307FA76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE model (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE notification (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, is_open TINYINT NOT NULL, created_at DATETIME NOT NULL, user_id INT DEFAULT NULL, INDEX IDX_BF5476CAA76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
@@ -39,7 +39,7 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('CREATE TABLE role (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(50) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE statistic (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, value INT NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE type (id INT AUTO_INCREMENT NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
-        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, firstname VARCHAR(255) NOT NULL, lastname VARCHAR(255) NOT NULL, nickname VARCHAR(255) DEFAULT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, phone_number VARCHAR(15) DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, is_active TINYINT NOT NULL, position VARCHAR(255) DEFAULT NULL, role_id INT NOT NULL, address_id INT DEFAULT NULL, media_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), INDEX IDX_8D93D649D60322AC (role_id), INDEX IDX_8D93D649F5B7AF75 (address_id), INDEX IDX_8D93D649EA9FDD75 (media_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
+        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, firstname VARCHAR(255) NOT NULL, lastname VARCHAR(255) NOT NULL, nickname VARCHAR(255) DEFAULT NULL, email VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, phone_number VARCHAR(15) DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, is_active TINYINT NOT NULL, position VARCHAR(255) DEFAULT NULL, role_id INT NOT NULL, address_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), INDEX IDX_8D93D649D60322AC (role_id), INDEX IDX_8D93D649F5B7AF75 (address_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('ALTER TABLE boat ADD CONSTRAINT FK_D86E834AE036D5E3 FOREIGN KEY (boatinfo_id) REFERENCES boat_info (id)');
         $this->addSql('ALTER TABLE boat ADD CONSTRAINT FK_D86E834A3BDC1916 FOREIGN KEY (boat_type_id) REFERENCES type (id)');
         $this->addSql('ALTER TABLE boat ADD CONSTRAINT FK_D86E834AE45950DD FOREIGN KEY (boat_model_id) REFERENCES model (id)');
@@ -52,7 +52,8 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('ALTER TABLE formula_rental ADD CONSTRAINT FK_1B2610AEA50A6386 FOREIGN KEY (formula_id) REFERENCES formula (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE formula_rental ADD CONSTRAINT FK_1B2610AEA7CF2329 FOREIGN KEY (rental_id) REFERENCES rental (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE innovice ADD CONSTRAINT FK_22C97FABA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE media ADD CONSTRAINT FK_6A2CA10CA1E84A29 FOREIGN KEY (boat_id) REFERENCES boat (id)');
+        $this->addSql('ALTER TABLE media ADD CONSTRAINT FK_6A2CA10CA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE media ADD CONSTRAINT FK_6A2CA10CA1E84A29 FOREIGN KEY (boat_id) REFERENCES boat (id) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE message ADD CONSTRAINT FK_B6BD307FA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE notification ADD CONSTRAINT FK_BF5476CAA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE rental ADD CONSTRAINT FK_1619C27DA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
@@ -60,7 +61,6 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('ALTER TABLE rental_fitting ADD CONSTRAINT FK_EB61165C98604CA FOREIGN KEY (fitting_id) REFERENCES fitting (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D649D60322AC FOREIGN KEY (role_id) REFERENCES role (id)');
         $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D649F5B7AF75 FOREIGN KEY (address_id) REFERENCES address (id)');
-        $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D649EA9FDD75 FOREIGN KEY (media_id) REFERENCES media (id)');
     }
 
     public function down(Schema $schema): void
@@ -78,6 +78,7 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('ALTER TABLE formula_rental DROP FOREIGN KEY FK_1B2610AEA50A6386');
         $this->addSql('ALTER TABLE formula_rental DROP FOREIGN KEY FK_1B2610AEA7CF2329');
         $this->addSql('ALTER TABLE innovice DROP FOREIGN KEY FK_22C97FABA76ED395');
+        $this->addSql('ALTER TABLE media DROP FOREIGN KEY FK_6A2CA10CA76ED395');
         $this->addSql('ALTER TABLE media DROP FOREIGN KEY FK_6A2CA10CA1E84A29');
         $this->addSql('ALTER TABLE message DROP FOREIGN KEY FK_B6BD307FA76ED395');
         $this->addSql('ALTER TABLE notification DROP FOREIGN KEY FK_BF5476CAA76ED395');
@@ -86,7 +87,6 @@ final class Version20260307090350 extends AbstractMigration
         $this->addSql('ALTER TABLE rental_fitting DROP FOREIGN KEY FK_EB61165C98604CA');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D649D60322AC');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D649F5B7AF75');
-        $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_8D93D649EA9FDD75');
         $this->addSql('DROP TABLE address');
         $this->addSql('DROP TABLE boat');
         $this->addSql('DROP TABLE boat_info');
