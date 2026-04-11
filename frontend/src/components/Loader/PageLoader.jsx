@@ -6,7 +6,7 @@ const PageLoader = () => {
     <div className='bg-black flex flex-col items-center justify-center h-screen'>
         <BounceLoader
         size={80}
-        color="rgba(30,215,96,1)"
+        color="rgba(8, 16, 57, 1)"
         />
         
     </div>

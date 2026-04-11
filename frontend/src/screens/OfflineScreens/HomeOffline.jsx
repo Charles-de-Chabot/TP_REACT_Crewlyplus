@@ -1,6 +1,7 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, Link } from 'react-router-dom'
 import { IMAGE_URL } from '../../constants/apiConstant'
+import { IMG_LOGO } from '../../constants/appConstant'
 
 const HomeOffline = () => {
   return (
@@ -12,7 +13,9 @@ const HomeOffline = () => {
       
       <div className="relative z-10 w-full h-full flex flex-col justify-center items-center px-4">
         <div className="w-full flex justify-center items-center mb-8 animate-fade-in-down">
-          <img className="h-16 md:h-20 object-contain drop-shadow-2xl filter brightness-110" src={`${IMAGE_URL}/logo.png`} alt="Crewly" />
+          <Link to="/" className="cursor-pointer hover:scale-105 transition-transform duration-300">
+            <img className="h-16 md:h-20 object-contain drop-shadow-2xl filter brightness-110" src={`${IMG_LOGO}`} alt="Crewly" />
+          </Link>
         </div>
         <div className="w-full flex justify-center">
           <Outlet/>

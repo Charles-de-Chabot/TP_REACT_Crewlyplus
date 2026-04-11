@@ -26,23 +26,23 @@ class Address
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['address:read', 'boat:read'])]
+    #[Groups(['address:read', 'boat:read', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['address:read', 'address:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read'])]
     private ?string $houseNumber = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['address:read', 'address:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read'])]
     private ?string $streetName = null;
 
     #[ORM\Column(length: 15)]
-    #[Groups(['address:read', 'address:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read'])]
     private ?string $postcode = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['address:read', 'address:write', 'boat:read'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read'])]
     private ?string $city = null;
 
     /**

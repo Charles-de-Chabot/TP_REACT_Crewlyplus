@@ -4,6 +4,7 @@ import BoatCard from '../../components/Boat/BoatCard'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBoats } from '../../store/boat/boatSlice'
 import selectBoatData from '../../store/boat/boatSelector'
+import { TRAILER_VIDEO } from '../../constants/appConstant'
 
 const Home = () => {
     const dispatch = useDispatch();
@@ -25,17 +26,27 @@ const Home = () => {
         <div className="flex flex-col w-full min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden">
             
             {/* Hero Section */}
-            <div className="relative w-full py-24 lg:py-32 overflow-hidden">
-                {/* Arrière-plan avec dégradés cohérents avec le thème Login/Register */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0f172a] to-[#020617] z-0"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-transparent to-transparent z-0"></div>
+            <div className="relative w-full py-24 lg:py-32 overflow-hidden pt-2">
+                {/* Arrière-plan Vidéo */}
+                <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                >
+                    <source src={TRAILER_VIDEO} type="video/mp4" />
+                </video>
+                
+                {/* Overlay sombre pour assurer la lisibilité du texte */}
+                <div className="absolute inset-0 bg-slate-950/60 z-0"></div>
                 
                 <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center animate-slideup">
                     <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl mb-6 drop-shadow-2xl">
-                        L'aventure commence ici
+                        Embarquez avec Crewly
                     </h1>
-                    <p className="mt-4 max-w-2xl text-xl text-slate-400 mb-10">
-                        Louez le bateau de vos rêves et partez à la découverte des plus beaux horizons. Simple, rapide et sécurisé.
+                    <p className="mt-4 max-w-3xl text-xl text-slate-200 mb-10">
+                        Louez le bateau de vos rêves et partez à la découverte des plus beaux horizons
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link 
@@ -53,7 +64,7 @@ const Home = () => {
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold text-white sm:text-4xl">Pourquoi choisir Crewly ?</h2>
-                        <p className="mt-4 text-lg text-slate-400">Nous rendons la location de bateaux accessible à tous.</p>
+                        <p className="mt-4 text-lg text-slate-400">Disponible partout en France: simple, rapide et sécurisé.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

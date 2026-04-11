@@ -6,6 +6,7 @@ import BoatCalendar from '../../components/Boat/BoatCalendar';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBoats, setSearchDates } from '../../store/boat/boatSlice';
 import selectBoatData from '../../store/boat/boatSelector';
+import { TRAILER_VIDEO } from '../../constants/appConstant';
 
 const Boats = () => {
     const { userId } = useAuthContext();
@@ -81,15 +82,26 @@ const Boats = () => {
             
             {/* Hero Section */}
             <div className="relative w-full py-16 lg:py-24 overflow-hidden border-b border-white/5">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0f172a] to-[#020617] z-0"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-teal-900/20 via-transparent to-transparent z-0"></div>
+                {/* Arrière-plan Vidéo */}
+                <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover z-0 blur-xs"
+                >
+                    <source src={TRAILER_VIDEO} type="video/mp4" />
+                </video>
                 
-                <div className="relative z-10 container mx-auto px-4 flex flex-col items-center md:items-start text-center md:text-left">
+                {/* Overlay sombre pour assurer la lisibilité du texte */}
+                <div className="absolute inset-0 bg-slate-950/60 z-0"></div>
+                
+                <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center">
                     <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl mb-4 drop-shadow-lg">
                         Naviguez vers l'aventure
                     </h1>
-                    <p className="max-w-2xl text-lg text-slate-400">
-                        Découvrez notre flotte de bateaux d'exception et réservez votre prochaine escapade en mer.
+                    <p className="max-w-3xl text-lg text-slate-200">
+                        Découvrez notre flotte de bateaux d'exception et réservez votre prochaine escapade en mer
                     </p>
                 </div>
             </div>
@@ -118,7 +130,7 @@ const Boats = () => {
                         {/* Sélecteurs de Dates (Affiché uniquement si connecté) */}
                         {userId && (
                             <div className="w-full lg:w-auto flex-shrink-0 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-white/5 pb-8 lg:pb-0 lg:pr-8">
-                                <h4 className="block text-sm font-bold text-slate-300 mb-4">Dates de navigation</h4>
+                                <h4 className="block text-sm font-bold text-slate-300 mb-4">Dates de reservation</h4>
                                 
                                 <BoatCalendar 
                                     startDate={filters.start} 

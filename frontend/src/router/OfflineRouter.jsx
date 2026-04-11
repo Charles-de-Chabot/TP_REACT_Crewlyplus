@@ -1,23 +1,43 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomeOffline from "../screens/OfflineScreens/HomeOffline";
 import ErrorPage from "../screens/ErrorScreens/ErrorPage";
 import Login from "../screens/OfflineScreens/Login";
 import Register from "../screens/OfflineScreens/Register";
+import App from "../App";
+import Home from "../screens/OnlineScreens/Home";
+import Boats from "../screens/OnlineScreens/Boats";
+import DetailBoat from "../screens/OnlineScreens/DetailBoat";
 
 const OfflineRouter = createBrowserRouter([
     {
-        element: <HomeOffline/>, // L'élément retourné sour toutes nos vues
-        errorElement: <ErrorPage/>, // L'élément retourné en cas d'erreur
+        // 1. Les routes publiques accessibles hors connexion
+        element: <App/>, 
+        errorElement: <ErrorPage/>, 
+        children:[
+            { path: "/", element: <Home/> },
+            { path: "/boats", element: <Boats/> },
+            { path: "/boats/:id", element: <DetailBoat/> },
+        ]
+    },
+    {
+        // 2. Les routes exclusives à la déconnexion (Login / Register)
+        element: <HomeOffline/>,
+        errorElement: <ErrorPage/>,
         children:[
             {
-                path: "/", // Chemain de la vue
-                element: <Login/>, // L'élément retourné
+                path: "/login",
+                element: <Login/>,
             },
             {
                 path: "/register",
                 element: <Register/>, 
             },
         ]
+    },
+    {
+        // Redirection par défaut si l'URL n'existe pas ou est protégée
+        path: "*",
+        element: <Navigate to="/login" replace />
     }
 ])
 
