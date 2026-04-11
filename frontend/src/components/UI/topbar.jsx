@@ -35,7 +35,7 @@ const Topbar = () => {
           <div className="hidden md:flex items-center space-x-6">
             {isAuthenticated ? (
               <>
-                <Link className="flex items-center space-x-3 group" to="/profile">
+                <Link className="flex items-center space-x-3 group" to="/user">
                   <div className="h-9 w-9 rounded-full bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 group-hover:bg-teal-500 group-hover:text-slate-900 transition-all duration-300">
                     <span className="font-bold text-sm">
                       {firstname ? firstname.charAt(0).toUpperCase() : (email ? email.charAt(0).toUpperCase() : 'U')}
@@ -93,7 +93,7 @@ const Topbar = () => {
                 <>
                   <Link 
                     className="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/10" 
-                    to="/profile"
+                    to="/user"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Mon compte
