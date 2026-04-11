@@ -4,8 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\MediaRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -26,19 +24,26 @@ class Media
     #[Groups(['media:read', 'media:write', 'boat:read', 'user:read'])]
     private ?string $media_path = null;
 
+    
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['media:read', 'media:write', 'boat:read', 'user:read'])]
+    private ?string $type = null;
+
     /**
-     * @var Collection<int, User>
+     * Un média appartient à UN utilisateur (mais un utilisateur peut avoir plusieurs médias)
      */
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'media')]
-    private Collection $users;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'media')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['media:read'])]
+    private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'media')]
+    /**
+     * Un média appartient à UN bateau (mais un bateau peut avoir plusieurs médias)
+     */
+    #[ORM\ManyToOne(targetEntity: Boat::class, inversedBy: 'media')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['media:read'])]
     private ?Boat $boat = null;
-
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -53,37 +58,28 @@ class Media
     public function setMediaPath(string $media_path): static
     {
         $this->media_path = $media_path;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsers(): Collection
+    public function getType(): ?string
     {
-        return $this->users;
+        return $this->type;
     }
 
-    public function addUser(User $user): static
+    public function setType(?string $type): static
     {
-        if (!$this->users->contains($user)) {
-            $this->users->add($user);
-            $user->setMedia($this);
-        }
-
+        $this->type = $type;
         return $this;
     }
 
-    public function removeUser(User $user): static
+    public function getUser(): ?User
     {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getMedia() === $this) {
-                $user->setMedia(null);
-            }
-        }
+        return $this->user;
+    }
 
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 
@@ -95,7 +91,6 @@ class Media
     public function setBoat(?Boat $boat): static
     {
         $this->boat = $boat;
-
         return $this;
     }
 }
