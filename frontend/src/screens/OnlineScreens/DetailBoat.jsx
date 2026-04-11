@@ -88,4 +88,4 @@ const DetailBoat = () => {
     );
 };
 
-export default DetailBoat;
+export default DetailBoat; 
