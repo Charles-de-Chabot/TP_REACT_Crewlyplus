@@ -37,9 +37,12 @@ const BoatCard = ({ data }) => {
             </Link>
             
             <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-white mb-2 line-clamp-1">
+                <h3 className="text-xl font-bold text-white mb-1 line-clamp-1">
                     <Link to={`/boats/${boatId}`} className="hover:text-teal-400 transition-colors duration-200">{boatName}</Link>
                 </h3>
+                <span className="block text-teal-500/80 text-xs font-bold uppercase tracking-wider mb-3">
+                    {data?.model?.label || data?.model?.name || 'Modèle inconnu'}
+                </span>
                 
                 <p className="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">
                     {data?.description || "Pas de description"}

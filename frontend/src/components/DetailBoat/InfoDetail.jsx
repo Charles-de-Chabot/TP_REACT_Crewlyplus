@@ -16,7 +16,10 @@ import {
 const InfoDetail = ({ boatDetail }) => {
   return (
     <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-8">
-        <h2 className="text-2xl font-bold text-white mb-4">À propos de ce bateau</h2>
+        <h2 className="text-2xl font-bold text-white mb-1">À propos de ce bateau</h2>
+        <span className="block text-teal-500/80 text-sm font-bold uppercase tracking-wider mb-4">
+            {boatDetail?.model?.label || boatDetail?.model?.name || 'Modèle inconnu'}
+        </span>
         <p className="text-slate-400 leading-relaxed whitespace-pre-line">
             {boatDetail?.description || "Aucune description disponible pour ce bateau."}
         </p>
