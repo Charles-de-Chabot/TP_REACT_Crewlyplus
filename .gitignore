@@ -1,5 +1,5 @@
 # Fichiers d'environnement (NE JAMAIS COMMITER !)
-#.env
+env
 .env.local
 .env.*.local
 # Exception : autoriser .env.example comme modèle
