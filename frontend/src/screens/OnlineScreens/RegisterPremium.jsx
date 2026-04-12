@@ -4,11 +4,10 @@ import FeatureList from '../../components/RegisterPremium/FeatureList';
 import PricingCard from '../../components/RegisterPremium/PricingCard';
 import CommunitySection from '../../components/RegisterPremium/CommunitySection';
 import FleetSection from '../../components/RegisterPremium/FleetSection';
-// Import de ton nouveau composant de formulaire
 import PremiumForm from '../../components/RegisterPremium/PremiumForm'; 
+import StripeContainer from '../../components/Stripe/StripeContainer'; 
 
 const RegisterPremium = () => {
-    // Étape 1 : Présentation / Étape 2 : Formulaire / Étape 3 : Stripe
     const [step, setStep] = useState(1); 
 
     return (
@@ -20,7 +19,6 @@ const RegisterPremium = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
                     <FeatureList />
 
-                    {/* Zone dynamique : On gère les 3 étapes */}
                     <div className="relative">
                         {/* ÉTAPE 1 : PRIX */}
                         {step === 1 && (
@@ -40,16 +38,10 @@ const RegisterPremium = () => {
                             </div>
                         )}
 
-                        {/* ÉTAPE 3 : PAIEMENT STRIPE (Placeholder en attendant l'install) */}
+                        {/* ÉTAPE 3 : LE VRAI TUNNEL STRIPE */}
                         {step === 3 && (
-                            <div className="bg-slate-900/60 border border-teal-500/30 backdrop-blur-3xl p-12 rounded-[4rem] text-center shadow-2xl animate-fade-in">
-                                <div className="w-16 h-16 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                                <h2 className="text-2xl font-black italic uppercase text-white mb-2">Sécurisation</h2>
-                                <p className="text-slate-400 text-sm leading-relaxed">
-                                    Préparation de votre tunnel de paiement sécurisé...
-                                </p>
+                            <div className="animate-fade-in">
+                                <StripeContainer />
                             </div>
                         )}
                     </div>

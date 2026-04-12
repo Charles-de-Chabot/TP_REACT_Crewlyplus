@@ -6,6 +6,7 @@ import Boats from "../screens/OnlineScreens/Boats";
 import DetailBoat from "../screens/OnlineScreens/DetailBoat";
 import User from "../screens/OnlineScreens/User";
 import RegisterPremium from "../screens/OnlineScreens/RegisterPremium";
+import PaymentStatus from "../components/Stripe/PaymentStatus";
 
 const OnlineRouter = createBrowserRouter([
     {
@@ -20,11 +21,11 @@ const OnlineRouter = createBrowserRouter([
             { path: "/boats", element: <Boats/> },
             { path: "/boats/:id", element: <DetailBoat /> },
             
-            
             // 2. Les routes privées
             { path: "/user", element: <User/> },
             { path: "/register_premium", element: <RegisterPremium /> },
-            
+            { path: "/payment-success", element: <PaymentStatus /> },
+
             // 3. Redirections pour les pages hors-ligne si l'utilisateur est déjà connecté
             { path: "/login", element: <Navigate to="/" replace /> },
             { path: "/register", element: <Navigate to="/" replace /> },

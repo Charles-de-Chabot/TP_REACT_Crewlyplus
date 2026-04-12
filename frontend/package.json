@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
+    "@stripe/react-stripe-js": "^6.1.0",
+    "@stripe/stripe-js": "^9.1.0",
     "axios": "^1.13.6",
     "flatpickr": "^4.6.13",
     "html-react-parser": "^5.2.17",
