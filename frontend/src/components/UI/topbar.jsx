@@ -1,24 +1,45 @@
-// src/components/UI/topbar.jsx
 import React, { useState } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useAuthContext } from '../../contexts/authContext'
-import { useSidebar } from '../../hooks/useSidebar' // Notre hook de navigation dynamique
+import { useSidebar } from '../../hooks/useSidebar'
 import { IMAGE_URL } from '../../constants/apiConstant'
 
+// Configuration visuelle par rôle
+const ROLE_CONFIG = {
+  'ROLE_ADMIN': { label: 'Administrateur', color: 'text-red-400', border: 'border-red-500/30', bg: 'bg-red-500/10' },
+  'ROLE_CAPITAINE': { label: 'Capitaine', color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-500/10' },
+  'ROLE_CHEF': { label: 'Chef', color: 'text-orange-400', border: 'border-orange-500/30', bg: 'bg-orange-500/10' },
+  'ROLE_HOTESSE': { label: 'Hôtesse', color: 'text-pink-400', border: 'border-pink-500/30', bg: 'bg-pink-500/10' },
+  'ROLE_PREMIUM': { label: 'Élite', color: 'text-amber-400', border: 'border-amber-500/30', bg: 'bg-amber-500/10', glow: 'shadow-[0_0_15px_rgba(245,158,11,0.2)]' },
+  'ROLE_USER': { label: 'Moussaillon', color: 'text-slate-400', border: 'border-slate-500/30', bg: 'bg-slate-500/10' }
+};
+
 const Topbar = () => {
-  // On récupère les infos nécessaires du contexte
-  const { firstname, email, role, signOut } = useAuthContext()
+  // On récupère les infos. Note : Assure-toi que ton context expose bien roleLabel
+  const { firstname, email, role, roleLabel, signOut, userId } = useAuthContext()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
-
-  // Authentifié si ID présent (plus robuste que firstname/email)
-  const { userId } = useAuthContext()
   const isAuthenticated = !!userId
-
-  // On récupère les liens de navigation selon le rôle via le hook useSidebar
   const navItems = useSidebar(role)
 
-  // Calcul de l'initiale
+  // Déterminer le rôle prioritaire en utilisant le nouveau roleLabel de l'entité
+  const getActiveRoleKey = () => {
+    // On priorise roleLabel (le label de l'entité Role ID 8, etc.)
+    // On convertit en string et en majuscules pour la comparaison
+    const currentRole = String(roleLabel || role || '').toUpperCase();
+
+    if (currentRole.includes('ADMIN')) return 'ROLE_ADMIN';
+    if (currentRole.includes('PREMIUM')) return 'ROLE_PREMIUM';
+    if (currentRole.includes('CAPITAINE')) return 'ROLE_CAPITAINE';
+    if (currentRole.includes('CHEF')) return 'ROLE_CHEF';
+    if (currentRole.includes('HOTESSE')) return 'ROLE_HOTESSE';
+    
+    return 'ROLE_USER';
+  };
+
+  const activeKey = getActiveRoleKey();
+  const config = ROLE_CONFIG[activeKey];
+
   const userInitial = firstname 
     ? firstname.charAt(0).toUpperCase() 
     : (email ? email.charAt(0).toUpperCase() : 'U');
@@ -36,14 +57,12 @@ const Topbar = () => {
       <div className="max-w-[1700px] mx-auto px-6">
         <div className="flex justify-between items-center h-20">
           
-          {/* GAUCHE : Logo + Navigation Principale */}
+          {/* GAUCHE : Logo + Navigation Desktop */}
           <div className="flex items-center space-x-12">
             <Link className="flex-shrink-0" to="/">
-              {/* Utilisation du logo.png comme demandé */}
               <img className="h-9 w-auto" src={`${IMAGE_URL}/logo.png`} alt="Crewly" />
             </Link>
 
-            {/* Navigation Desktop filtrée dynamiquement par rôle */}
             <div className="hidden lg:flex items-center space-x-9">
               {navItems.map((item) => (
                 <NavLink 
@@ -60,30 +79,34 @@ const Topbar = () => {
             </div>
           </div>
 
-          {/* DROITE : Actions utilisateur (Connecté vs Déconnecté) */}
+          {/* DROITE : Profil & Actions */}
           <div className="hidden md:flex items-center space-x-6">
             {isAuthenticated ? (
-              // --- ÉTAT CONNECTÉ ---
               <div className="flex items-center space-x-5 pl-5 border-l border-white/10">
                 
-                {/* Lien vers le Profil avec l'initiale */}
                 <Link className="flex items-center space-x-3.5 group" to="/user">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-teal-500/10 border-2 border-teal-500/30 flex items-center justify-center text-teal-400 group-hover:bg-teal-500 group-hover:text-black group-hover:border-teal-500 transition-all duration-300 shadow-inner">
-                    <span className="font-extrabold text-base tracking-tight">
+                  {/* Avatar Dynamique */}
+                  <div className={`
+                    flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-inner border-2
+                    ${config.bg} ${config.border} ${config.color} ${config.glow || ''}
+                    group-hover:scale-110
+                  `}>
+                    <span className="font-extrabold text-base tracking-tight italic">
                       {userInitial}
                     </span>
                   </div>
+
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-white group-hover:text-teal-400 transition-colors leading-none">
                       {firstname || (email ? email.split('@')[0] : 'Utilisateur')}
                     </span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold mt-1">
-                      {role || 'Membre'}
+                    {/* Badge de Grade */}
+                    <span className={`text-[9px] uppercase tracking-[0.2em] font-black mt-1.5 ${config.color}`}>
+                      {config.label}
                     </span>
                   </div>
                 </Link>
 
-                {/* Bouton déconnexion discret mais accessible */}
                 <button 
                   onClick={handleLogout} 
                   className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
@@ -95,7 +118,6 @@ const Topbar = () => {
                 </button>
               </div>
             ) : (
-              // --- ÉTAT DÉCONNECTÉ ---
               <div className="flex items-center space-x-5">
                 <Link className="text-sm font-bold text-slate-300 hover:text-white transition-colors" to="/login">
                   Connexion
@@ -119,10 +141,9 @@ const Topbar = () => {
         </div>
       </div>
 
-      {/* Menu Mobile (Dropdown) */}
+      {/* Dropdown Mobile */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-white/5 p-6 shadow-2xl animate-fade-in">
-           {/* Liens dynamiques mobiles */}
            <div className="space-y-3 mb-6">
               {navItems.map((item) => (
                   <Link key={item.path} to={item.path} className="block text-xl font-bold text-white hover:text-teal-400" onClick={() => setIsMobileMenuOpen(false)}>
@@ -130,12 +151,15 @@ const Topbar = () => {
                   </Link>
               ))}
            </div>
-           
            <hr className="border-white/5 mb-6" />
-           
-           {/* Actions utilisateur mobiles */}
            {isAuthenticated ? (
-             <div className="space-y-3">
+             <div className="space-y-4">
+               <div className="flex items-center space-x-3 mb-4">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${config.bg} ${config.color}`}>
+                    {userInitial}
+                  </div>
+                  <span className={`text-sm font-black uppercase tracking-widest ${config.color}`}>{config.label}</span>
+               </div>
                <Link to="/user" className="block text-lg font-bold text-slate-300" onClick={() => setIsMobileMenuOpen(false)}>Mon Profil</Link>
                <button onClick={handleLogout} className="text-red-400 font-bold italic text-lg">Déconnexion</button>
              </div>

@@ -28,6 +28,8 @@ class MeController extends AbstractController
             'email' => $user->getEmail(),
             'firstname' => $user->getFirstname(),
             'nickname' => $user->getNickname(),
+            'roles' => $user->getRoles(),
+            'roleLabel' => $user->getRoleLabel(),
         ]);
     }
 }

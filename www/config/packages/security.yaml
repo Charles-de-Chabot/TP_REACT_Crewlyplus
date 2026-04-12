@@ -3,6 +3,17 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
 
+    role_hierarchy:
+        # La chaîne de progression principale
+        ROLE_PREMIUM: ROLE_USER
+        ROLE_ADMIN:   ROLE_PREMIUM
+
+        # Les rôles métier "à part"
+        # Ils héritent de ROLE_USER pour pouvoir se connecter
+        ROLE_CAPITAINE: ROLE_USER
+        ROLE_HOTESSE:   ROLE_USER
+        ROLE_CHEF:      ROLE_USER
+
     providers:
         app_user_provider:
             entity:

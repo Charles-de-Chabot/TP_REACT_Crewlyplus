@@ -19,9 +19,15 @@ class StripeController extends AbstractController
     {
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non connecté.'], 401);
+        }
+
         try {
             $customer = Customer::create([
-                'email' => 'user_' . uniqid() . '@test.com',
+                'email' => $user->getEmail(),
             ]);
 
             $subscription = Subscription::create([
@@ -38,7 +44,6 @@ class StripeController extends AbstractController
             $latestInvoice = $subscription->latest_invoice;
             $invoiceId = is_string($latestInvoice) ? $latestInvoice : $latestInvoice->id;
 
-            // ✅ On crée manuellement le PaymentIntent sur la facture ouverte
             $paymentIntent = PaymentIntent::create([
                 'amount'   => 2900,
                 'currency' => 'eur',
@@ -47,6 +52,7 @@ class StripeController extends AbstractController
                 'metadata' => [
                     'subscription_id' => $subscription->id,
                     'invoice_id'      => $invoiceId,
+                    'user_id'         => $user->getId(), // ✅ L'info cruciale pour le webhook
                 ],
             ]);
 

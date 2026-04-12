@@ -44,6 +44,11 @@ class AppFixtures extends Fixture
         $roleUser->setLabel('ROLE_USER');
         $manager->persist($roleUser);
 
+        // Role Premium
+        $rolePremium = new Role();
+        $rolePremium->setLabel('ROLE_PREMIUM');
+        $manager->persist($rolePremium);
+
         //Role Capitain
         $roleCapitain = new Role();
         $roleCapitain->setLabel('ROLE_CAPITAIN');

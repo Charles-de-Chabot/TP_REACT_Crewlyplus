@@ -1,6 +1,3 @@
-// ===========================
-// CONTEXTE D'AUTHENTIFICATION (JWT)
-// ===========================
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import api, { setAccessToken, clearAccessToken } from "../api/axios";
 import { USER_INFOS } from "../constants/appConstant";
@@ -11,6 +8,7 @@ const AuthContext = createContext({
     email: "",
     firstname: "",
     role: "",
+    roleLabel: "", // Ajouté pour la Topbar
     avatar: "",
     loading: true,
     signIn: async () => {},
@@ -22,25 +20,26 @@ export const AuthContextProvider = ({ children }) => {
     const [email, setEmail] = useState("");
     const [firstname, setFirstname] = useState("");
     const [role, setRole] = useState("");
+    const [roleLabel, setRoleLabel] = useState(""); // Nouveau State
     const [avatar, setAvatar] = useState("");
     const [loading, setLoading] = useState(true);
 
-    // ===========================
-    // HELPER: MISE À JOUR ÉTATS
-    // ===========================
     const hydrateUser = useCallback((userData) => {
         setUserId(userData.id || "");
         setEmail(userData.email || "");
         setFirstname(userData.firstname || userData.nickname || "");
-        // On récupère le premier rôle du tableau (format Symfony) ou le champ role direct
-        const userRole = Array.isArray(userData.roles) ? userData.roles[0] : userData.role;
-        setRole(userRole || "user");
+        
+        // On récupère le rôle technique (ex: ROLE_USER)
+        const technicalRole = Array.isArray(userData.roles) ? userData.roles[0] : userData.role;
+        setRole(technicalRole || "user");
+
+        // On récupère le label de l'entité (ex: ROLE_PREMIUM) ou on prend le technique par défaut
+        // C'est ici que la magie opère pour ta Topbar
+        setRoleLabel(userData.roleLabel || technicalRole || "user");
+        
         setAvatar(userData.avatar || "");
     }, []);
 
-    // ===========================
-    // METHODE DE CONNEXION
-    // ===========================
     const signIn = async (emailInput, passwordInput) => {
         try {
             const response = await api.post(URL_LOGIN, {
@@ -49,15 +48,12 @@ export const AuthContextProvider = ({ children }) => {
             });
 
             const { token, user } = response.data;
-
             if (!token) throw new Error("Token introuvable");
 
-            // Stockage JWT
             setAccessToken(token);
             localStorage.setItem("token", token);
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-            // Si l'API renvoie l'user complet, on hydrate, sinon on va le chercher
             if (user) {
                 hydrateUser(user);
                 localStorage.setItem(USER_INFOS, JSON.stringify(user));
@@ -66,39 +62,31 @@ export const AuthContextProvider = ({ children }) => {
                 hydrateUser(meResponse.data);
                 localStorage.setItem(USER_INFOS, JSON.stringify(meResponse.data));
             }
-
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
             throw new Error(`Erreur connexion: ${errorMessage}`);
         }
     };
 
-    // ===========================
-    // METHODE DE DECONNEXION
-    // ===========================
     const signOut = useCallback(() => {
         setUserId("");
         setEmail("");
         setFirstname("");
         setRole("");
+        setRoleLabel(""); // On vide aussi le label
         setAvatar("");
-        
         clearAccessToken();
         localStorage.removeItem("token");
         localStorage.removeItem(USER_INFOS);
         delete api.defaults.headers.common['Authorization'];
     }, []);
 
-    // ===========================
-    // VERIFICATION SESSION (F5)
-    // ===========================
     useEffect(() => {
         const checkSession = async () => {
             const token = localStorage.getItem("token");
             const storedUser = localStorage.getItem(USER_INFOS);
 
             if (token) {
-                // 1. Restauration immédiate depuis le localStorage (évite le flash sidebar)
                 if (storedUser) {
                     hydrateUser(JSON.parse(storedUser));
                 }
@@ -106,19 +94,15 @@ export const AuthContextProvider = ({ children }) => {
                 try {
                     setAccessToken(token);
                     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                    
-                    // 2. Refresh des données depuis le serveur
                     const response = await api.get("/api/me");
                     hydrateUser(response.data);
                     localStorage.setItem(USER_INFOS, JSON.stringify(response.data));
                 } catch (error) {
-                    // Si le token est expiré (401), on déconnecte
                     signOut();
                 }
             }
             setLoading(false);
         };
-
         checkSession();
     }, [hydrateUser, signOut]);
 
@@ -127,6 +111,7 @@ export const AuthContextProvider = ({ children }) => {
         email,
         firstname,
         role,
+        roleLabel, // On transmet bien le state ici
         avatar,
         loading,
         signIn,

@@ -268,6 +268,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(['user:read'])] // On l'ajoute au groupe de lecture
+    public function getRoleLabel(): ?string
+    {
+        // On va chercher le label dans l'entité Role liée
+        return $this->role ? $this->role->getLabel() : 'ROLE_USER';
+    }
+
     public function getAddress(): ?Address
     {
         return $this->address;
