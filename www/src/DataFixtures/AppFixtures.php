@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+<<<<<<< HEAD
 use App\Entity\Address;
 use App\Entity\Boat;
 use App\Entity\BoatInfo;
@@ -13,6 +14,9 @@ use App\Entity\Type;
 use App\Entity\User;
 use DateTime;
 use DateTimeImmutable;
+=======
+use App\Entity\User;
+>>>>>>> 6a7d94a (merge)
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -30,6 +34,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+<<<<<<< HEAD
         //==============================
         // Création des rôles
         //==============================
@@ -186,6 +191,10 @@ class AppFixtures extends Fixture
         $this->loadBoat($manager);
         $this->loadFitting($manager);
 
+=======
+        $admin = new User();
+        
+>>>>>>> 6a7d94a (merge)
         $manager->flush();
     }
 
