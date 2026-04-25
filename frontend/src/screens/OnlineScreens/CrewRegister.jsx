@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/authContext';
 import api from '../../api/axios';
 import Layout from '../../components/UI/Layout';
+import { CONFIG_JSON_LD } from '../../constants/apiConstant';
 
 // Sub-components
 import RegisterHeader from '../../components/Crew/RegisterHeader';
@@ -17,8 +18,7 @@ const CREW_OPTIONS = [
         icon: '👨‍✈️',
         description: 'Prenez le commandement et guidez nos clients vers des destinations d\'exception.',
         features: ['Navigation experte', 'Gestion d\'équipage', 'Sécurité à bord'],
-        color: 'blue',
-        id: 2
+        color: 'blue'
     },
     {
         role: 'ROLE_CHEF',
@@ -26,8 +26,7 @@ const CREW_OPTIONS = [
         icon: '👨‍🍳',
         description: 'Créez des expériences culinaires inoubliables en pleine mer.',
         features: ['Cuisine gastronomique', 'Gestion des stocks', 'Menus personnalisés'],
-        color: 'orange',
-        id: 3
+        color: 'orange'
     },
     {
         role: 'ROLE_HOTESSE',
@@ -35,14 +34,13 @@ const CREW_OPTIONS = [
         icon: '⚜️',
         description: 'Assurez un service d\'excellence et un confort absolu pour les passagers.',
         features: ['Service hôtelier', 'Cocktails signatures', 'Conciergerie'],
-        color: 'pink',
-        id: 4
+        color: 'pink'
     }
 ];
 
 const CrewRegister = () => {
     const navigate = useNavigate();
-    const { userId, role } = useAuthContext();
+    const { userId, role, refreshProfile } = useAuthContext();
     const [step, setStep] = useState(1);
     const [selectedRole, setSelectedRole] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -69,19 +67,26 @@ const CrewRegister = () => {
     const handleRegistration = async () => {
         setLoading(true);
         try {
-            // 1. Create Address
+            // 1. Fetch Role IRI by label (Robust method instead of hardcoded IDs)
+            const roleRes = await api.get(`/api/roles?label=${selectedRole}`);
+            const roleData = roleRes.data['member'] || roleRes.data['hydra:member'] || [];
+            if (roleData.length === 0) {
+                throw new Error(`Rôle ${selectedRole} non trouvé en base de données.`);
+            }
+            const roleIri = roleData[0]['@id'];
+
+            // 2. Create Address
             const addressRes = await api.post('/api/addresses', {
                 houseNumber: formData.houseNumber,
                 streetName: formData.streetName,
                 postcode: formData.postcode,
                 city: formData.city
-            });
+            }, CONFIG_JSON_LD);
             const addressIri = addressRes.data['@id'];
 
-            // 2. Update User
-            const roleObj = CREW_OPTIONS.find(o => o.role === selectedRole);
+            // 3. Update User
             await api.patch(`/api/users/${userId}`, {
-                role: `/api/roles/${roleObj.id}`,
+                role: roleIri,
                 phoneNumber: formData.phoneNumber,
                 position: formData.position,
                 address: addressIri
@@ -89,11 +94,14 @@ const CrewRegister = () => {
                 headers: { 'Content-Type': 'application/merge-patch+json' }
             });
 
+            // 4. Refresh profile to update UI
+            await refreshProfile();
+
             alert("Bienvenue dans le Crew ! Votre profil est maintenant complet.");
             navigate('/crew/dashboard');
         } catch (err) {
             console.error("Error during crew registration", err);
-            alert("Une erreur est survenue lors de l'inscription.");
+            alert("Une erreur est survenue lors de l'inscription : " + (err.response?.data?.['hydra:description'] || err.message));
         } finally {
             setLoading(false);
         }

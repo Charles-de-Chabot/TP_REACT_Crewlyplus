@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\RoleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,6 +16,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['role:read']],
     denormalizationContext: ['groups' => ['role:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['label' => 'exact'])]
 class Role
 {
     #[ORM\Id]

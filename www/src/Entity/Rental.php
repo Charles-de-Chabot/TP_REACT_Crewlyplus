@@ -14,7 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
 use App\State\RentalProcessor;
 
 #[ORM\Entity(repositoryClass: RentalRepository::class)]
@@ -22,13 +25,17 @@ use App\State\RentalProcessor;
     normalizationContext: ['groups' => ['rental:read']],
     denormalizationContext: ['groups' => ['rental:write']],
     operations: [
-        new Post(processor: RentalProcessor::class)
+        new Get(),
+        new GetCollection(),
+        new Post(processor: RentalProcessor::class),
+        new Patch()
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'user.email' => 'exact',    // Filter rentals by user email
     'boat.name'  => 'ipartial', // Filter rentals by boat name (partial, case-insensitive)
     'status'     => 'exact',    // Filter by status: pending | confirmed | cancelled | completed
+    'crewMembers.id' => 'exact' // Filter by crew member ID
 ])]
 class Rental
 {

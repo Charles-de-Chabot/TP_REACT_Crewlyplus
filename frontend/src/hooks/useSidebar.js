@@ -4,19 +4,14 @@ export const useSidebar = (userRole) => {
     return useMemo(() => {
         const role = userRole?.replace('ROLE_', '').toLowerCase();
 
-        // 1. LIENS UNIVERSELS
+        // 1. LIENS UNIVERSELS (Toujours visibles)
         const universalLinks = [
             { label: 'Accueil', path: '/', allowed: ['user', 'premium', 'capitaine', 'hotesse', 'chef', 'admin'] },
+            { label: 'La Flotte', path: '/boats', allowed: ['user', 'premium', 'capitaine', 'hotesse', 'chef', 'admin'] },
         ];
 
-        // 2. LIENS CONDITIONNELS
+        // 2. LIENS CONDITIONNELS (Selon le rôle)
         const roleLinks = [
-            // --- CLIENTS (User & Premium) ---
-            { label: 'Bateaux', path: '/boats', allowed: ['user', 'premium'] },
-            
-            // --- STAFF (Capitaine, Hôtesse, Chef) ---
-            { label: 'Dashboard Pro', path: '/crew/dashboard', allowed: ['capitaine', 'hotesse', 'chef'] },
-
             // --- PREMIUM UNIQUEMENT ---
             { label: 'Régates', path: '/regattas', allowed: ['premium'] },
 
