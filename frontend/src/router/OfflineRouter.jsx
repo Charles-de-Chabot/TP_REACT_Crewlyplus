@@ -7,6 +7,7 @@ import App from "../App";
 import Home from "../screens/OnlineScreens/Home";
 import Boats from "../screens/OnlineScreens/Boats";
 import DetailBoat from "../screens/OnlineScreens/DetailBoat";
+import PaymentStatus from "../components/Stripe/PaymentStatus";
 
 const OfflineRouter = createBrowserRouter([
     {
@@ -17,6 +18,7 @@ const OfflineRouter = createBrowserRouter([
             { path: "/", element: <Home/> },
             { path: "/boats", element: <Boats/> },
             { path: "/boats/:id", element: <DetailBoat/> },
+            { path: "/payment-success", element: <PaymentStatus /> },
         ]
     },
     {

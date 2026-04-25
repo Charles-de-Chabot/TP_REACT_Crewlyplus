@@ -3,11 +3,21 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Entity\Type;
+use App\Entity\Model;
+use App\Entity\Address;
+use App\Entity\Boat;
+use App\Entity\BoatInfo;
+use App\Entity\Media;
+use App\Entity\Fitting;
+use App\Entity\Formula;
+use App\Entity\Role;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use DateTime;
 
 class AppFixtures extends Fixture
 {
@@ -20,9 +30,80 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $admin = new User();
-        
+        $this->loadRole($manager);
+        $this->loadType($manager);
+        $this->loadModel($manager);
+        $this->loadAdress($manager);
+        $this->loadFitting($manager);
+        $this->loadUser($manager);
+        $this->loadBoat($manager);
+
         $manager->flush();
+    }
+
+    //==============================
+    // Création des rôles
+    //==============================
+    public function loadRole(ObjectManager $manager)
+    {
+        $roles = [
+            'ROLE_USER',
+            'ROLE_ADMIN',
+            'ROLE_PREMIUM',
+            'ROLE_CAPITAINE',
+            'ROLE_CHEF',
+            'ROLE_HOTESSE'
+        ];
+
+        foreach ($roles as $label) {
+            $role = new Role();
+            $role->setLabel($label);
+            $manager->persist($role);
+            $this->addReference('role_' . $label, $role);
+        }
+    }
+
+    //==============================
+    // Création des utilisateurs
+    //==============================
+    public function loadUser(ObjectManager $manager)
+    {
+        // 1. Admin
+        $admin = new User();
+        $admin->setEmail('admin@crewly.com');
+        $admin->setFirstname('Admin');
+        $admin->setLastname('Crewly');
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
+        $admin->setRole($this->getReference('role_ROLE_ADMIN', Role::class));
+        $manager->persist($admin);
+
+        // 2. Premium User (pour tester la réduction)
+        $premium = new User();
+        $premium->setEmail('premium@gmail.com');
+        $premium->setFirstname('Charles');
+        $premium->setLastname('Premium');
+        $premium->setPassword($this->passwordHasher->hashPassword($premium, 'password'));
+        $premium->setRole($this->getReference('role_ROLE_PREMIUM', Role::class));
+        $manager->persist($premium);
+
+        // 3. Crew Members
+        $crewData = [
+            ['role' => 'ROLE_CAPITAINE', 'count' => 5, 'prefix' => 'Capitaine'],
+            ['role' => 'ROLE_CHEF', 'count' => 3, 'prefix' => 'Chef'],
+            ['role' => 'ROLE_HOTESSE', 'count' => 4, 'prefix' => 'Hotesse'],
+        ];
+
+        foreach ($crewData as $data) {
+            for ($i = 1; $i <= $data['count']; $i++) {
+                $user = new User();
+                $user->setEmail(strtolower($data['prefix']) . $i . '@crewly.com');
+                $user->setFirstname($data['prefix']);
+                $user->setLastname('N°' . $i);
+                $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
+                $user->setRole($this->getReference('role_' . $data['role'], Role::class));
+                $manager->persist($user);
+            }
+        }
     }
 
     //==============================

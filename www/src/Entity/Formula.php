@@ -17,7 +17,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['formula:read']],
     denormalizationContext: ['groups' => ['formula:write']]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['title' => 'ipartial'])]
+#[ApiFilter(SearchFilter::class, properties: [
+    'title' => 'ipartial',
+    'boat.id' => 'exact'
+])]
 class Formula
 {
     #[ORM\Id]

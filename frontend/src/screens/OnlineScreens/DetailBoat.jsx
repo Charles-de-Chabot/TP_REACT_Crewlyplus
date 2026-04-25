@@ -36,7 +36,7 @@ const DetailBoat = () => {
                     {/* Colonne de droite : Réservation et Calendrier */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-28 space-y-6">
-                            <BookingCard searchDates={searchDates} onDateChange={handleDateChange} />
+                            <BookingCard boatDetail={boatDetail} searchDates={searchDates} onDateChange={handleDateChange} />
                             
                             {/* Section Emplacement / Adresse */}
                             <AddressDetail address={boatDetail?.adress} />

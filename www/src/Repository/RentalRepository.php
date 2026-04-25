@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
+use App\Entity\Boat;
 use App\Entity\Rental;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +19,30 @@ class RentalRepository extends ServiceEntityRepository
         parent::__construct($registry, Rental::class);
     }
 
-//    /**
-//     * @return Rental[] Returns an array of Rental objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Checks if a boat is available for a given period.
+     * Overlaps with any rental that is not cancelled.
+     *
+     * @param Boat $boat The boat to check
+     * @param \DateTimeInterface $start Start of requested period
+     * @param \DateTimeInterface $end End of requested period
+     * @return bool True if available
+     */
+    public function isBoatAvailable(Boat $boat, \DateTimeInterface $start, \DateTimeInterface $end): bool
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->join('r.boat', 'b')
+            ->where('b = :boat')
+            ->andWhere('r.status != :status_cancelled')
+            ->andWhere('r.rentalStart < :end')
+            ->andWhere('r.rentalEnd > :start')
+            ->setParameter('boat', $boat)
+            ->setParameter('end', $end)
+            ->setParameter('start', $start)
+            ->setParameter('status_cancelled', Rental::STATUS_CANCELLED);
 
-//    public function findOneBySomeField($value): ?Rental
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $results = $qb->getQuery()->getResult();
+
+        return count($results) === 0;
+    }
 }

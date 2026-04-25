@@ -1,11 +1,13 @@
 import React from 'react'
 import { Outlet, Link } from 'react-router-dom'
+import ScrollToTop from '../../components/UI/ScrollToTop'
 import { IMAGE_URL } from '../../constants/apiConstant'
 import { IMG_LOGO } from '../../constants/appConstant'
 
 const HomeOffline = () => {
   return (
     <div className="flex flex-col w-screen min-h-screen items-center justify-center bg-slate-950 relative overflow-y-auto hide-scrollbar py-10">
+      <ScrollToTop />
       {/* Fond avec gradients subtiles bleu marine */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0f172a] to-[#020617] z-0"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent z-0"></div>

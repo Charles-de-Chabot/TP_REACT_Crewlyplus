@@ -81,41 +81,56 @@ export const AuthContextProvider = ({ children }) => {
         delete api.defaults.headers.common['Authorization'];
     }, []);
 
+    const refreshProfile = useCallback(async () => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                // IMPORTANT : On doit s'assurer que le token est bien configuré pour Axios
+                setAccessToken(token);
+                api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                
+                const response = await api.get("/api/me");
+                hydrateUser(response.data);
+                localStorage.setItem(USER_INFOS, JSON.stringify(response.data));
+            } catch (error) {
+                console.error("Erreur refresh profile:", error);
+                // Si le token est expiré ou invalide, on déconnecte
+                if (error.response?.status === 401) {
+                    signOut();
+                }
+            }
+        }
+    }, [hydrateUser, signOut]);
+
     useEffect(() => {
         const checkSession = async () => {
             const token = localStorage.getItem("token");
             const storedUser = localStorage.getItem(USER_INFOS);
 
             if (token) {
+                // On pré-charge les infos locales pour éviter les flashs
                 if (storedUser) {
                     hydrateUser(JSON.parse(storedUser));
                 }
-
-                try {
-                    setAccessToken(token);
-                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                    const response = await api.get("/api/me");
-                    hydrateUser(response.data);
-                    localStorage.setItem(USER_INFOS, JSON.stringify(response.data));
-                } catch (error) {
-                    signOut();
-                }
+                // On lance la vérification/mise à jour réelle auprès de l'API
+                await refreshProfile();
             }
             setLoading(false);
         };
         checkSession();
-    }, [hydrateUser, signOut]);
+    }, [refreshProfile, hydrateUser]);
 
     const value = {
         userId,
         email,
         firstname,
         role,
-        roleLabel, // On transmet bien le state ici
+        roleLabel, 
         avatar,
         loading,
         signIn,
         signOut,
+        refreshProfile, // On l'expose ici
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

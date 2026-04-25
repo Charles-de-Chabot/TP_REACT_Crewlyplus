@@ -13,9 +13,7 @@ const StripeContainer = () => {
         useEffect(() => {
             api.post('/api/create-subscription')
                 .then(res => {
-                    console.log("Secret reçu !", res.data.clientSecret, "type:", res.data.type);
                     setClientSecret(res.data.clientSecret);
-                    setIntentType(res.data.type); // 'payment' ou 'setup'
                 })
                 .catch(err => {
                     console.error("L'APPEL API A ÉCHOUÉ :", err.response?.data || err.message);

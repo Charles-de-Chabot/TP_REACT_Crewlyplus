@@ -6,6 +6,8 @@ import Boats from "../screens/OnlineScreens/Boats";
 import DetailBoat from "../screens/OnlineScreens/DetailBoat";
 import User from "../screens/OnlineScreens/User";
 import RegisterPremium from "../screens/OnlineScreens/RegisterPremium";
+import Configurator from "../screens/OnlineScreens/Configurator";
+import CheckoutScreen from "../screens/OnlineScreens/CheckoutScreen";
 import PaymentStatus from "../components/Stripe/PaymentStatus";
 
 const OnlineRouter = createBrowserRouter([
@@ -20,6 +22,8 @@ const OnlineRouter = createBrowserRouter([
             },
             { path: "/boats", element: <Boats/> },
             { path: "/boats/:id", element: <DetailBoat /> },
+            { path: "/configurator", element: <Configurator /> },
+            { path: "/checkout", element: <CheckoutScreen /> },
             
             // 2. Les routes privées
             { path: "/user", element: <User/> },

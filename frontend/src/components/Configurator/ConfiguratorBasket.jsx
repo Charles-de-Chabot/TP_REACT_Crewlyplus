@@ -1,0 +1,125 @@
+import React from 'react';
+
+const ConfiguratorBasket = ({ 
+    boat, 
+    dates, 
+    selectedFormula, 
+    selectedFittings, 
+    selectedCrew, 
+    crewMembers, 
+    crewRoles,
+    subTotalPrice,
+    discountPrice,
+    totalPrice,
+    isPremiumDiscount,
+    bookingStatus,
+    bookingError,
+    onPayment
+}) => {
+    return (
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-8 sticky top-32">
+            <h2 className="text-2xl font-black text-white mb-8">Votre Panier</h2>
+            
+            <div className="space-y-6 mb-12">
+                {/* Boat Item */}
+                <div className="flex justify-between items-start">
+                    <div>
+                        <p className="text-white font-bold">{boat.name}</p>
+                        <p className="text-teal-500/60 text-[10px] font-black uppercase tracking-widest mt-1">
+                            {dates.nbDays >= 7 
+                                ? `Forfait Semaine : ${boat.weekPrice} €` 
+                                : `${dates.nbDays} jours x ${boat.dayPrice} €`
+                            }
+                        </p>
+                    </div>
+                    <p className="text-white font-bold">
+                        {dates.nbDays >= 7 ? boat.weekPrice : boat.dayPrice * dates.nbDays} €
+                    </p>
+                </div>
+
+                {/* Formula Item */}
+                {selectedFormula && (
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-white font-bold">{selectedFormula.title}</p>
+                            <p className="text-white/40 text-xs">Formule</p>
+                        </div>
+                        <p className="text-white font-bold">{selectedFormula.formulaPrice} €</p>
+                    </div>
+                )}
+
+                {/* Fittings Items */}
+                {selectedFittings.map(f => (
+                    <div key={f.id} className="flex justify-between items-start">
+                        <div>
+                            <p className="text-white font-bold">{f.label}</p>
+                            <p className="text-white/40 text-xs">Équipement</p>
+                        </div>
+                        <p className="text-white font-bold">{f.fittingPrice} €</p>
+                    </div>
+                ))}
+
+                {/* Crew Items */}
+                {selectedCrew.map(role => {
+                    const roleInfo = crewRoles.find(r => r.role === role);
+                    return (
+                        <div key={role} className="flex justify-between items-start">
+                            <div>
+                                <p className="text-white font-bold">{roleInfo?.label}</p>
+                                <p className="text-white/40 text-xs italic">
+                                    Équipage • {dates.nbDays} j x {roleInfo?.price} €/j
+                                </p>
+                            </div>
+                            <p className="text-white font-bold">{roleInfo ? roleInfo.price * dates.nbDays : 0} €</p>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Summary Block */}
+            <div className="pt-6 border-t border-white/10 space-y-4 mb-8">
+                <div className="flex justify-between items-center text-sm">
+                    <p className="text-slate-400 font-bold">Sous-total</p>
+                    <p className="text-white font-bold">{subTotalPrice} €</p>
+                </div>
+                
+                {isPremiumDiscount && (
+                    <div className="flex justify-between items-center text-sm text-amber-500">
+                        <p className="font-bold">Remise Élite (-15%)</p>
+                        <p className="font-black">-{discountPrice} €</p>
+                    </div>
+                )}
+
+                <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                    <p className="text-white font-black text-xl uppercase italic">Total TTC</p>
+                    <p className="text-3xl font-black text-teal-400">{totalPrice} €</p>
+                </div>
+            </div>
+
+            {/* Payment Button */}
+            <button 
+                onClick={onPayment}
+                disabled={bookingStatus === 'submitting'}
+                className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-5 rounded-2xl transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 flex items-center justify-center gap-3"
+            >
+                {bookingStatus === 'submitting' ? (
+                    <>
+                        <div className="w-5 h-5 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
+                        Validation...
+                    </>
+                ) : (
+                    <>Procéder au paiement 💳</>
+                )}
+            </button>
+
+            {/* Error Message */}
+            {bookingError && (
+                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-xs text-center font-medium animate-shake">
+                    ⚠️ {bookingError}
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ConfiguratorBasket;

@@ -43,3 +43,7 @@ desktop.ini
 *.crt
 secrets/
 
+# Agent de développement — fichiers de gouvernance (ne pas commiter)
+TODO_BOOKING_FINAL.md
+INSTRUCTIONS_AGENT.md
+

@@ -7,9 +7,11 @@ const selectTypes = (state) => state.boats.types;
 const selectModels = (state) => state.boats.models;
 const selectCities = (state) => state.boats.cities;
 
+const selectSearchDates = (state) => state.boats.searchDates;
+
 const selectBoatData = createSelector(
-    [selectLoading, selectBoats, selectBoatDetail, selectTypes, selectModels, selectCities],
-    (loading, boats, boatDetail, types, models, cities) => ({ loading, boats, boatDetail, types, models, cities })
+    [selectLoading, selectBoats, selectBoatDetail, selectTypes, selectModels, selectCities, selectSearchDates],
+    (loading, boats, boatDetail, types, models, cities, searchDates) => ({ loading, boats, boatDetail, types, models, cities, searchDates })
 );
 
 export default selectBoatData;

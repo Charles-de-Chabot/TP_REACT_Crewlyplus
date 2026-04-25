@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use App\Repository\UserRepository;
+use App\Entity\Innovice;
+use App\Entity\Notification;
+use App\Entity\Rental;
 use App\Repository\RoleRepository;
+use App\Repository\UserRepository;
+use App\Repository\RentalRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -12,12 +18,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Controller to handle Stripe Webhooks.
+ * Handles both Premium upgrades and Rental confirmations.
+ */
 class WebhookController extends AbstractController
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private RoleRepository $roleRepository,
-        private EntityManagerInterface $em,
+        private readonly UserRepository $userRepository,
+        private readonly RoleRepository $roleRepository,
+        private readonly RentalRepository $rentalRepository,
+        private readonly EntityManagerInterface $em,
     ) {}
 
     #[Route('/api/webhook/stripe', name: 'app_stripe_webhook', methods: ['POST'])]
@@ -32,51 +43,108 @@ class WebhookController extends AbstractController
         try {
             $event  = Webhook::constructEvent($payload, $sigHeader, $secret);
             $type   = $event->type;
-            $userId = $event->data->object->metadata->user_id ?? null;
-
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
             return new JsonResponse(['error' => 'Signature invalide.'], 400);
-
         } catch (\Exception $e) {
-            // Fallback : parse manuel si le SDK ne supporte pas la version API
+            // Fallback parsing if signature fails or SDK issue
             $data = json_decode($payload, true);
             if (!$data) {
                 return new JsonResponse(['error' => 'Payload invalide.'], 400);
             }
-            $type   = $data['type'] ?? null;
-            $userId = $data['data']['object']['metadata']['user_id'] ?? null;
+            $type = $data['type'] ?? null;
         }
 
         if ($type === 'payment_intent.succeeded') {
-            try {
-                if (!$userId) {
-                    return new JsonResponse(['error' => 'user_id manquant.'], 400);
-                }
+            $paymentIntent = $event->data->object;
+            $metadata = $paymentIntent->metadata;
 
-                $user = $this->userRepository->find($userId);
-                if (!$user) {
-                    return new JsonResponse(['error' => 'Utilisateur introuvable.', 'user_id' => $userId], 404);
-                }
+            // --- Case A: Rental Confirmation ---
+            if (isset($metadata->rental_id)) {
+                $this->handleRentalConfirmation((int) $metadata->rental_id);
+            } 
+            // --- Case B: Premium Upgrade ---
+            elseif (isset($metadata->user_id)) {
+                $this->handlePremiumUpgrade((int) $metadata->user_id);
+            }
+        }
 
-                // ✅ On cherche le rôle ROLE_PREMIUM dans ta table Role
-                $premiumRole = $this->roleRepository->findOneBy(['label' => 'ROLE_PREMIUM']);
-                if (!$premiumRole) {
-                    return new JsonResponse(['error' => 'Rôle ROLE_PREMIUM introuvable en base.'], 500);
-                }
+        if ($type === 'payment_intent.payment_failed') {
+            $paymentIntent = $event->data->object;
+            $metadata = $paymentIntent->metadata;
 
-                // ✅ On assigne le rôle à l'utilisateur
-                $user->setRole($premiumRole);
-                $this->em->flush();
-
-            } catch (\Exception $e) {
-                return new JsonResponse([
-                    'error' => $e->getMessage(),
-                    'file'  => $e->getFile(),
-                    'line'  => $e->getLine(),
-                ], 500);
+            if (isset($metadata->rental_id)) {
+                $this->handleRentalFailure((int) $metadata->rental_id);
             }
         }
 
         return new JsonResponse(['status' => 'ok']);
+    }
+
+    /**
+     * Confirms a rental and generates invoice/notification.
+     */
+    private function handleRentalConfirmation(int $rentalId): void
+    {
+        $rental = $this->rentalRepository->find($rentalId);
+        if (!$rental) {
+            return;
+        }
+
+        // 1. Update status
+        $rental->setStatus(Rental::STATUS_CONFIRMED);
+
+        // 2. Create Invoice
+        $invoice = new Innovice();
+        $invoice->setUser($rental->getUser());
+        $invoice->setInnovicePath(sprintf('invoice_%s_%d.pdf', date('Ymd'), $rental->getId()));
+        $invoice->setCreatedAt(new \DateTime());
+        $this->em->persist($invoice);
+
+        // 3. Create Notification
+        $boat = $rental->getBoat()->first();
+        $notification = new Notification();
+        $notification->setUser($rental->getUser());
+        $notification->setLabel(sprintf(
+            'Votre réservation pour le bateau %s est confirmée !', 
+            $boat ? $boat->getName() : 'sélectionné'
+        ));
+        $notification->setIsOpen(false);
+        $notification->setCreatedAt(new \DateTime());
+        $this->em->persist($notification);
+
+        $this->em->flush();
+    }
+
+    /**
+     * Upgrades a user to ROLE_PREMIUM.
+     */
+    private function handlePremiumUpgrade(int $userId): void
+    {
+        $user = $this->userRepository->find($userId);
+        if (!$user) {
+            return;
+        }
+
+        $premiumRole = $this->roleRepository->findOneBy(['label' => 'ROLE_PREMIUM']);
+        if (!$premiumRole) {
+            return;
+        }
+
+        $user->setRole($premiumRole);
+        $this->em->flush();
+    }
+
+    /**
+     * Handles payment failure for a rental.
+     */
+    private function handleRentalFailure(int $rentalId): void
+    {
+        $rental = $this->rentalRepository->find($rentalId);
+        if (!$rental) {
+            return;
+        }
+
+        $rental->setStatus(Rental::STATUS_CANCELLED);
+        $this->em->flush();
     }
 }
