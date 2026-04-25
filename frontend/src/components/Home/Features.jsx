@@ -7,8 +7,8 @@ const Features = () => {
     const { role } = useAuthContext();
 
     // On normalise la vérification des rôles (exact match base de données)
-    const isPremium = role === 'ROLE_PREMIUM'; // En supposant que Premium suit la même nomenclature
-    const isStaff = ['ROLE_CAPITAIN', 'ROLE_HOTESS', 'ROLE_CHEF'].includes(role);
+    const isPremium = role === 'ROLE_PREMIUM';
+    const isStaff = ['ROLE_CAPITAINE', 'ROLE_HOTESSE', 'ROLE_CHEF'].includes(role);
 
     return (
         <div className="py-24 bg-slate-900/50 relative border-y border-white/5">
@@ -54,7 +54,7 @@ const Features = () => {
 
                     {/* CARTE 3 : STAFF (Professionnels) */}
                     <Link 
-                        to={isStaff ? "/dashboard" : "/register_staff"} 
+                        to={isStaff ? "/crew/dashboard" : "/crew/register"} 
                         className={`group text-center p-8 rounded-[3rem] border backdrop-blur-sm transition-all duration-500 ${isStaff ? 'bg-blue-500/5 border-blue-500/20 hover:bg-blue-500/10' : 'bg-slate-800/10 border-white/5 hover:border-blue-500/30'}`}
                     >
                         <div className="flex items-center justify-center h-16 w-16 rounded-2xl bg-blue-500/10 text-blue-400 mb-6 mx-auto group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">

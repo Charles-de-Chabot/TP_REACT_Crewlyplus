@@ -36,7 +36,7 @@ const CREW_ROLES = [
         role: 'ROLE_CAPITAINE', 
         label: 'Capitaine', 
         icon: '👨‍✈️', 
-        required: true, 
+        required: false, 
         price: 250, 
         description: 'Confiez la barre à un expert passionné. Au-delà de la navigation, votre capitaine sera votre guide privilégié pour découvrir des criques secrètes et garantir une sécurité absolue à votre famille.' 
     },
@@ -135,7 +135,10 @@ const Configurator = () => {
             rentalPrice: totalPrice,
             formulas: selectedFormula ? [`/api/formulas/${selectedFormula.id}`] : [],
             fitting: selectedFittings.map(f => `/api/fittings/${f.id}`),
-            crewMembers: [], // Modified for role-based selection, backend logic to be implemented later
+            crewMembers: selectedCrew.map(role => {
+                const availableUsers = crewMembers[role];
+                return availableUsers && availableUsers.length > 0 ? `/api/users/${availableUsers[0].id}` : null;
+            }).filter(iri => iri !== null),
             status: 'pending'
         };
         dispatch(submitBooking(payload));

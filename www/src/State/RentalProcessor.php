@@ -7,8 +7,10 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Rental;
+use App\Entity\Notification;
 use App\Repository\RentalRepository;
 use App\Service\PriceCalculatorService;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -16,19 +18,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * Processor for creating a Rental.
- * 
- * Flow:
- * 1. Validate boat availability.
- * 2. Recalculate price on server.
- * 3. Validate price coherence with client.
- * 4. Create Stripe PaymentIntent.
- * 5. Persist rental with 'pending' status.
  */
 class RentalProcessor implements ProcessorInterface
 {
     public function __construct(
         private readonly RentalRepository $rentalRepository,
         private readonly PriceCalculatorService $priceCalculator,
+        private readonly EntityManagerInterface $entityManager,
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly ProcessorInterface $persistProcessor,
         #[Autowire('%env(STRIPE_SECRET_KEY)%')]
@@ -42,7 +38,7 @@ class RentalProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         // 1. Availability check
-        $boat = $data->getBoat()->first(); // Rental has a OneToMany relation to Boat in this project
+        $boat = $data->getBoat()->first();
         if (!$boat) {
             throw new UnprocessableEntityHttpException('A boat must be selected.');
         }
@@ -68,7 +64,7 @@ class RentalProcessor implements ProcessorInterface
             $data->getCrewMembers()->toArray()
         );
 
-        // 3. Price coherence check (1€ tolerance)
+        // 3. Price coherence check
         if (abs($calculatedPrice - $data->getRentalPrice()) > 1.0) {
             throw new UnprocessableEntityHttpException(sprintf(
                 'Price mismatch. Server calculated %.2f, received %.2f.',
@@ -77,48 +73,81 @@ class RentalProcessor implements ProcessorInterface
             ));
         }
 
-        // Ensure we use the server calculated price
         $data->setRentalPrice($calculatedPrice);
         $data->setStatus(Rental::STATUS_PENDING);
 
         // 4. Stripe PaymentIntent
         Stripe::setApiKey($this->stripeSecretKey);
         
+        $nbDays = $this->priceCalculator->calculateNbDays($data->getRentalStart(), $data->getRentalEnd());
+        
+        $client = $data->getUser();
+        $clientName = $client->getFirstname() . ' ' . $client->getLastname();
+        $boatAddress = $boat->getAddress();
+        $location = $boatAddress ? $boatAddress->getCity() : 'Lieu non défini';
+
+        $metadata = [
+            'client_id' => (string) $client->getId(),
+            'client_name' => $clientName,
+            'boat' => $boat->getName(),
+            'dates' => $data->getRentalStart()->format('d/m/Y') . ' - ' . $data->getRentalEnd()->format('d/m/Y'),
+            'duration' => $nbDays . ' jours',
+            'total' => $calculatedPrice . ' €',
+        ];
+
+        if ($data->getFitting()->count() > 0) {
+            $fittings = array_map(fn($f) => $f->getLabel() . ' (' . $f->getFittingPrice() . '€)', $data->getFitting()->toArray());
+            $metadata['details_fittings'] = implode(' | ', $fittings);
+        }
+
+        if ($data->getCrewMembers()->count() > 0) {
+            $crew = array_map(fn($u) => $u->getRoleLabel(), $data->getCrewMembers()->toArray());
+            $metadata['details_crew'] = implode(' | ', $crew);
+        }
+
         try {
             $paymentIntent = PaymentIntent::create([
-                'amount' => (int) ($calculatedPrice * 100), // In cents
+                'amount' => (int) ($calculatedPrice * 100),
                 'currency' => 'eur',
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                ],
-                'metadata' => [
-                    'rental_id' => null, // Will be updated after persist or use a temporary ID
-                ],
+                'automatic_payment_methods' => ['enabled' => true],
+                'metadata' => $metadata,
             ]);
         } catch (\Exception $e) {
             throw new UnprocessableEntityHttpException('Stripe Error: ' . $e->getMessage());
         }
 
         // 5. Persist the rental
-        // We persist first to get an ID for the Stripe metadata update if needed,
-        // or we just return the clientSecret.
         $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
 
-        // Update Stripe metadata with the real rental ID
+        // 6. Notifications for Crew
+        foreach ($data->getCrewMembers() as $crewMember) {
+            $notification = new Notification();
+            $notification->setUser($crewMember);
+            
+            // Rich notification label
+            $message = sprintf(
+                'Nouvelle mission : %s demandée par %s à %s du %s au %s',
+                $boat->getName(),
+                $clientName,
+                $location,
+                $data->getRentalStart()->format('d/m/Y'),
+                $data->getRentalEnd()->format('d/m/Y')
+            );
+            
+            $notification->setLabel($message);
+            $notification->setIsOpen(false);
+            $notification->setCreatedAt(new \DateTime());
+            $this->entityManager->persist($notification);
+        }
+        $this->entityManager->flush();
+
+        // 7. Update Stripe metadata with the real rental ID
         try {
             PaymentIntent::update($paymentIntent->id, [
-                'metadata' => ['rental_id' => $data->getId()]
+                'metadata' => array_merge($metadata, ['rental_id' => (string) $data->getId()])
             ]);
-        } catch (\Exception $e) {
-            // Log error but don't break the flow as the rental is created
-        }
+        } catch (\Exception $e) { }
 
-        // 6. Return response with Stripe client secret
-        // Note: API Platform expects the entity as return by default. 
-        // If we want a custom response, we should use a DTO or wrap the result.
-        // However, for this task, we will add the clientSecret to the Rental entity 
-        // as a non-persistent property for the response.
-        
         $data->stripeClientSecret = $paymentIntent->client_secret;
 
         return $result;

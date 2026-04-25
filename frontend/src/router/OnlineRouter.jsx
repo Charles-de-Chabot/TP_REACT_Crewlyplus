@@ -9,6 +9,8 @@ import RegisterPremium from "../screens/OnlineScreens/RegisterPremium";
 import Configurator from "../screens/OnlineScreens/Configurator";
 import CheckoutScreen from "../screens/OnlineScreens/CheckoutScreen";
 import PaymentStatus from "../components/Stripe/PaymentStatus";
+import CrewDashboard from "../screens/OnlineScreens/CrewDashboard";
+import CrewRegister from "../screens/OnlineScreens/CrewRegister";
 
 const OnlineRouter = createBrowserRouter([
     {
@@ -27,6 +29,8 @@ const OnlineRouter = createBrowserRouter([
             
             // 2. Les routes privées
             { path: "/user", element: <User/> },
+            { path: "/crew/dashboard", element: <CrewDashboard /> },
+            { path: "/crew/register", element: <CrewRegister /> },
             { path: "/register_premium", element: <RegisterPremium /> },
             { path: "/payment-success", element: <PaymentStatus /> },
 

@@ -92,7 +92,7 @@ class PriceCalculatorService
     /**
      * Calculates base price based on duration.
      */
-    private function calculateBaseBoatPrice(Boat $boat, int $nbDays): float
+    public function calculateBaseBoatPrice(Boat $boat, int $nbDays): float
     {
         if ($nbDays >= 7) {
             // If it's a week or more, we take the weekly price. 
@@ -109,7 +109,7 @@ class PriceCalculatorService
      * Checks if the user is eligible for the 15% premium discount.
      * Criteria: User has ROLE_PREMIUM AND Boat is used for Regatta (used = true).
      */
-    private function isEligibleForPremiumDiscount(User $user, Boat $boat): bool
+    public function isEligibleForPremiumDiscount(User $user, Boat $boat): bool
     {
         // Get roles from the User entity. Note: roles are usually stored as an array.
         $roles = $user->getRoles();
@@ -120,7 +120,7 @@ class PriceCalculatorService
     /**
      * Helper to calculate the number of days between two dates.
      */
-    private function calculateNbDays(\DateTimeInterface $start, \DateTimeInterface $end): int
+    public function calculateNbDays(\DateTimeInterface $start, \DateTimeInterface $end): int
     {
         $diff = $start->diff($end);
         

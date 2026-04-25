@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useAuthContext } from '../../contexts/authContext'
 import { useSidebar } from '../../hooks/useSidebar'
 import { IMAGE_URL } from '../../constants/apiConstant'
+import api from '../../api/axios'
 
 // Configuration visuelle par rôle
 const ROLE_CONFIG = {
@@ -15,25 +16,41 @@ const ROLE_CONFIG = {
 };
 
 const Topbar = () => {
-  // On récupère les infos. Note : Assure-toi que ton context expose bien roleLabel
   const { firstname, email, role, roleLabel, signOut, userId } = useAuthContext()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
   const navigate = useNavigate()
   const isAuthenticated = !!userId
   const navItems = useSidebar(role)
 
-  // Déterminer le rôle prioritaire en utilisant le nouveau roleLabel de l'entité
-  const getActiveRoleKey = () => {
-    // On priorise roleLabel (le label de l'entité Role ID 8, etc.)
-    // On convertit en string et en majuscules pour la comparaison
-    const currentRole = String(roleLabel || role || '').toUpperCase();
+  const isStaff = ['ROLE_CAPITAINE', 'ROLE_CHEF', 'ROLE_HOTESSE'].includes(role);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchNotifications = async () => {
+        try {
+          const res = await api.get(`/api/notifications?user.id=${userId}&is_open=false`);
+          const count = res.data['hydra:totalItems'] || 0;
+          setUnreadNotifications(count);
+        } catch (err) {
+          console.error("Error fetching notifications", err);
+        }
+      };
+      fetchNotifications();
+      // Polling every 60s for new notifications
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, userId]);
+
+  // Déterminer le rôle prioritaire
+  const getActiveRoleKey = () => {
+    const currentRole = String(roleLabel || role || '').toUpperCase();
     if (currentRole.includes('ADMIN')) return 'ROLE_ADMIN';
     if (currentRole.includes('PREMIUM')) return 'ROLE_PREMIUM';
     if (currentRole.includes('CAPITAINE')) return 'ROLE_CAPITAINE';
     if (currentRole.includes('CHEF')) return 'ROLE_CHEF';
     if (currentRole.includes('HOTESSE')) return 'ROLE_HOTESSE';
-    
     return 'ROLE_USER';
   };
 
@@ -84,8 +101,29 @@ const Topbar = () => {
             {isAuthenticated ? (
               <div className="flex items-center space-x-5 pl-5 border-l border-white/10">
                 
+                {/* Notifications Bell */}
+                <div className="relative group mr-2">
+                  <div className={`p-2 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    {unreadNotifications > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-slate-950">
+                        {unreadNotifications}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Dashboard Pro Shortcut for Staff */}
+                {isStaff && (
+                  <Link 
+                    to="/crew/dashboard" 
+                    className="px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                  >
+                    Tableau de bord Pro
+                  </Link>
+                )}
+
                 <Link className="flex items-center space-x-3.5 group" to="/user">
-                  {/* Avatar Dynamique */}
                   <div className={`
                     flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-inner border-2
                     ${config.bg} ${config.border} ${config.color} ${config.glow || ''}
@@ -100,7 +138,6 @@ const Topbar = () => {
                     <span className="text-sm font-bold text-white group-hover:text-teal-400 transition-colors leading-none">
                       {firstname || (email ? email.split('@')[0] : 'Utilisateur')}
                     </span>
-                    {/* Badge de Grade */}
                     <span className={`text-[9px] uppercase tracking-[0.2em] font-black mt-1.5 ${config.color}`}>
                       {config.label}
                     </span>
@@ -160,6 +197,9 @@ const Topbar = () => {
                   </div>
                   <span className={`text-sm font-black uppercase tracking-widest ${config.color}`}>{config.label}</span>
                </div>
+               {isStaff && (
+                 <Link to="/crew/dashboard" className="block text-lg font-bold text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>Dashboard Pro</Link>
+               )}
                <Link to="/user" className="block text-lg font-bold text-slate-300" onClick={() => setIsMobileMenuOpen(false)}>Mon Profil</Link>
                <button onClick={handleLogout} className="text-red-400 font-bold italic text-lg">Déconnexion</button>
              </div>
