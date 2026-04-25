@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { CONFIG_JSON_LD } from "../../constants/apiConstant";
 
 /**
  * bookingSlice
@@ -157,7 +158,7 @@ export const submitBooking = (bookingPayload) => async (dispatch) => {
         dispatch(setBookingStatus('submitting'));
         dispatch(setError(null));
 
-        const response = await api.post('/api/rentals', bookingPayload);
+        const response = await api.post('/api/rentals', bookingPayload, CONFIG_JSON_LD);
 
         // API Platform returns the created Rental with stripeClientSecret property
         if (response.data && response.data.stripeClientSecret) {
