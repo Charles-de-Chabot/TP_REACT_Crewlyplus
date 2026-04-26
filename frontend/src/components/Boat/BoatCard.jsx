@@ -38,20 +38,20 @@ const BoatCard = ({ data }) => {
                     {data?.model?.label || data?.model?.name || 'Modèle inconnu'}
                 </span>
                 
-                <p className="text-slate-400 text-xs font-medium leading-relaxed mb-6 line-clamp-2 flex-grow">
+                <p className="text-slate-500 text-xs font-medium leading-relaxed mb-6 line-clamp-2 flex-grow">
                     {data?.description || "Pas de description technique disponible pour ce navire."}
                 </p>
                 
                 {/* Footer de la carte */}
-                <div className="flex items-center justify-between text-sm text-slate-400 pt-4 border-t border-white/5 mt-auto">
+                <div className="flex items-center justify-between text-[10px] text-slate-500 pt-4 border-t border-white/5 mt-auto">
                     <div className="flex items-center gap-6">
-                        <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest" title="Capacité">
-                            <IconRenderer icon="👥" size={14} className="text-teal-500/50" />
-                            <span className="font-mono tracking-tighter">{data?.maxUser}</span> Pers.
+                        <span className="flex items-center gap-2 font-black uppercase tracking-widest" title="Capacité">
+                            <IconRenderer icon="👥" size={14} className="text-slate-600" />
+                            <span className="font-mono tracking-tighter text-white">{data?.maxUser}</span> Pers.
                         </span>
-                        <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest" title="Ville">
-                            <IconRenderer icon="📍" size={14} className="text-teal-500/50" />
-                            {data?.adress?.city || 'N/A'}
+                        <span className="flex items-center gap-2 font-black uppercase tracking-widest" title="Ville">
+                            <IconRenderer icon="📍" size={14} className="text-slate-600" />
+                            <span className="text-white/80">{data?.adress?.city || 'N/A'}</span>
                         </span>
                     </div>
                 </div>

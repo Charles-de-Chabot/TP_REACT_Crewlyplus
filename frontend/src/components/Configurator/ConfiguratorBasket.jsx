@@ -12,6 +12,7 @@ import {
     selectIsPremiumDiscount, 
     selectBookingStatus 
 } from '../../store/booking/bookingSelectors';
+import IconRenderer from '../UI/IconRenderer';
 
 const CREW_ROLES = [
     { role: 'ROLE_CAPITAINE', label: 'Capitaine', price: 250 },
@@ -34,22 +35,22 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
     if (!boat) return null;
 
     return (
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col">
-            <h2 className="text-xl font-black text-white mb-6 shrink-0">Votre Panier</h2>
+        <div className="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col shadow-2xl">
+            <h2 className="text-xl font-black text-white mb-8 shrink-0 italic uppercase tracking-tighter">Votre Panier</h2>
             
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4 space-y-4">
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-6 space-y-6">
                 {/* Boat Item */}
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start group">
                     <div>
-                        <p className="text-white font-bold text-sm">{boat.name}</p>
-                        <p className="text-teal-500/60 text-[9px] font-black uppercase tracking-widest mt-1">
+                        <p className="text-white font-bold text-sm uppercase tracking-tight">{boat.name}</p>
+                        <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-1">
                             {dates.nbDays >= 7 
-                                ? `Forfait Semaine : ${boat.weekPrice} €` 
+                                ? `Forfait Semaine` 
                                 : `${dates.nbDays} jours x ${boat.dayPrice} €`
                             }
                         </p>
                     </div>
-                    <p className="text-white font-bold text-sm">
+                    <p className="text-white font-mono text-sm font-black tracking-tighter">
                         {dates.nbDays >= 7 ? boat.weekPrice : boat.dayPrice * dates.nbDays} €
                     </p>
                 </div>
@@ -58,10 +59,10 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
                 {selectedFormula && (
                     <div className="flex justify-between items-start">
                         <div>
-                            <p className="text-white font-bold text-sm">{selectedFormula.title}</p>
-                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-tighter">Formule</p>
+                            <p className="text-white font-bold text-sm uppercase tracking-tight">{selectedFormula.title}</p>
+                            <p className="text-slate-500 text-[9px] uppercase font-black tracking-widest mt-1">Option Formule</p>
                         </div>
-                        <p className="text-white font-bold text-sm">{selectedFormula.formulaPrice} €</p>
+                        <p className="text-white font-mono text-sm font-black tracking-tighter">{selectedFormula.formulaPrice} €</p>
                     </div>
                 )}
 
@@ -69,10 +70,10 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
                 {selectedFittings.map(f => (
                     <div key={f.id} className="flex justify-between items-start">
                         <div>
-                            <p className="text-white font-bold text-sm">{f.label}</p>
-                            <p className="text-white/40 text-[9px] uppercase font-bold tracking-tighter">Équipement</p>
+                            <p className="text-white font-bold text-sm uppercase tracking-tight">{f.label}</p>
+                            <p className="text-slate-500 text-[9px] uppercase font-black tracking-widest mt-1">Équipement</p>
                         </div>
-                        <p className="text-white font-bold text-sm">{f.fittingPrice} €</p>
+                        <p className="text-white font-mono text-sm font-black tracking-tighter">{f.fittingPrice} €</p>
                     </div>
                 ))}
 
@@ -82,53 +83,53 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
                     return (
                         <div key={role} className="flex justify-between items-start">
                             <div>
-                                <p className="text-white font-bold text-sm">{roleInfo?.label}</p>
-                                <p className="text-white/40 text-[9px] italic">
-                                    Équipage • {dates.nbDays} j x {roleInfo?.price} €/j
+                                <p className="text-white font-bold text-sm uppercase tracking-tight">{roleInfo?.label}</p>
+                                <p className="text-slate-500 text-[9px] uppercase font-black tracking-widest mt-1 italic">
+                                    Crew • {dates.nbDays}j x {roleInfo?.price} €
                                 </p>
                             </div>
-                            <p className="text-white font-bold text-sm">{roleInfo ? roleInfo.price * dates.nbDays : 0} €</p>
+                            <p className="text-white font-mono text-sm font-black tracking-tighter">{roleInfo ? roleInfo.price * dates.nbDays : 0} €</p>
                         </div>
                     );
                 })}
             </div>
 
-            <div className="shrink-0 pt-4 border-t border-white/10 space-y-3">
-                <div className="flex justify-between items-center text-xs">
-                    <p className="text-slate-400 font-bold">Sous-total</p>
-                    <p className="text-white font-bold">{subTotalPrice} €</p>
+            <div className="shrink-0 pt-6 border-t border-white/5 space-y-4">
+                <div className="flex justify-between items-center text-[10px]">
+                    <p className="text-slate-500 font-black uppercase tracking-widest">Sous-total</p>
+                    <p className="text-white font-mono font-black">{subTotalPrice} €</p>
                 </div>
                 
                 {isPremiumDiscount && (
-                    <div className="flex justify-between items-center text-xs text-amber-500">
-                        <p className="font-bold">Remise Élite (-15%)</p>
-                        <p className="font-black">-{discountPrice} €</p>
+                    <div className="flex justify-between items-center text-[10px] text-amber-400">
+                        <p className="font-black uppercase tracking-widest">Remise Élite (-15%)</p>
+                        <p className="font-mono font-black">-{discountPrice} €</p>
                     </div>
                 )}
 
-                <div className="flex justify-between items-center pt-3 border-t border-white/5 mb-4">
-                    <p className="text-white font-black text-lg uppercase italic">Total TTC</p>
-                    <p className="text-2xl font-black text-teal-400">{totalPrice} €</p>
+                <div className="flex justify-between items-center pt-4 border-t border-white/5 mb-6">
+                    <p className="text-white font-black text-xl uppercase italic tracking-tighter">Total TTC</p>
+                    <p className="text-3xl font-black text-teal-400 font-mono tracking-tighter italic">{totalPrice} <span className="text-lg not-italic">€</span></p>
                 </div>
 
                 <button 
                     onClick={onPayment}
                     disabled={bookingStatus === 'submitting'}
-                    className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-4 rounded-2xl transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 flex items-center justify-center gap-3 text-sm"
+                    className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-4 rounded-xl transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]"
                 >
                     {bookingStatus === 'submitting' ? (
-                        <>
-                            <div className="w-4 h-4 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
-                            Validation...
-                        </>
+                        <IconRenderer icon="⌛" size={16} animate />
                     ) : (
-                        <>Procéder au paiement 💳</>
+                        <>
+                            <IconRenderer icon="💳" size={16} />
+                            Confirmer
+                        </>
                     )}
                 </button>
 
                 {bookingError && (
-                    <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-[10px] text-center font-medium animate-shake">
-                        ⚠️ {bookingError}
+                    <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] text-center font-black uppercase tracking-widest animate-shake">
+                        {bookingError}
                     </div>
                 )}
             </div>

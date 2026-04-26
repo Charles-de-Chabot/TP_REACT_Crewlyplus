@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleFitting } from '../../store/booking/bookingSlice';
 import { selectSelectedFittings } from '../../store/booking/bookingSelectors';
+import IconRenderer from '../UI/IconRenderer';
 
 const FittingSelector = ({ fitting }) => {
     const dispatch = useDispatch();
@@ -11,21 +12,25 @@ const FittingSelector = ({ fitting }) => {
     return (
         <div 
             onClick={() => dispatch(toggleFitting(fitting))}
-            className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${
+            className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between group ${
                 isSelected
-                ? 'bg-teal-500/10 border-teal-500/50 text-teal-400'
-                : 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20'
+                ? 'bg-teal-500/5 border-teal-500/50 text-teal-400 shadow-lg shadow-teal-500/5'
+                : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:border-white/10 hover:text-white'
             }`}
         >
             <div className="flex items-center gap-4">
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
-                    isSelected ? 'bg-teal-500 border-teal-500 text-slate-950' : 'border-white/20 group-hover:border-teal-500/50'
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
+                    isSelected ? 'bg-teal-500 border-teal-500 text-slate-950 shadow-[0_0_10px_rgba(20,184,166,0.3)]' : 'border-white/10 group-hover:border-teal-500/50'
                 }`}>
-                    {isSelected && <span className="text-xs font-black">✓</span>}
+                    {isSelected && <IconRenderer icon="✅" size={12} />}
                 </div>
-                <span className="font-bold text-sm">{fitting.label}</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest ${isSelected ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                    {fitting.label}
+                </span>
             </div>
-            <p className="font-black text-sm">{fitting.fittingPrice} €</p>
+            <p className="font-mono text-xs font-black italic tracking-tighter">
+                {fitting.fittingPrice} <span className="text-[10px] not-italic text-slate-500">€</span>
+            </p>
         </div>
     );
 };
