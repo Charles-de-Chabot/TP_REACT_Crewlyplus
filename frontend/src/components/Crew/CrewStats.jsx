@@ -17,24 +17,33 @@ const CrewStats = ({ theme, stats = {} }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {statsConfig.map((s, i) => (
-                <div key={i} className="bg-slate-900/40 border border-white/5 p-6 rounded-3xl backdrop-blur-xl relative overflow-hidden group">
+                <div 
+                    key={i} 
+                    className="bg-slate-950/40 border border-white/5 border-t-white/10 p-8 rounded-2xl backdrop-blur-xl relative overflow-hidden group transition-all duration-500 hover:-translate-y-1 animate-stagger-fade opacity-0"
+                    style={{ animationDelay: `${i * 150}ms` }}
+                >
                     {/* Background Detail */}
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <IconRenderer icon={s.icon} size={80} />
+                    <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <IconRenderer icon={s.icon} size={100} />
                     </div>
 
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className={`w-10 h-10 rounded-2xl ${theme.secondary} border ${theme.border} flex items-center justify-center ${theme.primary}`}>
+                    <div className="flex justify-between items-start mb-8 relative z-10">
+                        <div className={`w-12 h-12 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center ${theme.primary} shadow-lg`}>
                             <IconRenderer icon={s.icon} size={20} />
                         </div>
-                        <div className={`w-1.5 h-1.5 rounded-full ${theme.primary.replace('text', 'bg')} shadow-[0_0_10px_currentColor]`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${theme.primary.replace('text', 'bg')} shadow-[0_0_15px_currentColor]`} />
                     </div>
                     
                     <div className="relative z-10">
-                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">{s.label}</p>
-                        <p className="text-2xl font-black text-white mt-2 italic font-mono tracking-tighter">{s.value}</p>
+                        <p className="text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] mb-2">{s.label}</p>
+                        <p className="text-3xl font-black text-white italic font-mono tracking-tighter">{s.value}</p>
+                    </div>
+                    
+                    {/* Progress Bar Detail (Aesthetic only) */}
+                    <div className="mt-6 h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className={`h-full ${theme.primary.replace('text', 'bg')} opacity-20 w-2/3 group-hover:w-full transition-all duration-1000`} />
                     </div>
                 </div>
             ))}

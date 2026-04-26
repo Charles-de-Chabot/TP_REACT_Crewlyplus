@@ -64,8 +64,8 @@ const CrewDashboard = () => {
 
                         <RevenueChart theme={theme} missions={confirmedMissions} />
 
-                        <div className="bg-slate-900/20 p-8 rounded-[3rem] border border-white/5">
-                            <h2 className="text-3xl font-black text-white italic uppercase mb-8">Missions Disponibles</h2>
+                        <div className="bg-slate-950/40 p-10 rounded-2xl border border-white/5 border-t-white/10 shadow-2xl shadow-black/50">
+                            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-10">Missions Disponibles</h2>
                             <MissionList 
                                 missions={missions} 
                                 theme={theme}
