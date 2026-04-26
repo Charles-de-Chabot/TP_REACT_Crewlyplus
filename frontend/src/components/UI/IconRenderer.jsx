@@ -52,6 +52,14 @@ const ICON_MAP = {
     '🖼️': LuIcons.LuImage,
     '🚪': LuIcons.LuLogOut || LuIcons.LuLogout || LuIcons.LuExternalLink,
     '🍔': LuIcons.LuMenu,
+
+    // Technique Bateau (Nouveaux)
+    '📏': LuIcons.LuRuler,
+    '↔️': LuIcons.LuArrowsHorizontal || Hi2Icons.HiArrowsRightLeft,
+    '🛏️': LuIcons.LuBed || LuIcons.LuBedSingle,
+    '⛽': LuIcons.LuFuel || LuIcons.LuContainer,
+    '🏠': LuIcons.LuHome,
+    '🌐': LuIcons.LuGlobe,
 };
 
 const IconRenderer = ({ 
