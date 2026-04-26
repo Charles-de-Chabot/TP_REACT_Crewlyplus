@@ -3,7 +3,7 @@ import IconRenderer from '../UI/IconRenderer';
 
 const InfoDetail = ({ boatDetail }) => {
   return (
-    <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-2xl p-8 md:p-10 shadow-2xl shadow-black/50">
+    <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-2xl p-10 md:p-14 shadow-2xl shadow-black/50">
         <h2 className="text-3xl font-black text-white mb-2 italic uppercase tracking-tighter">À propos de ce navire</h2>
         <span className="block text-teal-500/80 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
             {boatDetail?.model?.label || boatDetail?.model?.name || 'Modèle inconnu'}

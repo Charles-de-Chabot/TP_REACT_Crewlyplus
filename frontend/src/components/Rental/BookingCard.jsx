@@ -47,7 +47,7 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
     };
 
     return (
-        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-8 shadow-2xl shadow-black/50">
+        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 shadow-2xl shadow-black/50">
             <h3 className="text-xl font-black text-white mb-6 italic uppercase tracking-tighter">Dates de Réservation</h3>
             
             {/* Premium Badge */}
@@ -74,7 +74,7 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
                     onClick={handleBookingClick}
                     className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 group ${
                         (searchDates?.start && searchDates?.end)
-                            ? 'bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-lg shadow-teal-500/20'
+                            ? 'bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-glow-teal hover:shadow-teal-500/30'
                             : 'bg-white/5 text-slate-500 border border-white/5'
                     }`}
                 >

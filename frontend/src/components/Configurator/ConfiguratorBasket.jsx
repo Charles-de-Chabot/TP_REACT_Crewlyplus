@@ -35,7 +35,7 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
     if (!boat) return null;
 
     return (
-        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-8 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col shadow-2xl shadow-black/50">
+        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col shadow-2xl shadow-black/50">
             <h2 className="text-xl font-black text-white mb-8 shrink-0 italic uppercase tracking-tighter">Votre Panier</h2>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-6 space-y-6">
@@ -115,7 +115,7 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
                 <button 
                     onClick={onPayment}
                     disabled={bookingStatus === 'submitting'}
-                    className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-4 rounded-xl transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]"
+                    className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-4 rounded-xl transition-all shadow-glow-teal hover:shadow-teal-500/30 disabled:opacity-50 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]"
                 >
                     {bookingStatus === 'submitting' ? (
                         <IconRenderer icon="⌛" size={16} animate />

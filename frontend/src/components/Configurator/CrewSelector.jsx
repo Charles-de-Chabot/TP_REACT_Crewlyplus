@@ -17,7 +17,7 @@ const CrewSelector = ({ roleConfig }) => {
             onClick={() => isAvailable && dispatch(toggleCrewRole(roleConfig.role))}
             className={`p-1 rounded-2xl border transition-all cursor-pointer group relative overflow-hidden ${
                 isSelected
-                ? 'bg-gradient-to-br from-teal-500/10 to-blue-500/5 border-teal-500/50 shadow-lg shadow-teal-500/5'
+                ? 'bg-gradient-to-br from-teal-500/10 to-blue-500/5 border-teal-500/50 shadow-glow-teal'
                 : 'bg-white/5 border-white/5 hover:border-white/10'
             } ${!isAvailable && 'opacity-50 cursor-not-allowed grayscale'}`}
         >

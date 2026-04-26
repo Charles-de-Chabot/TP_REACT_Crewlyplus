@@ -4,6 +4,10 @@
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
+  --shadow-glow-teal: 0 0 15px rgba(20, 184, 166, 0.15), 0 0 30px rgba(20, 184, 166, 0.05);
+  --shadow-glow-blue: 0 0 15px rgba(59, 130, 246, 0.15), 0 0 30px rgba(59, 130, 246, 0.05);
+  --shadow-glow-orange: 0 0 15px rgba(249, 115, 22, 0.15), 0 0 30px rgba(249, 115, 22, 0.05);
+
   --animate-slideup: slideup 1s ease-in-out;
   --animate-fade-in-down: fadeInDown 0.8s ease-out;
   --animate-shake: shake 0.5s ease-in-out;
@@ -22,6 +26,12 @@
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-8px); }
     75% { transform: translateX(8px); }
+  }
+}
+
+@layer base {
+  body {
+    @apply text-sm antialiased selection:bg-teal-500/30 selection:text-white;
   }
 }
 

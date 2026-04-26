@@ -7,7 +7,7 @@ const UserInfoCard = ({ userData, onEdit }) => {
     const phone = userData?.phoneNumber || userData?.phone_number || "Non renseigné";
 
     return (
-        <div className="bg-slate-950/40 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-8 shadow-2xl shadow-black/50 sticky top-28 overflow-hidden group">
+        <div className="bg-slate-950/40 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 shadow-2xl shadow-black/50 sticky top-28 overflow-hidden group">
             {/* Background Glow */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-all duration-700" />
             
