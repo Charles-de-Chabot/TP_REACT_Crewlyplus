@@ -9,7 +9,7 @@ const BoatCard = ({ data }) => {
     const boatName = data?.name ?? "Bateau inconnu";
 
     return (
-        <div className="group bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-glow-teal hover:border-teal-500/20">
+        <div className="group bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-glow-role hover:border-accent-role/20">
             <Link to={`/boats/${boatId}`} className="block relative h-60 overflow-hidden scan-line">
                 {imgBoat ? (
                     <img 
@@ -24,7 +24,7 @@ const BoatCard = ({ data }) => {
                 )}
 
                 <div className="absolute top-4 right-4">
-                    <span className="bg-slate-950/80 backdrop-blur-md text-teal-500 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-lg border border-white/5 shadow-xl shadow-black/50">
+                    <span className="bg-slate-950/80 backdrop-blur-md text-accent-role text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-lg border border-white/5 shadow-xl shadow-black/50">
                         {data?.type?.label || 'Inconnu'}
                     </span>
                 </div>
@@ -35,9 +35,9 @@ const BoatCard = ({ data }) => {
             
             <div className="p-8 flex flex-col flex-grow">
                 <h3 className="text-xl font-black text-white mb-1 line-clamp-1 italic tracking-tighter">
-                    <Link to={`/boats/${boatId}`} className="hover:text-teal-400 transition-colors duration-300 uppercase">{boatName}</Link>
+                    <Link to={`/boats/${boatId}`} className="hover:text-accent-role transition-colors duration-300 uppercase">{boatName}</Link>
                 </h3>
-                <span className="block text-teal-500/80 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
+                <span className="block text-accent-role/80 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
                     {data?.model?.label || data?.model?.name || 'Modèle inconnu'}
                 </span>
                 
@@ -49,14 +49,14 @@ const BoatCard = ({ data }) => {
                 <div className="flex items-center justify-between pt-6 border-t border-white/5 mt-auto">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-3 group/stat">
-                            <IconRenderer icon="👥" size={16} className="text-slate-600 group-hover/stat:text-teal-500 transition-colors" />
+                            <IconRenderer icon="👥" size={16} className="text-slate-600 group-hover/stat:text-accent-role transition-colors" />
                             <div>
                                 <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">Capacité</p>
                                 <p className="text-sm font-black font-mono text-white tracking-tighter">{data?.maxUser || '-'}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 group/stat">
-                            <IconRenderer icon="📍" size={16} className="text-slate-600 group-hover/stat:text-teal-500 transition-colors" />
+                            <IconRenderer icon="📍" size={16} className="text-slate-600 group-hover/stat:text-accent-role transition-colors" />
                             <div>
                                 <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">Port</p>
                                 <p className="text-sm font-black text-white/80 tracking-tight uppercase">{data?.adress?.city || 'N/A'}</p>

@@ -74,7 +74,7 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
                     onClick={handleBookingClick}
                     className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 group ${
                         (searchDates?.start && searchDates?.end)
-                            ? 'bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-glow-teal hover:shadow-teal-500/30'
+                            ? 'bg-accent-role text-slate-950 shadow-glow-role hover:opacity-90 hover:shadow-accent-role/30'
                             : 'bg-white/5 text-slate-500 border border-white/5'
                     }`}
                 >

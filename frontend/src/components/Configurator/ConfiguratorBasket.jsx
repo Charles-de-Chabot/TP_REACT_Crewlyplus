@@ -115,7 +115,7 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
                 <button 
                     onClick={onPayment}
                     disabled={bookingStatus === 'submitting'}
-                    className="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-black py-4 rounded-xl transition-all shadow-glow-teal hover:shadow-teal-500/30 disabled:opacity-50 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]"
+                    className="w-full bg-accent-role hover:opacity-90 text-slate-950 font-black py-4 rounded-xl transition-all shadow-glow-role hover:shadow-accent-role/30 disabled:opacity-50 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]"
                 >
                     {bookingStatus === 'submitting' ? (
                         <IconRenderer icon="⌛" size={16} animate />

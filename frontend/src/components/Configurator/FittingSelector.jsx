@@ -14,7 +14,7 @@ const FittingSelector = ({ fitting }) => {
             onClick={() => dispatch(toggleFitting(fitting))}
             className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between group ${
                 isSelected
-                ? 'bg-teal-500/5 border-teal-500/50 text-teal-400 shadow-glow-teal'
+                ? 'bg-accent-role/5 border-accent-role/50 text-accent-role shadow-glow-role'
                 : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10 hover:border-white/10 hover:text-white'
             }`}
         >

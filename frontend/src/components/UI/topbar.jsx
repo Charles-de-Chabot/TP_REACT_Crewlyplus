@@ -129,7 +129,7 @@ const Topbar = () => {
                   to={item.path}
                   className={({ isActive }) => `
                     text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300
-                    ${isActive ? 'text-teal-400' : 'text-slate-500 hover:text-white'}
+                    ${isActive ? 'text-accent-role' : 'text-slate-500 hover:text-white'}
                   `}
                 >
                   {item.label}
@@ -145,7 +145,7 @@ const Topbar = () => {
                 <div className="relative group mr-2">
                   <div 
                     onClick={() => setIsNotifModalOpen(true)}
-                    className={`p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}
+                    className={`p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-accent-role transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}
                   >
                     <IconRenderer icon="🔔" size={20} />
                     {unreadNotifications > 0 && (
@@ -159,7 +159,7 @@ const Topbar = () => {
                 {!isStaff && (
                   <Link 
                     to="/user" 
-                    className={`px-4 py-2 rounded-xl ${config.bg} border ${config.border} ${config.color} text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all`}
+                    className={`px-4 py-2 rounded-xl bg-accent-role/10 border border-accent-role/20 text-accent-role text-[10px] font-black uppercase tracking-widest hover:bg-accent-role/20 transition-all`}
                   >
                     Tableau de bord
                   </Link>
@@ -168,7 +168,7 @@ const Topbar = () => {
                 {isStaff && (
                   <Link 
                     to="/crew/dashboard" 
-                    className={`px-4 py-2 rounded-xl ${config.bg} border ${config.border} ${config.color} text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all`}
+                    className={`px-4 py-2 rounded-xl bg-accent-role/10 border border-accent-role/20 text-accent-role text-[10px] font-black uppercase tracking-widest hover:bg-accent-role/20 transition-all`}
                   >
                     Tableau de bord Pro
                   </Link>
@@ -177,7 +177,7 @@ const Topbar = () => {
                 <Link className="flex items-center space-x-3.5 group" to="/user">
                   <div className={`
                     flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-inner border-2
-                    ${config.bg} ${config.border} ${config.color} ${config.glow || ''}
+                    bg-accent-role/10 border-accent-role/20 text-accent-role shadow-glow-role
                     group-hover:scale-110
                   `}>
                     <span className="font-extrabold text-base tracking-tight italic">
@@ -186,10 +186,10 @@ const Topbar = () => {
                   </div>
 
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white group-hover:text-teal-400 transition-colors leading-none">
+                    <span className="text-sm font-bold text-white group-hover:text-accent-role transition-colors leading-none">
                       {firstname || (email ? email.split('@')[0] : 'Utilisateur')}
                     </span>
-                    <span className={`text-[9px] uppercase tracking-[0.2em] font-black mt-1.5 ${config.color}`}>
+                    <span className={`text-[9px] uppercase tracking-[0.2em] font-black mt-1.5 text-accent-role`}>
                       {config.label}
                     </span>
                   </div>

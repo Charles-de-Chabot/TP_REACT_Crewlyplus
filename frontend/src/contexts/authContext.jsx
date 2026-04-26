@@ -134,6 +134,30 @@ export const AuthContextProvider = ({ children }) => {
         checkSession();
     }, [refreshProfile, hydrateUser]);
 
+    // Dynamic Theme Injector
+    useEffect(() => {
+        const root = document.documentElement;
+        let color = "#14b8a6"; // Default Teal
+        let rgb = "20, 184, 166";
+
+        if (roleLabel === 'ROLE_CAPTAIN') {
+            color = "#3b82f6";
+            rgb = "59, 130, 246";
+        } else if (roleLabel === 'ROLE_CHEF') {
+            color = "#f97316";
+            rgb = "249, 115, 22";
+        } else if (roleLabel === 'ROLE_STEWARD') {
+            color = "#a855f7";
+            rgb = "168, 85, 247";
+        } else if (roleLabel === 'ROLE_PREMIUM') {
+            color = "#f59e0b";
+            rgb = "245, 158, 11";
+        }
+
+        root.style.setProperty('--role-color', color);
+        root.style.setProperty('--role-color-rgb', rgb);
+    }, [roleLabel]);
+
     const value = {
         userId,
         email,

@@ -19,17 +19,17 @@ const MissionCard = ({ mission, onAccept, onRefuse, isProcessing, userId, index 
 
     return (
         <div 
-            className="bg-slate-950/40 backdrop-blur-sm border border-white/5 border-t-white/10 p-8 rounded-2xl hover:border-teal-500/30 transition-all group shadow-lg shadow-black/20 animate-stagger-fade opacity-0"
+            className="bg-slate-950/40 backdrop-blur-sm border border-white/5 border-t-white/10 p-8 rounded-2xl hover:border-accent-role/30 transition-all group shadow-lg shadow-black/20 animate-stagger-fade opacity-0"
             style={{ animationDelay: `${index * 100}ms` }}
         >
             <div className="flex items-center gap-8">
-                <div className="flex flex-col items-center justify-center w-20 h-20 bg-slate-950 rounded-xl border border-white/5 shadow-inner shrink-0 group-hover:border-teal-500/20 transition-colors">
-                    <span className="text-[10px] font-black text-teal-500 uppercase tracking-[0.2em] mb-1">{month}.</span>
+                <div className="flex flex-col items-center justify-center w-20 h-20 bg-slate-950 rounded-xl border border-white/5 shadow-inner shrink-0 group-hover:border-accent-role/20 transition-colors">
+                    <span className="text-[10px] font-black text-accent-role uppercase tracking-[0.2em] mb-1">{month}.</span>
                     <span className="text-3xl font-black text-white italic leading-none font-mono tracking-tighter">{day}</span>
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-2xl font-black text-white italic mb-2 uppercase tracking-tighter group-hover:text-teal-400 transition-colors">
+                    <h3 className="text-2xl font-black text-white italic mb-2 uppercase tracking-tighter group-hover:text-accent-role transition-colors">
                         {mission.boat?.name || 'Bateau'}
                     </h3>
                     <div className="flex items-center gap-6">
@@ -50,7 +50,7 @@ const MissionCard = ({ mission, onAccept, onRefuse, isProcessing, userId, index 
 
                 <div className="flex items-center gap-4">
                     {isAlreadyAccepted ? (
-                        <div className="flex items-center gap-3 px-8 py-4 bg-teal-500/10 text-teal-500 font-black text-[10px] uppercase tracking-widest rounded-xl border border-teal-500/20 shadow-glow-teal">
+                        <div className="flex items-center gap-3 px-8 py-4 bg-accent-role/10 text-accent-role font-black text-[10px] uppercase tracking-widest rounded-xl border border-accent-role/20 shadow-glow-role">
                             <IconRenderer icon="✅" size={16} />
                             Mission Confirmée
                         </div>
@@ -67,7 +67,7 @@ const MissionCard = ({ mission, onAccept, onRefuse, isProcessing, userId, index 
                             <button 
                                 onClick={() => onAccept(mission.id)}
                                 disabled={isProcessing}
-                                className="px-10 py-4 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-teal-400 transition-all shadow-xl shadow-white/5 disabled:opacity-50 flex items-center gap-3"
+                                className="px-10 py-4 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-accent-role transition-all shadow-xl shadow-white/5 disabled:opacity-50 flex items-center gap-3"
                             >
                                 {isProcessing ? (
                                     <IconRenderer icon="⌛" size={14} animate />

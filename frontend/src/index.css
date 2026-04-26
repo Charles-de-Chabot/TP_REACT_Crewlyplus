@@ -4,6 +4,9 @@
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
+  --color-accent-role: var(--role-color, #14b8a6);
+  --shadow-glow-role: 0 0 15px rgba(var(--role-color-rgb, 20, 184, 166), 0.15), 0 0 30px rgba(var(--role-color-rgb, 20, 184, 166), 0.05);
+
   --shadow-glow-teal: 0 0 15px rgba(20, 184, 166, 0.15), 0 0 30px rgba(20, 184, 166, 0.05);
   --shadow-glow-blue: 0 0 15px rgba(59, 130, 246, 0.15), 0 0 30px rgba(59, 130, 246, 0.05);
   --shadow-glow-orange: 0 0 15px rgba(249, 115, 22, 0.15), 0 0 30px rgba(249, 115, 22, 0.05);

@@ -30,10 +30,10 @@ const CrewStats = ({ theme, stats = {} }) => {
                     </div>
 
                     <div className="flex justify-between items-start mb-8 relative z-10">
-                        <div className={`w-12 h-12 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center ${theme.primary} shadow-lg`}>
+                        <div className={`w-12 h-12 rounded-xl bg-slate-900 border border-white/5 flex items-center justify-center text-accent-role shadow-lg`}>
                             <IconRenderer icon={s.icon} size={20} />
                         </div>
-                        <div className={`w-1.5 h-1.5 rounded-full ${theme.primary.replace('text', 'bg')} shadow-[0_0_15px_currentColor]`} />
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent-role shadow-[0_0_15px_var(--role-color)]" />
                     </div>
                     
                     <div className="relative z-10">
@@ -43,7 +43,7 @@ const CrewStats = ({ theme, stats = {} }) => {
                     
                     {/* Progress Bar Detail (Aesthetic only) */}
                     <div className="mt-6 h-[2px] w-full bg-white/5 rounded-full overflow-hidden">
-                        <div className={`h-full ${theme.primary.replace('text', 'bg')} opacity-20 w-2/3 group-hover:w-full transition-all duration-1000`} />
+                        <div className="h-full bg-accent-role opacity-20 w-2/3 group-hover:w-full transition-all duration-1000" />
                     </div>
                 </div>
             ))}
