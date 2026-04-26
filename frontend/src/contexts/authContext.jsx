@@ -7,37 +7,47 @@ const AuthContext = createContext({
     userId: "",
     email: "",
     firstname: "",
+    lastname: "",
     role: "",
-    roleLabel: "", // Ajouté pour la Topbar
+    roleLabel: "",
     avatar: "",
+    phoneNumber: "",
+    position: "",
+    address: null,
     loading: true,
     signIn: async () => {},
     signOut: () => {},
+    refreshProfile: async () => {},
 });
 
 export const AuthContextProvider = ({ children }) => {
     const [userId, setUserId] = useState("");
     const [email, setEmail] = useState("");
     const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
     const [role, setRole] = useState("");
-    const [roleLabel, setRoleLabel] = useState(""); // Nouveau State
+    const [roleLabel, setRoleLabel] = useState("");
     const [avatar, setAvatar] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [position, setPosition] = useState("");
+    const [address, setAddress] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const hydrateUser = useCallback((userData) => {
         setUserId(userData.id || "");
         setEmail(userData.email || "");
         setFirstname(userData.firstname || userData.nickname || "");
+        setLastname(userData.lastname || "");
         
-        // On récupère le rôle technique (ex: ROLE_USER)
         const technicalRole = Array.isArray(userData.roles) ? userData.roles[0] : userData.role;
         setRole(technicalRole || "user");
-
-        // On récupère le label de l'entité (ex: ROLE_PREMIUM) ou on prend le technique par défaut
-        // C'est ici que la magie opère pour ta Topbar
         setRoleLabel(userData.roleLabel || technicalRole || "user");
         
-        setAvatar(userData.avatar || "");
+        const avatarPath = userData.media?.[0]?.media_path || "";
+        setAvatar(avatarPath);
+        setPhoneNumber(userData.phoneNumber || userData.phone_number || "");
+        setPosition(userData.position || "");
+        setAddress(userData.address || null);
     }, []);
 
     const signIn = async (emailInput, passwordInput) => {
@@ -72,9 +82,13 @@ export const AuthContextProvider = ({ children }) => {
         setUserId("");
         setEmail("");
         setFirstname("");
+        setLastname("");
         setRole("");
-        setRoleLabel(""); // On vide aussi le label
+        setRoleLabel("");
         setAvatar("");
+        setPhoneNumber("");
+        setPosition("");
+        setAddress(null);
         clearAccessToken();
         localStorage.removeItem("token");
         localStorage.removeItem(USER_INFOS);
@@ -124,13 +138,17 @@ export const AuthContextProvider = ({ children }) => {
         userId,
         email,
         firstname,
+        lastname,
         role,
         roleLabel, 
         avatar,
+        phoneNumber,
+        position,
+        address,
         loading,
         signIn,
         signOut,
-        refreshProfile, // On l'expose ici
+        refreshProfile,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

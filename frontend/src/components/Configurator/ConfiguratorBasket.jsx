@@ -1,26 +1,42 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { 
+    selectSelectedBoat, 
+    selectBookingDates, 
+    selectSelectedFormula, 
+    selectSelectedFittings, 
+    selectSelectedCrew, 
+    selectSubTotalPrice, 
+    selectDiscountPrice, 
+    selectTotalPrice, 
+    selectIsPremiumDiscount, 
+    selectBookingStatus 
+} from '../../store/booking/bookingSelectors';
 
-const ConfiguratorBasket = ({ 
-    boat, 
-    dates, 
-    selectedFormula, 
-    selectedFittings, 
-    selectedCrew, 
-    crewMembers, 
-    crewRoles,
-    subTotalPrice,
-    discountPrice,
-    totalPrice,
-    isPremiumDiscount,
-    bookingStatus,
-    bookingError,
-    onPayment
-}) => {
+const CREW_ROLES = [
+    { role: 'ROLE_CAPITAINE', label: 'Capitaine', price: 250 },
+    { role: 'ROLE_CHEF', label: 'Chef', price: 200 },
+    { role: 'ROLE_HOTESSE', label: 'Hôtesse', price: 150 },
+];
+
+const ConfiguratorBasket = ({ onPayment, bookingError }) => {
+    const boat = useSelector(selectSelectedBoat);
+    const dates = useSelector(selectBookingDates);
+    const selectedFormula = useSelector(selectSelectedFormula);
+    const selectedFittings = useSelector(selectSelectedFittings);
+    const selectedCrew = useSelector(selectSelectedCrew);
+    const subTotalPrice = useSelector(selectSubTotalPrice);
+    const discountPrice = useSelector(selectDiscountPrice);
+    const totalPrice = useSelector(selectTotalPrice);
+    const isPremiumDiscount = useSelector(selectIsPremiumDiscount);
+    const bookingStatus = useSelector(selectBookingStatus);
+
+    if (!boat) return null;
+
     return (
         <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col">
             <h2 className="text-xl font-black text-white mb-6 shrink-0">Votre Panier</h2>
             
-            {/* Scrollable Items Area */}
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4 space-y-4">
                 {/* Boat Item */}
                 <div className="flex justify-between items-start">
@@ -62,7 +78,7 @@ const ConfiguratorBasket = ({
 
                 {/* Crew Items */}
                 {selectedCrew.map(role => {
-                    const roleInfo = crewRoles.find(r => r.role === role);
+                    const roleInfo = CREW_ROLES.find(r => r.role === role);
                     return (
                         <div key={role} className="flex justify-between items-start">
                             <div>
@@ -77,7 +93,6 @@ const ConfiguratorBasket = ({
                 })}
             </div>
 
-            {/* Fixed Summary & Button Area */}
             <div className="shrink-0 pt-4 border-t border-white/10 space-y-3">
                 <div className="flex justify-between items-center text-xs">
                     <p className="text-slate-400 font-bold">Sous-total</p>
@@ -96,7 +111,6 @@ const ConfiguratorBasket = ({
                     <p className="text-2xl font-black text-teal-400">{totalPrice} €</p>
                 </div>
 
-                {/* Payment Button */}
                 <button 
                     onClick={onPayment}
                     disabled={bookingStatus === 'submitting'}
@@ -112,7 +126,6 @@ const ConfiguratorBasket = ({
                     )}
                 </button>
 
-                {/* Error Message */}
                 {bookingError && (
                     <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-500 text-[10px] text-center font-medium animate-shake">
                         ⚠️ {bookingError}

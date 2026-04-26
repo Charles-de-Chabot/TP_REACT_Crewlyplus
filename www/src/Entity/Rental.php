@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use App\State\RentalProcessor;
+use App\State\RentalStatusProcessor;
 
 #[ORM\Entity(repositoryClass: RentalRepository::class)]
 #[ApiResource(
@@ -28,36 +29,22 @@ use App\State\RentalProcessor;
         new Get(),
         new GetCollection(),
         new Post(processor: RentalProcessor::class),
-        new Patch()
+        new Patch(processor: RentalStatusProcessor::class)
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'user.email' => 'exact',    // Filter rentals by user email
     'boat.name'  => 'ipartial', // Filter rentals by boat name (partial, case-insensitive)
-    'status'     => 'exact',    // Filter by status: pending | confirmed | cancelled | completed
-    'crewMembers.id' => 'exact' // Filter by crew member ID
+    'status'     => 'exact'     // Filter by status: pending | confirmed | cancelled | completed
 ])]
 class Rental
 {
-    // =========================================================================
-    // Constants — Rental status values
-    // =========================================================================
-
-    public const STATUS_PENDING   = 'pending';
-    public const STATUS_CONFIRMED = 'confirmed';
+    /** Status constants */
+    public const STATUS_CREATED   = 'created';   // Created but not paid yet
+    public const STATUS_PENDING   = 'pending';   // Paid, waiting for crew
+    public const STATUS_CONFIRMED = 'confirmed'; // Paid and crew validated
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_COMPLETED = 'completed';
-
-    /** @var string[] Valid crew member roles */
-    public const ALLOWED_CREW_ROLES = [
-        'ROLE_CAPITAINE',
-        'ROLE_CHEF',
-        'ROLE_HOTESSE',
-    ];
-
-    // =========================================================================
-    // Primary Key
-    // =========================================================================
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -65,35 +52,28 @@ class Rental
     #[Groups(['rental:read'])]
     private ?int $id = null;
 
-    // =========================================================================
-    // Scalar fields
-    // =========================================================================
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['rental:read', 'rental:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Type('\DateTimeInterface')]
+    private ?\DateTimeInterface $rentalStart = null;
+
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['rental:read', 'rental:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Type('\DateTimeInterface')]
+    private ?\DateTimeInterface $rentalEnd = null;
 
     #[ORM\Column]
     #[Groups(['rental:read', 'rental:write'])]
-    private ?\DateTime $rentalStart = null;
-
-    #[ORM\Column]
-    #[Groups(['rental:read', 'rental:write'])]
-    private ?\DateTime $rentalEnd = null;
-
-    #[ORM\Column]
-    #[Groups(['rental:read', 'rental:write'])]
+    #[Assert\NotBlank]
+    #[Assert\PositiveOrZero]
     private ?float $rentalPrice = null;
 
-    /**
-     * Non-persistent property to hold the Stripe client secret for the frontend.
-     */
-    #[Groups(['rental:read'])]
-    public ?string $stripeClientSecret = null;
-
-    /**
-     * Rental lifecycle status.
-     * Set to 'pending' by default; updated by Stripe webhook on payment outcome.
-     */
-    #[ORM\Column(length: 50)]
-    #[Groups(['rental:read'])]
+    #[ORM\Column(length: 20)]
+    #[Groups(['rental:read', 'rental:write'])]
     #[Assert\Choice(choices: [
+        self::STATUS_CREATED,
         self::STATUS_PENDING,
         self::STATUS_CONFIRMED,
         self::STATUS_CANCELLED,
@@ -116,11 +96,12 @@ class Rental
     // =========================================================================
 
     /**
-     * @var Collection<int, Boat>
+     * @var Boat
      */
-    #[ORM\OneToMany(targetEntity: Boat::class, mappedBy: 'rental')]
-    #[Groups(['rental:read'])]
-    private Collection $boat;
+    #[ORM\ManyToOne(inversedBy: 'rentals')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rental:read', 'rental:write'])]
+    private ?Boat $boat = null;
 
     // =========================================================================
     // Relations — ManyToMany
@@ -131,7 +112,7 @@ class Rental
      *
      * @var Collection<int, Formula>
      */
-    #[ORM\ManyToMany(targetEntity: Formula::class, mappedBy: 'rental')]
+    #[ORM\ManyToMany(targetEntity: Formula::class, inversedBy: 'rental')]
     #[Groups(['rental:read', 'rental:write'])]
     private Collection $formulas;
 
@@ -155,21 +136,37 @@ class Rental
     #[Groups(['rental:read', 'rental:write'])]
     private Collection $crewMembers;
 
+    /**
+     * Crew members who have explicitly accepted this mission.
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'rental_confirmed_by')]
+    #[Groups(['rental:read', 'rental:write'])]
+    private Collection $confirmedBy;
+
+    /**
+     * Roles requested for this rental (e.g. ROLE_CAPITAINE, ROLE_CHEF).
+     * @var array<string>
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['rental:read', 'rental:write'])]
+    private array $requestedRoles = [];
+
     // =========================================================================
     // Constructor
     // =========================================================================
 
     public function __construct()
     {
-        $this->boat        = new ArrayCollection();
         $this->formulas    = new ArrayCollection();
         $this->fitting     = new ArrayCollection();
         $this->crewMembers = new ArrayCollection();
-        $this->status      = self::STATUS_PENDING;
+        $this->confirmedBy = new ArrayCollection();
     }
 
     // =========================================================================
-    // Getters & Setters — Scalar fields
+    // Getters / Setters
     // =========================================================================
 
     public function getId(): ?int
@@ -177,24 +174,24 @@ class Rental
         return $this->id;
     }
 
-    public function getRentalStart(): ?\DateTime
+    public function getRentalStart(): ?\DateTimeInterface
     {
         return $this->rentalStart;
     }
 
-    public function setRentalStart(\DateTime $rentalStart): static
+    public function setRentalStart(\DateTimeInterface $rentalStart): static
     {
         $this->rentalStart = $rentalStart;
 
         return $this;
     }
 
-    public function getRentalEnd(): ?\DateTime
+    public function getRentalEnd(): ?\DateTimeInterface
     {
         return $this->rentalEnd;
     }
 
-    public function setRentalEnd(\DateTime $rentalEnd): static
+    public function setRentalEnd(\DateTimeInterface $rentalEnd): static
     {
         $this->rentalEnd = $rentalEnd;
 
@@ -225,10 +222,6 @@ class Rental
         return $this;
     }
 
-    // =========================================================================
-    // Getters & Setters — Relations
-    // =========================================================================
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -241,38 +234,21 @@ class Rental
         return $this;
     }
 
-    // --- Boat -----------------------------------------------------------------
-
     /**
-     * @return Collection<int, Boat>
+     * @return Boat|null
      */
-    public function getBoat(): Collection
+    public function getBoat(): ?Boat
     {
         return $this->boat;
     }
 
-    public function addBoat(Boat $boat): static
+    public function setBoat(?Boat $boat): static
     {
-        if (!$this->boat->contains($boat)) {
-            $this->boat->add($boat);
-            $boat->setRental($this);
-        }
+        $this->boat = $boat;
 
         return $this;
     }
 
-    public function removeBoat(Boat $boat): static
-    {
-        if ($this->boat->removeElement($boat)) {
-            if ($boat->getRental() === $this) {
-                $boat->setRental(null);
-            }
-        }
-
-        return $this;
-    }
-
-    // --- Formula --------------------------------------------------------------
 
     /**
      * @return Collection<int, Formula>
@@ -301,8 +277,6 @@ class Rental
         return $this;
     }
 
-    // --- Fitting --------------------------------------------------------------
-
     /**
      * @return Collection<int, Fitting>
      */
@@ -327,8 +301,6 @@ class Rental
         return $this;
     }
 
-    // --- Crew Members ---------------------------------------------------------
-
     /**
      * @return Collection<int, User>
      */
@@ -337,40 +309,61 @@ class Rental
         return $this->crewMembers;
     }
 
-    /**
-     * Adds a crew member to this rental.
-     * The caller is responsible for ensuring the user has an allowed crew role
-     * (ROLE_CAPITAINE, ROLE_CHEF, ROLE_HOTESSE) before calling this method.
-     */
-    public function addCrewMember(User $user): static
+    public function addCrewMember(User $crewMember): static
     {
-        if (!$this->crewMembers->contains($user)) {
-            $this->crewMembers->add($user);
+        if (!$this->crewMembers->contains($crewMember)) {
+            $this->crewMembers->add($crewMember);
         }
 
         return $this;
     }
 
-    public function removeCrewMember(User $user): static
+    public function removeCrewMember(User $crewMember): static
     {
-        $this->crewMembers->removeElement($user);
+        $this->crewMembers->removeElement($crewMember);
 
         return $this;
     }
 
-    // =========================================================================
-    // Computed helpers
-    // =========================================================================
-
     /**
-     * Returns the number of rental days between start and end dates.
+     * @return Collection<int, User>
      */
-    public function getNbDays(): int
+    public function getConfirmedBy(): Collection
     {
-        if ($this->rentalStart === null || $this->rentalEnd === null) {
-            return 0;
+        return $this->confirmedBy;
+    }
+
+    public function addConfirmedBy(User $user): static
+    {
+        if (!$this->confirmedBy->contains($user)) {
+            $this->confirmedBy->add($user);
         }
 
-        return (int) $this->rentalStart->diff($this->rentalEnd)->days;
+        return $this;
     }
+
+    public function removeConfirmedBy(User $user): static
+    {
+        $this->confirmedBy->removeElement($user);
+
+        return $this;
+    }
+
+    public function getRequestedRoles(): array
+    {
+        return $this->requestedRoles ?? [];
+    }
+
+    public function setRequestedRoles(?array $requestedRoles): static
+    {
+        $this->requestedRoles = $requestedRoles;
+
+        return $this;
+    }
+
+    /**
+     * Virtual field for Stripe integration (not persisted)
+     */
+    #[Groups(['rental:read'])]
+    public ?string $stripeClientSecret = null;
 }

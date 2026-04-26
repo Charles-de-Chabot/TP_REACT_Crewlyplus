@@ -32,11 +32,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'rental:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'rental:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
@@ -80,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?Role $role = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\ManyToOne(inversedBy: 'users', cascade: ['persist'])]
     #[Groups(['user:read', 'user:write'])]
     private ?Address $address = null;
 
@@ -108,12 +108,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Innovice>
      */
     #[ORM\OneToMany(targetEntity: Innovice::class, mappedBy: 'user')]
+    #[Groups(['user:read'])]
     private Collection $innovices;
 
     /**
      * @var Collection<int, Rental>
      */
     #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'user')]
+    #[Groups(['user:read'])]
     private Collection $rentals;
 
 

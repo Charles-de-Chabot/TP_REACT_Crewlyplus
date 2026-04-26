@@ -1,11 +1,18 @@
 import React from 'react';
 
-const CrewStats = ({ theme, stats }) => {
+const CrewStats = ({ theme, stats = {} }) => {
+    const {
+        monthlyEarnings = 0,
+        totalEarnings = 0,
+        missionCount = 0,
+        rating = 0
+    } = stats;
+
     const statsConfig = [
-        { label: 'Revenus ce mois', value: `${stats.monthlyEarnings} €`, icon: '💰' },
-        { label: 'Total généré', value: `${stats.totalEarnings} €`, icon: '📈' },
-        { label: 'Missions effectuées', value: stats.missionCount, icon: '⚓' },
-        { label: 'Note moyenne', value: `${stats.rating} / 5`, icon: '⭐' }
+        { label: 'Revenus ce mois', value: `${monthlyEarnings} €`, icon: '💰' },
+        { label: 'Total généré', value: `${totalEarnings} €`, icon: '📈' },
+        { label: 'Missions effectuées', value: missionCount, icon: '⚓' },
+        { label: 'Note moyenne', value: `${rating} / 5`, icon: '⭐' }
     ];
 
     return (

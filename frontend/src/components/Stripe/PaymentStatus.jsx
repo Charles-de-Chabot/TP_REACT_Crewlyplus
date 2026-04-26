@@ -3,6 +3,8 @@ import { useStripe, Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/authContext';
+import { useDispatch } from 'react-redux';
+import { resetBooking } from '../../store/booking/bookingSlice';
 
 // 1. On charge Stripe
 const stripePromise = loadStripe('pk_test_51TLB0IGpNFFeiWtxVr7bdvlQBUR9lsjI9lsUgcGFuj2pjSGk1AfK8kF8Vt1TtxzdBWpoclT32XhIIDdvjT0tDreq00FjyGhLDD');
@@ -11,6 +13,7 @@ const PaymentStatusContent = () => {
     const stripe = useStripe();
     const [status, setStatus] = useState('loading');
     const { refreshProfile } = useAuthContext();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!stripe) return;
@@ -27,6 +30,7 @@ const PaymentStatusContent = () => {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
             if (paymentIntent.status === "succeeded") {
                 setStatus('success');
+                dispatch(resetBooking()); // On vide le panier après succès
                 refreshProfile(); // On rafraîchit les infos de l'utilisateur (rôle premium)
             } else {
                 setStatus('error');

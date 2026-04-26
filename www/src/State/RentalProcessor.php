@@ -38,7 +38,7 @@ class RentalProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         // 1. Availability check
-        $boat = $data->getBoat()->first();
+        $boat = $data->getBoat();
         if (!$boat) {
             throw new UnprocessableEntityHttpException('A boat must be selected.');
         }
@@ -61,7 +61,8 @@ class RentalProcessor implements ProcessorInterface
             $data->getRentalEnd(),
             $data->getFitting()->toArray(),
             $data->getFormulas()->toArray(),
-            $data->getCrewMembers()->toArray()
+            $data->getCrewMembers()->toArray(),
+            $data->getRequestedRoles()
         );
 
         // 3. Price coherence check
@@ -74,7 +75,7 @@ class RentalProcessor implements ProcessorInterface
         }
 
         $data->setRentalPrice($calculatedPrice);
-        $data->setStatus(Rental::STATUS_PENDING);
+        $data->setStatus(Rental::STATUS_CREATED);
 
         // 4. Stripe PaymentIntent
         Stripe::setApiKey($this->stripeSecretKey);
@@ -86,13 +87,28 @@ class RentalProcessor implements ProcessorInterface
         $boatAddress = $boat->getAddress();
         $location = $boatAddress ? $boatAddress->getCity() : 'Lieu non défini';
 
+        // --- Create/Get Stripe Customer (Like Premium Flow) ---
+        try {
+            $customer = \Stripe\Customer::create([
+                'email' => $client->getEmail(),
+                'name'  => $clientName,
+                'metadata' => [
+                    'user_id' => (string) $client->getId(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            // If customer creation fails, we can still proceed with the payment intent without a customer
+            $customer = null;
+        }
+
         $metadata = [
-            'client_id' => (string) $client->getId(),
+            'client_id'   => (string) $client->getId(),
+            'user_id'     => (string) $client->getId(), // Consistent with Premium flow
             'client_name' => $clientName,
-            'boat' => $boat->getName(),
-            'dates' => $data->getRentalStart()->format('d/m/Y') . ' - ' . $data->getRentalEnd()->format('d/m/Y'),
-            'duration' => $nbDays . ' jours',
-            'total' => $calculatedPrice . ' €',
+            'boat'        => $boat->getName(),
+            'dates'       => $data->getRentalStart()->format('d/m/Y') . ' - ' . $data->getRentalEnd()->format('d/m/Y'),
+            'duration'    => $nbDays . ' jours',
+            'total'       => $calculatedPrice . ' €',
         ];
 
         if ($data->getFitting()->count() > 0) {
@@ -103,15 +119,23 @@ class RentalProcessor implements ProcessorInterface
         if ($data->getCrewMembers()->count() > 0) {
             $crew = array_map(fn($u) => $u->getRoleLabel(), $data->getCrewMembers()->toArray());
             $metadata['details_crew'] = implode(' | ', $crew);
+        } elseif (!empty($data->getRequestedRoles())) {
+            $metadata['details_requested_crew'] = implode(' | ', $data->getRequestedRoles());
         }
 
         try {
-            $paymentIntent = PaymentIntent::create([
+            $paymentParams = [
                 'amount' => (int) ($calculatedPrice * 100),
                 'currency' => 'eur',
-                'automatic_payment_methods' => ['enabled' => true],
+                'payment_method_types' => ['card'],
                 'metadata' => $metadata,
-            ]);
+            ];
+
+            if ($customer) {
+                $paymentParams['customer'] = $customer->id;
+            }
+
+            $paymentIntent = PaymentIntent::create($paymentParams);
         } catch (\Exception $e) {
             throw new UnprocessableEntityHttpException('Stripe Error: ' . $e->getMessage());
         }
@@ -119,26 +143,6 @@ class RentalProcessor implements ProcessorInterface
         // 5. Persist the rental
         $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
 
-        // 6. Notifications for Crew
-        foreach ($data->getCrewMembers() as $crewMember) {
-            $notification = new Notification();
-            $notification->setUser($crewMember);
-            
-            // Rich notification label
-            $message = sprintf(
-                'Nouvelle mission : %s demandée par %s à %s du %s au %s',
-                $boat->getName(),
-                $clientName,
-                $location,
-                $data->getRentalStart()->format('d/m/Y'),
-                $data->getRentalEnd()->format('d/m/Y')
-            );
-            
-            $notification->setLabel($message);
-            $notification->setIsOpen(false);
-            $notification->setCreatedAt(new \DateTime());
-            $this->entityManager->persist($notification);
-        }
         $this->entityManager->flush();
 
         // 7. Update Stripe metadata with the real rental ID
@@ -150,6 +154,6 @@ class RentalProcessor implements ProcessorInterface
 
         $data->stripeClientSecret = $paymentIntent->client_secret;
 
-        return $result;
+        return $data;
     }
 }

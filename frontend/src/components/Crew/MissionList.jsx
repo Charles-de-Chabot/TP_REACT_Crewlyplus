@@ -1,60 +1,88 @@
 import React from 'react';
 
-const MissionList = ({ missions, theme, onAccept, onReject }) => {
-    return (
-        <div className="space-y-6">
-            <h3 className="text-xl font-black text-white px-4">Prochaines Missions</h3>
-            {missions.length === 0 ? (
-                <div className="bg-white/5 border border-dashed border-white/10 rounded-3xl p-12 text-center">
-                    <p className="text-slate-500 font-bold italic">Aucune mission pour le moment...</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {missions.map(m => (
-                        <div key={m.id} className="bg-slate-900/60 border border-white/10 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="flex items-center gap-6">
-                                <div className="w-14 h-14 rounded-2xl bg-slate-950 flex flex-col items-center justify-center border border-white/5 shrink-0">
-                                    <span className="text-[10px] font-black text-teal-500 uppercase leading-none mb-1">
-                                        {new Date(m.rentalStart).toLocaleString('default', { month: 'short' }).toUpperCase()}
-                                    </span>
-                                    <span className="text-xl font-black text-white leading-none">
-                                        {new Date(m.rentalStart).getDate()}
-                                    </span>
-                                </div>
-                                <div>
-                                    <h4 className="text-white font-bold text-lg">{m.boat?.[0]?.name || "Bateau inconnu"}</h4>
-                                    <p className="text-slate-500 text-xs font-medium">Du {new Date(m.rentalStart).toLocaleDateString()} au {new Date(m.rentalEnd).toLocaleDateString()}</p>
-                                </div>
-                            </div>
+const MissionCard = ({ mission, onAccept, onRefuse, isProcessing, userId }) => {
+    const startDateRaw = mission?.rentalStart || mission?.rental_start;
+    const endDateRaw = mission?.rentalEnd || mission?.rental_end;
 
-                            <div className="flex items-center gap-4">
-                                {m.status === 'pending' ? (
-                                    <>
-                                        <button 
-                                            onClick={() => onReject(m.id)}
-                                            className="px-6 py-3 rounded-xl bg-red-500/10 text-red-500 text-xs font-black uppercase hover:bg-red-500/20 transition-all"
-                                        >
-                                            Refuser
-                                        </button>
-                                        <button 
-                                            onClick={() => onAccept(m.id)}
-                                            className={`px-8 py-3 rounded-xl bg-white text-slate-950 text-xs font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-xl`}
-                                        >
-                                            Accepter
-                                        </button>
-                                    </>
-                                ) : (
-                                    <span className={`px-6 py-2 rounded-full border ${theme.border} ${theme.primary} text-[10px] font-black uppercase tracking-widest`}>
-                                        {m.status === 'confirmed' ? 'Confirmée' : m.status}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+    if (!mission || !startDateRaw) return null;
+
+    // Check if I am already in the crew
+    const isAlreadyAccepted = mission.crewMembers?.some(u => {
+        const uId = typeof u === 'string' ? parseInt(u.split('/').pop()) : u.id;
+        return uId === parseInt(userId);
+    });
+
+    const startDate = new Date(startDateRaw);
+    const day = startDate.getDate();
+    const month = startDate.toLocaleString('default', { month: 'short' });
+
+    return (
+        <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[2rem] hover:border-teal-500/30 transition-all group">
+            <div className="flex items-center gap-6">
+                <div className="flex flex-col items-center justify-center w-16 h-16 bg-slate-950 rounded-2xl border border-white/5 shadow-inner">
+                    <span className="text-[10px] font-black text-teal-500 uppercase tracking-tighter mb-0.5">{month}.</span>
+                    <span className="text-2xl font-black text-white italic leading-none">{day}</span>
                 </div>
-            )}
+
+                <div className="flex-1">
+                    <h3 className="text-xl font-black text-white italic mb-1">{mission.boat?.name || 'Bateau'}</h3>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                        Du {new Date(startDateRaw).toLocaleDateString()} au {new Date(endDateRaw).toLocaleDateString()}
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {isAlreadyAccepted ? (
+                        <div className="px-6 py-3 bg-green-500/10 text-green-500 font-black text-[10px] uppercase rounded-xl border border-green-500/30">
+                            Confirmé ✓
+                        </div>
+                    ) : (
+                        <>
+                            <button 
+                                onClick={() => onRefuse(mission.id)}
+                                disabled={isProcessing}
+                                className="px-6 py-3 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/10 transition-all disabled:opacity-50"
+                            >
+                                Refuser
+                            </button>
+                            <button 
+                                onClick={() => onAccept(mission.id)}
+                                disabled={isProcessing}
+                                className="px-8 py-3 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-teal-400 transition-all shadow-lg shadow-white/5 disabled:opacity-50"
+                            >
+                                {isProcessing ? '...' : 'Accepter'}
+                            </button>
+                        </>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
 
-export default MissionList;
+export const MissionList = ({ missions, onAccept, onRefuse, processingId, userId }) => {
+    if (missions.length === 0) {
+        return (
+            <div className="text-center py-20 bg-slate-900/20 border border-dashed border-white/10 rounded-[3rem]">
+                <p className="text-slate-500 font-bold italic">Aucune mission disponible pour le moment.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            {missions.map(mission => (
+                <MissionCard 
+                    key={mission.id} 
+                    mission={mission} 
+                    userId={userId}
+                    onAccept={onAccept}
+                    onRefuse={onRefuse}
+                    isProcessing={processingId === mission.id}
+                />
+            ))}
+        </div>
+    );
+};
+
+export default MissionCard;

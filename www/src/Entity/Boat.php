@@ -34,7 +34,7 @@ class Boat
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['boat:read', 'boat:write'])]
+    #[Groups(['boat:read', 'boat:write', 'rental:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -95,9 +95,11 @@ class Boat
     #[Groups(['boat:read'])]
     private Collection $media;
 
-    #[ORM\ManyToOne(inversedBy: 'boat')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Rental $rental = null;
+    /**
+     * @var Collection<int, Rental>
+     */
+    #[ORM\OneToMany(targetEntity: Rental::class, mappedBy: 'boat')]
+    private Collection $rentals;
 
     /**
      * @var Collection<int, Formula>
@@ -109,6 +111,7 @@ class Boat
     {
         $this->media = new ArrayCollection();
         $this->formulas = new ArrayCollection();
+        $this->rentals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -290,17 +293,6 @@ class Boat
         return $this;
     }
 
-    public function getRental(): ?Rental
-    {
-        return $this->rental;
-    }
-
-    public function setRental(?Rental $rental): static
-    {
-        $this->rental = $rental;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Formula>

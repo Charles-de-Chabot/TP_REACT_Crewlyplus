@@ -50,7 +50,7 @@ class Formula
     /**
      * @var Collection<int, Rental>
      */
-    #[ORM\ManyToMany(targetEntity: Rental::class, inversedBy: 'formulas')]
+    #[ORM\ManyToMany(targetEntity: Rental::class, mappedBy: 'formulas')]
     private Collection $rental;
 
     public function __construct()

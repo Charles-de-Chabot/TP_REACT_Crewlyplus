@@ -171,7 +171,12 @@ export const submitBooking = (bookingPayload) => async (dispatch) => {
             throw new Error("Impossible de récupérer le secret Stripe.");
         }
     } catch (error) {
-        const message = error.response?.data?.['hydra:description'] || error.message;
+        console.error('Booking submission failed:', error);
+        if (error.response) {
+            console.error('Status:', error.response.status);
+            console.error('Data:', JSON.stringify(error.response.data, null, 2));
+        }
+        const message = error.response?.data?.['hydra:description'] || error.response?.data?.detail || error.message;
         dispatch(setError(message));
         dispatch(setBookingStatus('error'));
     }

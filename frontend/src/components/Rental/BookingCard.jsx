@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import BoatCalendar from '../Boat/BoatCalendar';
 import { useAuthContext } from '../../contexts/authContext';
-import { setSelectedBoat, setDates, setPremiumDiscount } from '../../store/booking/bookingSlice';
+import { setSelectedBoat, setDates, setPremiumDiscount, setBookingStatus } from '../../store/booking/bookingSlice';
 
 const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
     const navigate = useNavigate();
@@ -22,6 +22,7 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
         dispatch(setSelectedBoat(boatDetail));
         dispatch(setDates({ start, end }));
         dispatch(setPremiumDiscount(isPremiumRegatta));
+        dispatch(setBookingStatus('idle'));
     };
 
     const handleBookingClick = () => {
@@ -38,6 +39,7 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
         dispatch(setSelectedBoat(boatDetail));
         dispatch(setDates({ start: searchDates.start, end: searchDates.end }));
         dispatch(setPremiumDiscount(isPremiumRegatta));
+        dispatch(setBookingStatus('idle'));
 
         // Navigate to the next step
         navigate('/configurator');

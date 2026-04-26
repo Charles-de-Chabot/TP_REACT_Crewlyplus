@@ -90,8 +90,8 @@ class WebhookController extends AbstractController
             return;
         }
 
-        // 1. Update status
-        $rental->setStatus(Rental::STATUS_CONFIRMED);
+        // 1. Update status to 'pending' (Paid, waiting for crew)
+        $rental->setStatus(Rental::STATUS_PENDING);
 
         // 2. Create Invoice
         $invoice = new Innovice();
@@ -101,7 +101,7 @@ class WebhookController extends AbstractController
         $this->em->persist($invoice);
 
         // 3. Create Notification
-        $boat = $rental->getBoat()->first();
+        $boat = $rental->getBoat();
         $notification = new Notification();
         $notification->setUser($rental->getUser());
         $notification->setLabel(sprintf(
@@ -111,6 +111,44 @@ class WebhookController extends AbstractController
         $notification->setIsOpen(false);
         $notification->setCreatedAt(new \DateTime());
         $this->em->persist($notification);
+
+        // 4. Notify Crew members
+        $requestedRoles = $rental->getRequestedRoles() ?: [];
+        $client = $rental->getUser();
+        $usersToNotify = [];
+
+        foreach ($requestedRoles as $roleLabel) {
+            $eligibleUsers = $this->userRepository->findByRoleLabel($roleLabel);
+            foreach ($eligibleUsers as $u) {
+                // Skip the client themselves
+                if ($u->getId() === $client->getId() || strtolower($u->getEmail()) === strtolower($client->getEmail())) {
+                    continue;
+                }
+                if (!isset($usersToNotify[$u->getId()])) {
+                    $usersToNotify[$u->getId()] = ['user' => $u, 'matchedRole' => $roleLabel];
+                }
+            }
+        }
+
+        foreach ($usersToNotify as $info) {
+            $crewMember = $info['user'];
+            $roleLabel = $info['matchedRole'];
+            $roleDisplay = $roleLabel === 'ROLE_CAPITAINE' ? 'Capitaine' : ($roleLabel === 'ROLE_CHEF' ? 'Chef' : 'Hôtesse');
+
+            $notif = new Notification();
+            $notif->setUser($crewMember);
+            $notif->setLabel(sprintf(
+                'Nouvelle mission DISPONIBLE (%s) : %s demandée par %s du %s au %s',
+                $roleDisplay,
+                $boat?->getName() ?: 'Bateau',
+                $client->getFirstname() . ' ' . $client->getNickname(),
+                $rental->getRentalStart()->format('d/m/Y'),
+                $rental->getRentalEnd()->format('d/m/Y')
+            ));
+            $notif->setIsOpen(false);
+            $notif->setCreatedAt(new \DateTime());
+            $this->em->persist($notif);
+        }
 
         $this->em->flush();
     }

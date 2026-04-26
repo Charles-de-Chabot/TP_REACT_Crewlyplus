@@ -33,13 +33,13 @@ class RentalRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('r')
             ->join('r.boat', 'b')
             ->where('b = :boat')
-            ->andWhere('r.status != :status_cancelled')
+            ->andWhere('r.status IN (:confirmed_statuses)')
             ->andWhere('r.rentalStart < :end')
             ->andWhere('r.rentalEnd > :start')
             ->setParameter('boat', $boat)
             ->setParameter('end', $end)
             ->setParameter('start', $start)
-            ->setParameter('status_cancelled', Rental::STATUS_CANCELLED);
+            ->setParameter('confirmed_statuses', [Rental::STATUS_PENDING, Rental::STATUS_CONFIRMED, Rental::STATUS_COMPLETED]);
 
         $results = $qb->getQuery()->getResult();
 

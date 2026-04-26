@@ -4,6 +4,9 @@ import { useAuthContext } from '../../contexts/authContext'
 import { useSidebar } from '../../hooks/useSidebar'
 import { IMAGE_URL } from '../../constants/apiConstant'
 import api from '../../api/axios'
+import NotificationModal from './NotificationModal'
+import { useDispatch } from 'react-redux'
+import { resetBooking } from '../../store/booking/bookingSlice'
 
 // Configuration visuelle par rôle
 const ROLE_CONFIG = {
@@ -19,7 +22,10 @@ const Topbar = () => {
   const { firstname, email, role, roleLabel, signOut, userId } = useAuthContext()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [notifications, setNotifications] = useState([])
+  const [isNotifModalOpen, setIsNotifModalOpen] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const isAuthenticated = !!userId
   const navItems = useSidebar(role)
 
@@ -29,9 +35,14 @@ const Topbar = () => {
     if (isAuthenticated) {
       const fetchNotifications = async () => {
         try {
-          const res = await api.get(`/api/notifications?user.id=${userId}&is_open=false`);
-          const count = res.data['hydra:totalItems'] || 0;
-          setUnreadNotifications(count);
+          // Fetch last 20 notifications (read or unread)
+          const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
+          const data = res.data['member'] || res.data['hydra:member'] || [];
+          setNotifications(data);
+          
+          // Unread count is calculated locally based on is_open property
+          const unreadCount = data.filter(n => !n.is_open).length;
+          setUnreadNotifications(unreadCount);
         } catch (err) {
           console.error("Error fetching notifications", err);
         }
@@ -42,6 +53,11 @@ const Topbar = () => {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, userId]);
+
+  // Reset booking state when user ID changes (Login/Logout/Switch)
+  useEffect(() => {
+    dispatch(resetBooking());
+  }, [userId, dispatch]);
 
   // Déterminer le rôle prioritaire
   const getActiveRoleKey = () => {
@@ -69,8 +85,43 @@ const Topbar = () => {
     }
   }
 
+  const handleDeleteNotifications = async (notifId) => {
+    try {
+      if (notifId === 'all') {
+        for (const n of notifications) {
+          await api.delete(`/api/notifications/${n.id}`);
+        }
+      } else {
+        await api.delete(`/api/notifications/${notifId}`);
+      }
+      // Refresh notifications
+      const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
+      const data = res.data['member'] || res.data['hydra:member'] || [];
+      setNotifications(data);
+      const unreadCount = data.filter(n => !n.is_open).length;
+      setUnreadNotifications(unreadCount);
+    } catch (err) {
+      console.error("Error deleting notification", err);
+    }
+  }
+
+  const handleReadNotification = async (notifId) => {
+    try {
+      await api.patch(`/api/notifications/${notifId}`, { is_open: true }, {
+        headers: { 'Content-Type': 'application/merge-patch+json' }
+      });
+      
+      // Update local state without full refresh for speed
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_open: true } : n));
+      setUnreadNotifications(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Error marking notification as read", err);
+    }
+  }
+
   return (
-    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/30">
+    <>
+      <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/30">
       <div className="max-w-[1700px] mx-auto px-6">
         <div className="flex justify-between items-center h-20">
           
@@ -103,7 +154,10 @@ const Topbar = () => {
                 
                 {/* Notifications Bell */}
                 <div className="relative group mr-2">
-                  <div className={`p-2 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}>
+                  <div 
+                    onClick={() => setIsNotifModalOpen(true)}
+                    className={`p-2 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}
+                  >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     {unreadNotifications > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-slate-950">
@@ -112,6 +166,16 @@ const Topbar = () => {
                     )}
                   </div>
                 </div>
+
+                {/* User Dashboard Link */}
+                {!isStaff && (
+                  <Link 
+                    to="/user" 
+                    className="px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[10px] font-black uppercase tracking-widest hover:bg-teal-500/20 transition-all"
+                  >
+                    Tableau de bord
+                  </Link>
+                )}
 
                 {/* Dashboard Pro Shortcut for Staff */}
                 {isStaff && (
@@ -212,6 +276,15 @@ const Topbar = () => {
         </div>
       )}
     </nav>
+    <NotificationModal 
+      isOpen={isNotifModalOpen} 
+      onClose={() => setIsNotifModalOpen(false)} 
+      notifications={notifications}
+      onDelete={handleDeleteNotifications}
+      onRead={handleReadNotification}
+      isStaff={isStaff}
+    />
+    </>
   )
 }
 

@@ -30,7 +30,8 @@ class PriceCalculatorService
      * @param \DateTimeInterface $end End date of the rental
      * @param Fitting[] $fittings Optional fittings added to the rental
      * @param Formula[] $formulas Optional formulas added to the rental
-     * @param User[] $crewMembers Professional crew members added to the rental
+     * @param User[] $crewMembers Professional crew members added to the rental (assigned)
+     * @param string[] $requestedRoles Roles requested by the customer (not yet assigned)
      * @return float The calculated total price
      */
     public function calculate(
@@ -40,7 +41,8 @@ class PriceCalculatorService
         \DateTimeInterface $end,
         array $fittings = [],
         array $formulas = [],
-        array $crewMembers = []
+        array $crewMembers = [],
+        array $requestedRoles = []
     ): float {
         $nbDays = $this->calculateNbDays($start, $end);
 
@@ -76,12 +78,20 @@ class PriceCalculatorService
             'ROLE_HOTESSE'   => 150.0,
         ];
 
+        // Calculation from assigned crew members
         foreach ($crewMembers as $member) {
             foreach ($crewPrices as $role => $price) {
                 if (in_array($role, $member->getRoles(), true)) {
                     $crewTotal += ($price * $nbDays);
-                    break; // One role per member for pricing
+                    break; 
                 }
+            }
+        }
+
+        // Calculation from requested roles (for new competitive booking system)
+        foreach ($requestedRoles as $role) {
+            if (isset($crewPrices[$role])) {
+                $crewTotal += ($crewPrices[$role] * $nbDays);
             }
         }
 

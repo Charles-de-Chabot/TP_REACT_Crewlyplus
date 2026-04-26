@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +15,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['notification:read']],
     denormalizationContext: ['groups' => ['notification:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['user.id' => 'exact'])]
+#[ApiFilter(BooleanFilter::class, properties: ['is_open'])]
 class Notification
 {
     #[ORM\Id]
