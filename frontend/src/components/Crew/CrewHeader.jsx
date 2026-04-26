@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import api from '../../api/axios';
 import { USER_URL } from '../../constants/apiConstant';
+import IconRenderer from '../UI/IconRenderer';
 
 const CrewHeader = ({ theme, firstname, lastname, avatar, pendingCount, onAvatarUpdate }) => {
     const fileInputRef = useRef(null);
@@ -52,7 +53,7 @@ const CrewHeader = ({ theme, firstname, lastname, avatar, pendingCount, onAvatar
             <div className="relative group/avatar cursor-pointer" onClick={handleAvatarClick}>
                 <div className={`w-32 h-32 rounded-[2.5rem] overflow-hidden flex items-center justify-center text-4xl font-black border-2 ${theme.secondary} ${theme.border} ${theme.primary} ${theme.glow} shadow-2xl transition-all duration-500 ${uploading ? 'opacity-50' : 'group-hover/avatar:scale-105'}`}>
                     {uploading ? (
-                        <div className="w-8 h-8 border-4 border-current border-t-transparent rounded-full animate-spin" />
+                        <IconRenderer icon="⌛" size={40} className={theme.primary} animate />
                     ) : imgUser ? (
                         <img src={imgUser} alt={firstname} className="w-full h-full object-cover" />
                     ) : (
@@ -63,8 +64,12 @@ const CrewHeader = ({ theme, firstname, lastname, avatar, pendingCount, onAvatar
                 </div>
                 
                 {/* Pastille de modification */}
-                <div className={`absolute -bottom-2 -right-2 w-10 h-10 ${theme.primary.replace('text', 'bg')} rounded-full border-4 border-slate-950 flex items-center justify-center text-slate-950 text-sm shadow-xl transform opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:scale-110 transition-all duration-300 z-20`}>
-                    {uploading ? '⌛' : '📷'}
+                <div className={`absolute -bottom-2 -right-2 w-10 h-10 bg-slate-950 rounded-full border-4 border-slate-900 flex items-center justify-center shadow-xl transform opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:scale-110 transition-all duration-300 z-20`}>
+                    {uploading ? (
+                        <IconRenderer icon="⌛" size={16} className={theme.primary} animate />
+                    ) : (
+                        <IconRenderer icon="📷" size={18} className={theme.primary} />
+                    )}
                 </div>
 
                 {/* Overlay au survol */}

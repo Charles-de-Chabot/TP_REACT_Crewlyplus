@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
   --animate-slideup: slideup 1s ease-in-out;
   --animate-fade-in-down: fadeInDown 0.8s ease-out;
   --animate-shake: shake 0.5s ease-in-out;

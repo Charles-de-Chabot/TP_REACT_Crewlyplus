@@ -1,4 +1,5 @@
 import React from 'react';
+import IconRenderer from '../UI/IconRenderer';
 
 const CrewStats = ({ theme, stats = {} }) => {
     const {
@@ -18,13 +19,23 @@ const CrewStats = ({ theme, stats = {} }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {statsConfig.map((s, i) => (
-                <div key={i} className="bg-slate-900/40 border border-white/5 p-6 rounded-3xl backdrop-blur-xl">
-                    <div className="flex justify-between items-start mb-4">
-                        <span className="text-2xl">{s.icon}</span>
-                        <div className={`w-2 h-2 rounded-full ${theme.primary.replace('text', 'bg')}`} />
+                <div key={i} className="bg-slate-900/40 border border-white/5 p-6 rounded-3xl backdrop-blur-xl relative overflow-hidden group">
+                    {/* Background Detail */}
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <IconRenderer icon={s.icon} size={80} />
                     </div>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{s.label}</p>
-                    <p className="text-2xl font-black text-white mt-1">{s.value}</p>
+
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <div className={`w-10 h-10 rounded-2xl ${theme.secondary} border ${theme.border} flex items-center justify-center ${theme.primary}`}>
+                            <IconRenderer icon={s.icon} size={20} />
+                        </div>
+                        <div className={`w-1.5 h-1.5 rounded-full ${theme.primary.replace('text', 'bg')} shadow-[0_0_10px_currentColor]`} />
+                    </div>
+                    
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">{s.label}</p>
+                        <p className="text-2xl font-black text-white mt-2 italic font-mono tracking-tighter">{s.value}</p>
+                    </div>
                 </div>
             ))}
         </div>

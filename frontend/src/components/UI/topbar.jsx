@@ -5,6 +5,7 @@ import { useSidebar } from '../../hooks/useSidebar'
 import { IMAGE_URL } from '../../constants/apiConstant'
 import api from '../../api/axios'
 import NotificationModal from './NotificationModal'
+import IconRenderer from './IconRenderer'
 import { useDispatch } from 'react-redux'
 import { resetBooking } from '../../store/booking/bookingSlice'
 
@@ -35,12 +36,9 @@ const Topbar = () => {
     if (isAuthenticated) {
       const fetchNotifications = async () => {
         try {
-          // Fetch last 20 notifications (read or unread)
           const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
           const data = res.data['member'] || res.data['hydra:member'] || [];
           setNotifications(data);
-          
-          // Unread count is calculated locally based on is_open property
           const unreadCount = data.filter(n => !n.is_open).length;
           setUnreadNotifications(unreadCount);
         } catch (err) {
@@ -48,18 +46,15 @@ const Topbar = () => {
         }
       };
       fetchNotifications();
-      // Polling every 60s for new notifications
       const interval = setInterval(fetchNotifications, 60000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, userId]);
 
-  // Reset booking state when user ID changes (Login/Logout/Switch)
   useEffect(() => {
     dispatch(resetBooking());
   }, [userId, dispatch]);
 
-  // Déterminer le rôle prioritaire
   const getActiveRoleKey = () => {
     const currentRole = String(roleLabel || role || '').toUpperCase();
     if (currentRole.includes('ADMIN')) return 'ROLE_ADMIN';
@@ -94,7 +89,6 @@ const Topbar = () => {
       } else {
         await api.delete(`/api/notifications/${notifId}`);
       }
-      // Refresh notifications
       const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
       const data = res.data['member'] || res.data['hydra:member'] || [];
       setNotifications(data);
@@ -110,8 +104,6 @@ const Topbar = () => {
       await api.patch(`/api/notifications/${notifId}`, { is_open: true }, {
         headers: { 'Content-Type': 'application/merge-patch+json' }
       });
-      
-      // Update local state without full refresh for speed
       setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_open: true } : n));
       setUnreadNotifications(prev => Math.max(0, prev - 1));
     } catch (err) {
@@ -125,7 +117,6 @@ const Topbar = () => {
       <div className="max-w-[1700px] mx-auto px-6">
         <div className="flex justify-between items-center h-20">
           
-          {/* GAUCHE : Logo + Navigation Desktop */}
           <div className="flex items-center space-x-12">
             <Link className="flex-shrink-0" to="/">
               <img className="h-9 w-auto" src={`${IMAGE_URL}/logo.png`} alt="Crewly" />
@@ -137,8 +128,8 @@ const Topbar = () => {
                   key={item.path} 
                   to={item.path}
                   className={({ isActive }) => `
-                    text-sm font-bold tracking-tight transition-all duration-300
-                    ${isActive ? 'text-teal-400' : 'text-slate-300 hover:text-white'}
+                    text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300
+                    ${isActive ? 'text-teal-400' : 'text-slate-500 hover:text-white'}
                   `}
                 >
                   {item.label}
@@ -147,18 +138,16 @@ const Topbar = () => {
             </div>
           </div>
 
-          {/* DROITE : Profil & Actions */}
           <div className="hidden md:flex items-center space-x-6">
             {isAuthenticated ? (
               <div className="flex items-center space-x-5 pl-5 border-l border-white/10">
                 
-                {/* Notifications Bell */}
                 <div className="relative group mr-2">
                   <div 
                     onClick={() => setIsNotifModalOpen(true)}
-                    className={`p-2 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}
+                    className={`p-2.5 rounded-xl bg-white/5 text-slate-400 hover:text-white transition-all cursor-pointer ${unreadNotifications > 0 ? 'animate-pulse' : ''}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <IconRenderer icon="🔔" size={20} />
                     {unreadNotifications > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-slate-950">
                         {unreadNotifications}
@@ -167,21 +156,19 @@ const Topbar = () => {
                   </div>
                 </div>
 
-                {/* User Dashboard Link */}
                 {!isStaff && (
                   <Link 
                     to="/user" 
-                    className="px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[10px] font-black uppercase tracking-widest hover:bg-teal-500/20 transition-all"
+                    className={`px-4 py-2 rounded-xl ${config.bg} border ${config.border} ${config.color} text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all`}
                   >
                     Tableau de bord
                   </Link>
                 )}
 
-                {/* Dashboard Pro Shortcut for Staff */}
                 {isStaff && (
                   <Link 
                     to="/crew/dashboard" 
-                    className="px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500/20 transition-all"
+                    className={`px-4 py-2 rounded-xl ${config.bg} border ${config.border} ${config.color} text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all`}
                   >
                     Tableau de bord Pro
                   </Link>
@@ -210,67 +197,74 @@ const Topbar = () => {
 
                 <button 
                   onClick={handleLogout} 
-                  className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
+                  className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl transition-all group"
                   title="Déconnexion"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <IconRenderer icon="🚪" size={20} className="group-hover:scale-110 transition-transform" />
                 </button>
               </div>
             ) : (
               <div className="flex items-center space-x-5">
-                <Link className="text-sm font-bold text-slate-300 hover:text-white transition-colors" to="/login">
+                <Link className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors" to="/login">
                   Connexion
                 </Link>
-                <Link className="bg-teal-500 hover:bg-teal-400 text-slate-950 text-sm font-black px-6 py-3 rounded-xl transition-all shadow-lg shadow-teal-500/20 active:scale-95" to="/register">
+                <Link className="bg-teal-500 hover:bg-teal-400 text-slate-950 text-[10px] font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-lg shadow-teal-500/20 active:scale-95" to="/register">
                   S'inscrire
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Bouton Menu Mobile */}
           <button 
-            className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg" 
+            className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
+            <IconRenderer icon={isMobileMenuOpen ? "❌" : "🍔"} size={28} />
           </button>
         </div>
       </div>
 
-      {/* Dropdown Mobile */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-white/5 p-6 shadow-2xl animate-fade-in">
-           <div className="space-y-3 mb-6">
+           <div className="space-y-4 mb-8">
               {navItems.map((item) => (
-                  <Link key={item.path} to={item.path} className="block text-xl font-bold text-white hover:text-teal-400" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link 
+                    key={item.path} 
+                    to={item.path} 
+                    className="block text-2xl font-black text-white hover:text-teal-400 italic uppercase tracking-tighter" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     {item.label}
                   </Link>
               ))}
            </div>
-           <hr className="border-white/5 mb-6" />
+           <hr className="border-white/5 mb-8" />
            {isAuthenticated ? (
-             <div className="space-y-4">
-               <div className="flex items-center space-x-3 mb-4">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${config.bg} ${config.color}`}>
+             <div className="space-y-6">
+               <div className="flex items-center space-x-4 mb-6">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center font-black italic text-lg border-2 ${config.bg} ${config.color} ${config.border}`}>
                     {userInitial}
                   </div>
-                  <span className={`text-sm font-black uppercase tracking-widest ${config.color}`}>{config.label}</span>
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold">{firstname}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${config.color}`}>{config.label}</span>
+                  </div>
                </div>
-               {isStaff && (
-                 <Link to="/crew/dashboard" className="block text-lg font-bold text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>Dashboard Pro</Link>
-               )}
-               <Link to="/user" className="block text-lg font-bold text-slate-300" onClick={() => setIsMobileMenuOpen(false)}>Mon Profil</Link>
-               <button onClick={handleLogout} className="text-red-400 font-bold italic text-lg">Déconnexion</button>
+               <div className="grid grid-cols-1 gap-3">
+                {isStaff && (
+                  <Link to="/crew/dashboard" className="w-full py-4 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-widest text-center rounded-2xl border border-blue-500/20" onClick={() => setIsMobileMenuOpen(false)}>Dashboard Pro</Link>
+                )}
+                <Link to="/user" className="w-full py-4 bg-teal-500/10 text-teal-400 font-black text-[10px] uppercase tracking-widest text-center rounded-2xl border border-teal-500/20" onClick={() => setIsMobileMenuOpen(false)}>Mon Profil</Link>
+                <button onClick={handleLogout} className="w-full py-4 bg-red-500/10 text-red-400 font-black text-[10px] uppercase tracking-widest text-center rounded-2xl border border-red-500/20 flex items-center justify-center gap-2">
+                  <IconRenderer icon="🚪" size={14} />
+                  Déconnexion
+                </button>
+               </div>
              </div>
            ) : (
-             <div className="space-y-4">
-               <Link to="/login" className="block text-center w-full py-3 bg-white/5 text-white font-bold rounded-xl" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
-               <Link to="/register" className="block text-center w-full py-3 bg-teal-500 text-slate-950 font-black rounded-xl" onClick={() => setIsMobileMenuOpen(false)}>S'inscrire</Link>
+             <div className="grid grid-cols-2 gap-4">
+               <Link to="/login" className="py-4 bg-white/5 text-white font-black text-[10px] uppercase tracking-widest text-center rounded-2xl border border-white/10" onClick={() => setIsMobileMenuOpen(false)}>Connexion</Link>
+               <Link to="/register" className="py-4 bg-teal-500 text-slate-950 font-black text-[10px] uppercase tracking-widest text-center rounded-2xl shadow-lg shadow-teal-500/20" onClick={() => setIsMobileMenuOpen(false)}>S'inscrire</Link>
              </div>
            )}
         </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { useAuthContext } from '../../contexts/authContext';
+import IconRenderer from '../UI/IconRenderer';
 
 const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
     const { refreshProfile } = useAuthContext();
@@ -43,7 +44,6 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // On prépare les données proprement
             const patchData = {
                 firstname: formData.firstname,
                 lastname: formData.lastname,
@@ -51,7 +51,6 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                 position: formData.position,
             };
 
-            // On traite l'adresse si la ville est renseignée
             if (formData.address.city) {
                 patchData.address = {
                     houseNumber: formData.address.houseNumber,
@@ -73,7 +72,6 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
             onClose();
         } catch (error) {
             console.error("Error updating profile:", error);
-            // Affichons l'erreur précise pour aider au débug si ça échoue encore
             if (error.response?.data?.violations) {
                 const messages = error.response.data.violations.map(v => `${v.propertyPath}: ${v.message}`).join('\n');
                 alert("Erreur de validation :\n" + messages);
@@ -91,14 +89,16 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
             
             <div className="relative bg-slate-900 border border-white/10 w-full max-w-xl rounded-[2.5rem] overflow-hidden shadow-2xl animate-slideup">
                 <div className="p-8 border-b border-white/5 flex justify-between items-center text-white">
-                    <h2 className="text-2xl font-black italic uppercase">Modifier mon profil</h2>
-                    <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">✕</button>
+                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">Modifier mon profil</h2>
+                    <button onClick={onClose} className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <IconRenderer icon="❌" size={24} />
+                    </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Prénom</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Prénom</label>
                             <input 
                                 type="text"
                                 value={formData.firstname}
@@ -107,7 +107,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Nom</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Nom</label>
                             <input 
                                 type="text"
                                 value={formData.lastname}
@@ -118,7 +118,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Numéro de téléphone</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Numéro de téléphone</label>
                         <input 
                             type="text"
                             value={formData.phoneNumber}
@@ -128,11 +128,14 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                     </div>
 
                     <div className="pt-4 border-t border-white/5">
-                        <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-widest">Adresse</h3>
+                        <h3 className="text-sm font-black text-white mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <IconRenderer icon="🗺️" size={14} className="text-teal-500" />
+                            Adresse de facturation
+                        </h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-4 gap-4">
                                 <div className="col-span-1 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">N°</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">N°</label>
                                     <input 
                                         type="text"
                                         value={formData.address.houseNumber}
@@ -141,7 +144,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                                     />
                                 </div>
                                 <div className="col-span-3 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Rue</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Rue</label>
                                     <input 
                                         type="text"
                                         value={formData.address.streetName}
@@ -152,7 +155,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                             </div>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="col-span-1 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">CP</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">CP</label>
                                     <input 
                                         type="text"
                                         value={formData.address.postcode}
@@ -161,7 +164,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                                     />
                                 </div>
                                 <div className="col-span-2 space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Ville</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Ville</label>
                                     <input 
                                         type="text"
                                         value={formData.address.city}
@@ -177,8 +180,9 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="w-full py-4 bg-teal-500 text-slate-950 font-black rounded-2xl hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50"
+                            className="w-full py-4 bg-teal-500 text-slate-950 font-black rounded-2xl hover:bg-teal-400 transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 uppercase tracking-widest text-xs flex items-center justify-center gap-3"
                         >
+                            {loading ? <IconRenderer icon="⌛" size={16} animate /> : <IconRenderer icon="✅" size={16} />}
                             {loading ? 'Enregistrement...' : 'Enregistrer les modifications'}
                         </button>
                     </div>

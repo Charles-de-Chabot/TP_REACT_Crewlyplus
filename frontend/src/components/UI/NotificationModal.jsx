@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import IconRenderer from './IconRenderer';
 
 const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, isStaff }) => {
     if (!isOpen) return null;
@@ -23,15 +24,14 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                         className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
                         title="Fermer"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <IconRenderer icon="❌" size={24} />
                     </button>
                 </div>
 
                 <div className="max-h-[400px] overflow-y-auto custom-scrollbar p-4 space-y-3">
                     {notifications.length === 0 ? (
                         <div className="text-center py-12">
+                            <IconRenderer icon="🔔" size={48} className="text-slate-800 mb-4 opacity-20" />
                             <p className="text-slate-500 font-bold italic text-sm">Aucune nouvelle notification.</p>
                         </div>
                     ) : (
@@ -59,11 +59,12 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                                             if (!notif.is_open) onRead(notif.id);
                                             onClose();
                                         }}
-                                        className={`text-[10px] font-black uppercase tracking-widest transition-colors ${
+                                        className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
                                             notif.is_open ? 'text-slate-500 hover:text-teal-500' : 'text-teal-500 hover:text-teal-400'
                                         }`}
                                     >
-                                        Voir mon dashboard →
+                                        Voir mon dashboard
+                                        <IconRenderer icon="➡️" size={12} />
                                     </Link>
                                     <button 
                                         onClick={(e) => {
@@ -72,7 +73,7 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                                         }}
                                         className="text-[9px] font-bold text-slate-500 hover:text-red-400 uppercase flex items-center gap-1.5 transition-colors"
                                     >
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        <IconRenderer icon="🗑️" size={14} />
                                         Supprimer
                                     </button>
                                 </div>
@@ -85,9 +86,9 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                     <div className="p-4 bg-slate-950/50 border-t border-white/5">
                         <button 
                             onClick={() => onDelete('all')}
-                            className="w-full py-3 text-[10px] font-black text-red-400/70 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-3 text-[10px] font-black text-red-400/70 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center justify-center gap-2 group/clear"
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <IconRenderer icon="🗑️" size={16} className="group-hover/clear:scale-110" />
                             Tout supprimer
                         </button>
                     </div>

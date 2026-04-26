@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../../api/axios';
+import IconRenderer from '../UI/IconRenderer';
 
 const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
     const [formData, setFormData] = useState({
@@ -22,7 +23,6 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            // 1. Update Address (if exists)
             if (user?.address?.id) {
                 await api.patch(`/api/addresses/${user.address.id}`, {
                     houseNumber: formData.houseNumber,
@@ -34,7 +34,6 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                 });
             }
 
-            // 2. Update User
             await api.patch(`/api/users/${user.id}`, {
                 phoneNumber: formData.phoneNumber,
                 position: formData.position
@@ -57,11 +56,11 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
             
             <div className="bg-slate-900 border border-white/10 w-full max-w-xl rounded-[3rem] p-10 relative z-10 shadow-2xl animate-scale-in">
-                <button onClick={onClose} className="absolute top-8 right-8 text-slate-500 hover:text-white transition-all">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <button onClick={onClose} className="absolute top-8 right-8 text-slate-500 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl">
+                    <IconRenderer icon="❌" size={24} />
                 </button>
 
-                <h3 className="text-2xl font-black text-white mb-8 italic">Modifier mon profil Pro</h3>
+                <h3 className="text-2xl font-black text-white mb-8 italic uppercase tracking-tighter">Modifier mon profil Pro</h3>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
@@ -94,8 +93,9 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full py-4 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black rounded-2xl transition-all shadow-lg shadow-teal-500/20 uppercase tracking-widest text-xs"
+                        className="w-full py-4 bg-teal-500 hover:bg-teal-400 text-slate-950 font-black rounded-2xl transition-all shadow-lg shadow-teal-500/20 uppercase tracking-widest text-xs flex items-center justify-center gap-3"
                     >
+                        {loading ? <IconRenderer icon="⌛" size={16} animate /> : <IconRenderer icon="✅" size={16} />}
                         {loading ? 'Enregistrement...' : 'Sauvegarder les modifications'}
                     </button>
                 </form>

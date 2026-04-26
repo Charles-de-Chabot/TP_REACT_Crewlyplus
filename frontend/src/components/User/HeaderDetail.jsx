@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react'
-import { USER_URL } from '../../constants/apiConstant';
+import React, { useRef, useState } from 'react';
 import api from '../../api/axios';
+import { USER_URL } from '../../constants/apiConstant';
+import IconRenderer from '../UI/IconRenderer';
 
 const HeaderDetail = ({ data, onEdit, onAvatarUpdate }) => {
     const fileInputRef = useRef(null);
@@ -68,7 +69,7 @@ const HeaderDetail = ({ data, onEdit, onAvatarUpdate }) => {
         <div className="relative group/avatar cursor-pointer" onClick={handleAvatarClick}>
             <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden shrink-0 border-4 border-teal-500/30 bg-slate-800 flex items-center justify-center shadow-lg shadow-teal-500/10 transition-all duration-500 ${uploading ? 'opacity-50' : 'group-hover/avatar:scale-105'}`}>
                 {uploading ? (
-                    <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                    <IconRenderer icon="⌛" size={40} className="text-teal-400" animate />
                 ) : imgUser ? (
                     <img src={imgUser} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
@@ -79,8 +80,8 @@ const HeaderDetail = ({ data, onEdit, onAvatarUpdate }) => {
             </div>
             
             {/* Pastille de modification */}
-            <div className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full border-4 border-slate-950 flex items-center justify-center text-slate-950 text-xs sm:text-sm shadow-xl transform translate-x-1 translate-y-1 opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:scale-110 transition-all duration-300 z-20">
-                {uploading ? '⌛' : '📷'}
+            <div className="absolute bottom-0 right-0 w-8 h-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full border-4 border-slate-950 flex items-center justify-center text-slate-950 shadow-xl transform translate-x-1 translate-y-1 opacity-0 group-hover/avatar:opacity-100 group-hover/avatar:scale-110 transition-all duration-300 z-20">
+                {uploading ? <IconRenderer icon="⌛" size={16} animate /> : <IconRenderer icon="📷" size={18} />}
             </div>
 
             {/* Overlay au survol */}
