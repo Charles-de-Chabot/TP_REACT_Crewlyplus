@@ -146,7 +146,7 @@ export const AuthContextProvider = ({ children }) => {
         } else if (roleLabel === 'ROLE_CHEF') {
             color = "#f97316";
             rgb = "249, 115, 22";
-        } else if (roleLabel === 'ROLE_STEWARD') {
+        } else if (roleLabel === 'ROLE_HOTESSE') {
             color = "#a855f7";
             rgb = "168, 85, 247";
         } else if (roleLabel === 'ROLE_PREMIUM') {

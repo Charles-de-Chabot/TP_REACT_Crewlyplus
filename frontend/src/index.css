@@ -47,7 +47,7 @@
 
 @layer base {
   body {
-    @apply text-sm antialiased selection:bg-teal-500/30 selection:text-white;
+    @apply text-sm antialiased selection:bg-accent-role/30 selection:text-white;
   }
 }
 
