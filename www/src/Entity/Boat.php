@@ -22,9 +22,11 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
 #[ApiFilter(SearchFilter::class, properties: [
     'name' => 'ipartial',           // Recherche partielle insensible à la casse sur le nom
     'boatType' => 'exact',          // Filtre sur la relation Type 
-    'boatModel' => 'exact'          // Filtre sur la relation Model 
+    'boatModel' => 'exact',         // Filtre sur la relation Model 
+    'address.city' => 'exact'       // Filtre sur la ville de l'adresse
 ])]
 #[ApiFilter(BooleanFilter::class, properties: ['is_active', 'used'])]
+#[ApiFilter(\App\Filter\BoatAvailabilityFilter::class)]
 class Boat
 {
     #[ORM\Id]

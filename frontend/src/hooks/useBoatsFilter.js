@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBoats, setSearchDates } from '../store/boat/boatSlice';
+import { fetchBoats, setSearchDates, fetchFilterData } from '../store/boat/boatSlice';
 import selectBoatData from '../store/boat/boatSelector';
 
 const useBoatsFilter = () => {
@@ -16,8 +16,21 @@ const useBoatsFilter = () => {
     });
 
     useEffect(() => {
-        if (boats.length === 0) dispatch(fetchBoats());
-    }, [dispatch, boats.length]);
+        // On récupère les données de filtres (Types, Modèles, Villes) une seule fois au chargement
+        dispatch(fetchFilterData());
+    }, [dispatch]);
+
+    useEffect(() => {
+        // On fetch les bateaux avec tous les filtres actifs
+        // Cela permet de déléguer le filtrage (notamment la disponibilité) au serveur
+        dispatch(fetchBoats({ 
+            start: filters.start, 
+            end: filters.end,
+            type: filters.type,
+            model: filters.model,
+            city: filters.city
+        }));
+    }, [dispatch, filters.start, filters.end, filters.type, filters.model, filters.city]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;

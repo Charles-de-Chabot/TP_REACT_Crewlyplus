@@ -7,7 +7,7 @@ const STATUS_LABELS = {
     'completed': { label: 'Terminée', color: 'text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/20' }
 };
 
-const BookingHistory = ({ bookings = [] }) => {
+const BookingHistory = ({ bookings = [], onCancel }) => {
     if (!bookings || bookings.length === 0) {
         return (
             <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-12 shadow-xl shadow-black/30 text-center">
@@ -76,6 +76,16 @@ const BookingHistory = ({ bookings = [] }) => {
                                         {status.label}
                                     </span>
                                     
+                                    {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                                        <button 
+                                            onClick={() => onCancel && onCancel(booking.id)}
+                                            className="px-4 py-1.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-[10px] font-black uppercase tracking-widest"
+                                            title="Annuler la réservation"
+                                        >
+                                            Annuler
+                                        </button>
+                                    )}
+
                                     {booking.status === 'confirmed' && (
                                         <button className="p-2.5 rounded-xl bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all border border-white/5" title="Télécharger la facture">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

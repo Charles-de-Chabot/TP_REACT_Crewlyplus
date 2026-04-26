@@ -42,11 +42,21 @@ export const { setLoading, setBoats, setBoatDetail, setFiltersData, setSearchDat
  * =============================
  */
 
-// Méthode qui récupère tous les bateaux
-export const fetchBoats = () => async (dispatch) => {
+// Méthode qui récupère tous les bateaux avec filtres optionnels
+export const fetchBoats = (filters = {}) => async (dispatch) => {
     try {
         dispatch(setLoading(true));
-        const response = await api.get('/api/boats');
+        
+        // Construction des paramètres de requête
+        const params = {};
+        if (filters.start) params.start = filters.start;
+        if (filters.end) params.end = filters.end;
+        if (filters.type && filters.type !== '0') params.boatType = filters.type;
+        if (filters.model && filters.model !== '0') params.boatModel = filters.model;
+        if (filters.city && filters.city !== '0') params['address.city'] = filters.city;
+        if (filters.used !== undefined) params.used = filters.used;
+
+        const response = await api.get('/api/boats', { params });
 
         // Gestion du format JSON-LD vs JSON classique
         let fetchedData = [];
@@ -60,23 +70,36 @@ export const fetchBoats = () => async (dispatch) => {
 
         dispatch(setBoats(fetchedData));
 
-        // Extraction dynamique des filtres
-        const uniqueTypes = [];
-        const uniqueModels = [];
-        const uniqueCities = [];
-
-        fetchedData.forEach(boat => {
-            if (boat.type && !uniqueTypes.find(t => t.id === boat.type.id)) uniqueTypes.push(boat.type);
-            if (boat.model && !uniqueModels.find(m => m.id === boat.model.id)) uniqueModels.push({ ...boat.model, typeId: boat.type?.id });
-            if (boat.adress?.city && !uniqueCities.includes(boat.adress.city)) uniqueCities.push(boat.adress.city);
-        });
-
-        dispatch(setFiltersData({ types: uniqueTypes, models: uniqueModels, cities: uniqueCities }));
-
+        dispatch(setBoats(fetchedData));
     } catch (error) {
         console.error(`Erreur lors de la récupération des bateaux: ${error}`);
     } finally {
         dispatch(setLoading(false));
+    }
+};
+
+// Méthode pour récupérer les données de filtres (Types, Modèles, Villes) de manière exhaustive
+export const fetchFilterData = () => async (dispatch) => {
+    try {
+        const [typesRes, modelsRes, boatsRes] = await Promise.all([
+            api.get('/api/types'),
+            api.get('/api/models'),
+            api.get('/api/boats') // On récupère tous les bateaux sans filtres pour les villes
+        ]);
+
+        const types = typesRes.data['hydra:member'] || typesRes.data.member || (Array.isArray(typesRes.data) ? typesRes.data : []);
+        const models = modelsRes.data['hydra:member'] || modelsRes.data.member || (Array.isArray(modelsRes.data) ? modelsRes.data : []);
+        const allBoats = boatsRes.data['hydra:member'] || boatsRes.data.member || (Array.isArray(boatsRes.data) ? boatsRes.data : []);
+
+        const uniqueCities = [...new Set(allBoats.map(b => b.adress?.city).filter(Boolean))];
+
+        dispatch(setFiltersData({ 
+            types, 
+            models, 
+            cities: uniqueCities 
+        }));
+    } catch (error) {
+        console.error("Erreur lors de la récupération des filtres:", error);
     }
 };
 
