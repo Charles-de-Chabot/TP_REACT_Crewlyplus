@@ -55,11 +55,17 @@ const ICON_MAP = {
 
     // Technique Bateau (Nouveaux)
     '📏': LuIcons.LuRuler,
+    'length': LuIcons.LuRuler,
     '↔️': LuIcons.LuArrowsHorizontal || Hi2Icons.HiArrowsRightLeft,
+    'width': LuIcons.LuArrowsHorizontal || Hi2Icons.HiArrowsRightLeft,
     '🛏️': LuIcons.LuBed || LuIcons.LuBedSingle,
+    'bed': LuIcons.LuBed || LuIcons.LuBedSingle,
     '⛽': LuIcons.LuFuel || LuIcons.LuContainer,
+    'fuel': LuIcons.LuFuel || LuIcons.LuContainer,
     '🏠': LuIcons.LuHome,
+    'home': Hi2Icons.HiHome || Hi2Icons.HiOutlineHome || LuIcons.LuMapPin,
     '🌐': LuIcons.LuGlobe,
+    'globe': LuIcons.LuGlobe,
 };
 
 const IconRenderer = ({ 

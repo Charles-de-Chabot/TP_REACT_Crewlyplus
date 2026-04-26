@@ -22,7 +22,7 @@ const AddressDetail = ({ address }) => {
             {streetLine && (
                 <div className="flex items-start gap-4 group/item">
                     <div className="bg-slate-950 p-2 rounded-lg border border-white/5 text-slate-600 group-hover/item:text-accent-role transition-colors">
-                        <IconRenderer icon="🏠" size={16} />
+                        <IconRenderer icon="home" size={16} />
                     </div>
                     <div>
                         <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Rue / Quai</p>
@@ -49,7 +49,7 @@ const AddressDetail = ({ address }) => {
             {countryLine && (
                 <div className="flex items-start gap-4 group/item">
                     <div className="bg-slate-950 p-2 rounded-lg border border-white/5 text-slate-600 group-hover/item:text-accent-role transition-colors">
-                        <IconRenderer icon="🌐" size={16} />
+                        <IconRenderer icon="globe" size={16} />
                     </div>
                     <div>
                         <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Région / Pays</p>

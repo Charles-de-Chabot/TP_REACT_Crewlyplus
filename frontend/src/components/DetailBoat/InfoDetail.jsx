@@ -22,8 +22,8 @@ const InfoDetail = ({ boatDetail }) => {
                         Dimensions de la coque
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <TechnicalCard label="Longueur" value={boatDetail?.boatinfo?.length} unit="m" icon="📏" />
-                        <TechnicalCard label="Largeur" value={boatDetail?.boatinfo?.width} unit="m" icon="↔️" />
+                        <TechnicalCard label="Longueur" value={boatDetail?.boatinfo?.length} unit="m" icon="length" />
+                        <TechnicalCard label="Largeur" value={boatDetail?.boatinfo?.width} unit="m" icon="width" />
                         <TechnicalCard label="Tirant d'eau" value={boatDetail?.boatinfo?.draught} unit="m" icon="⚓" />
                     </div>
                 </div>
@@ -36,7 +36,7 @@ const InfoDetail = ({ boatDetail }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         <TechnicalCard label="Capacité max." value={boatDetail?.boatinfo?.maxUser} unit="pers." icon="👥" />
                         <TechnicalCard label="Cabines" value={boatDetail?.boatinfo?.cabineNumber} unit="" icon="🚪" />
-                        <TechnicalCard label="Couchages" value={boatDetail?.boatinfo?.bedsNumber} unit="" icon="🛏️" />
+                        <TechnicalCard label="Couchages" value={boatDetail?.boatinfo?.bedsNumber} unit="" icon="bed" />
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@ const InfoDetail = ({ boatDetail }) => {
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <TechnicalCard label="Moteur" value={boatDetail?.boatinfo?.powerEngine} unit="" icon="⚙️" fullWidth />
-                        <TechnicalCard label="Carburant" value={boatDetail?.boatinfo?.fuel} unit="" icon="⛽" />
+                        <TechnicalCard label="Carburant" value={boatDetail?.boatinfo?.fuel} unit="" icon="fuel" />
                     </div>
                 </div>
             </div>
