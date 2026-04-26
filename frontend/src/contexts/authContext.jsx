@@ -140,7 +140,7 @@ export const AuthContextProvider = ({ children }) => {
         let color = "#14b8a6"; // Default Teal
         let rgb = "20, 184, 166";
 
-        if (roleLabel === 'ROLE_CAPTAIN') {
+        if (roleLabel === 'ROLE_CAPITAINE') {
             color = "#3b82f6";
             rgb = "59, 130, 246";
         } else if (roleLabel === 'ROLE_CHEF') {
