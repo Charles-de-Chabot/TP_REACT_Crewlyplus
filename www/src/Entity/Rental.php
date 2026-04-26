@@ -81,6 +81,14 @@ class Rental
     ])]
     private string $status = self::STATUS_PENDING;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['rental:read'])]
+    private ?string $paymentIntentId = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['rental:read'])]
+    private ?float $refundAmount = null;
+
     // =========================================================================
     // Relations — ManyToOne
     // =========================================================================
@@ -357,6 +365,30 @@ class Rental
     public function setRequestedRoles(?array $requestedRoles): static
     {
         $this->requestedRoles = $requestedRoles;
+
+        return $this;
+    }
+
+    public function getPaymentIntentId(): ?string
+    {
+        return $this->paymentIntentId;
+    }
+
+    public function setPaymentIntentId(?string $paymentIntentId): static
+    {
+        $this->paymentIntentId = $paymentIntentId;
+
+        return $this;
+    }
+
+    public function getRefundAmount(): ?float
+    {
+        return $this->refundAmount;
+    }
+
+    public function setRefundAmount(?float $refundAmount): static
+    {
+        $this->refundAmount = $refundAmount;
 
         return $this;
     }

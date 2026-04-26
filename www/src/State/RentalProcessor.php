@@ -140,6 +140,8 @@ class RentalProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('Stripe Error: ' . $e->getMessage());
         }
 
+        $data->setPaymentIntentId($paymentIntent->id);
+
         // 5. Persist the rental
         $result = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
 
