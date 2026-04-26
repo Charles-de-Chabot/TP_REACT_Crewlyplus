@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import BoatCalendar from '../Boat/BoatCalendar';
 import { useAuthContext } from '../../contexts/authContext';
 import { setSelectedBoat, setDates, setPremiumDiscount, setBookingStatus } from '../../store/booking/bookingSlice';
+import IconRenderer from '../UI/IconRenderer';
 
 const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
     const navigate = useNavigate();
@@ -46,21 +47,21 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
     };
 
     return (
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl shadow-black/30">
-            <h3 className="text-xl font-bold text-white mb-4">Dates de Réservation</h3>
+        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-8 shadow-2xl shadow-black/50">
+            <h3 className="text-xl font-black text-white mb-6 italic uppercase tracking-tighter">Dates de Réservation</h3>
             
             {/* Premium Badge */}
             {isPremiumRegatta && (
-                <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3">
-                    <span className="text-xl">✦</span>
+                <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-4">
+                    <IconRenderer icon="💎" size={20} className="text-amber-500" />
                     <div>
-                        <p className="text-amber-500 text-[10px] font-bold tracking-widest uppercase">Tarif Élite Activé</p>
-                        <p className="text-white/70 text-xs">Une remise de 15% sera appliquée sur vos formules.</p>
+                        <p className="text-amber-500 text-[10px] font-black tracking-[0.2em] uppercase leading-none mb-1">Tarif Élite Activé</p>
+                        <p className="text-white/60 text-[10px] font-medium uppercase tracking-tight">-15% sur toutes vos formules</p>
                     </div>
                 </div>
             )}
 
-            <div className="mb-6 flex justify-center">
+            <div className="mb-8 flex justify-center">
                 <BoatCalendar 
                     startDate={searchDates?.start || ''} 
                     endDate={searchDates?.end || ''} 
@@ -71,19 +72,19 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
             <div ref={shakeRef} className="transition-transform duration-200">
                 <button
                     onClick={handleBookingClick}
-                    className={`w-full py-4 rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-2 group ${
+                    className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 group ${
                         (searchDates?.start && searchDates?.end)
                             ? 'bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-lg shadow-teal-500/20'
-                            : 'bg-white/5 text-white/40 border border-white/5'
+                            : 'bg-white/5 text-slate-500 border border-white/5'
                     }`}
                 >
-                    Continuer la réservation
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    Réserver ce navire
+                    <IconRenderer icon="➡️" size={14} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 
                 {!searchDates?.start && (
-                    <p className="text-center text-white/30 text-[10px] mt-3 italic">
-                        Veuillez sélectionner vos dates pour continuer
+                    <p className="text-center text-slate-500 text-[9px] font-black uppercase tracking-widest mt-4 italic">
+                        Sélectionnez vos dates d'embarquement
                     </p>
                 )}
             </div>

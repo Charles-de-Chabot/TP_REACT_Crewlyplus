@@ -1,5 +1,5 @@
 import React from 'react'
-import { MdOutlineLocationOn, MdOutlineHome, MdOutlineLocationCity, MdOutlinePublic } from "react-icons/md";
+import IconRenderer from '../UI/IconRenderer';
 
 const AddressDetail = ({ address }) => {
   // S'il n'y a pas d'adresse, on n'affiche pas le bloc
@@ -9,36 +9,52 @@ const AddressDetail = ({ address }) => {
   const streetLine = [address.houseNumber, address.streetName].filter(Boolean).join(' ');
   const zipCodeLine = address.postcode;
   const cityLine = address.city;
-  const countryLine = address.country; // Laissé au cas où, ou à ignorer s'il n'y a pas de pays
+  const countryLine = address.country;
 
   return (
-    <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl shadow-black/30">
-        <h3 className="flex items-center gap-3 text-lg font-bold text-white mb-4 border-b border-white/5 pb-3">
-            <MdOutlineLocationOn className="w-6 h-6 text-teal-400" />
-            Emplacement du bateau
+    <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/10 rounded-2xl p-8 shadow-2xl shadow-black/50">
+        <h3 className="flex items-center gap-4 text-sm font-black text-white mb-8 italic uppercase tracking-tighter border-b border-white/5 pb-4">
+            <IconRenderer icon="📍" size={20} className="text-teal-500" />
+            Port d'attache
         </h3>
-        <div className="flex flex-col gap-4 text-slate-300">
+        
+        <div className="space-y-6">
             {streetLine && (
-                <div className="flex items-center gap-3">
-                    <MdOutlineHome className="w-5 h-5 text-slate-500 shrink-0" />
-                    <span className="text-base">{streetLine}</span>
+                <div className="flex items-start gap-4 group">
+                    <div className="bg-slate-950 p-2 rounded-lg border border-white/5 text-slate-600 group-hover:text-teal-500/50 transition-colors">
+                        <IconRenderer icon="🏠" size={16} />
+                    </div>
+                    <div>
+                        <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Rue / Quai</p>
+                        <p className="text-white text-sm font-bold">{streetLine}</p>
+                    </div>
                 </div>
             )}
             
             {(zipCodeLine || cityLine) && (
-                <div className="flex items-center gap-3">
-                    <MdOutlineLocationCity className="w-5 h-5 text-slate-500 shrink-0" />
+                <div className="flex items-start gap-4 group">
+                    <div className="bg-slate-950 p-2 rounded-lg border border-white/5 text-slate-600 group-hover:text-teal-500/50 transition-colors">
+                        <IconRenderer icon="📍" size={16} />
+                    </div>
                     <div>
-                        {zipCodeLine && <span className="mr-2">{zipCodeLine}</span>}
-                        {cityLine && <span className="font-semibold text-white">{cityLine}</span>}
+                        <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Localisation</p>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-teal-500 font-mono text-sm font-black tracking-tighter">{zipCodeLine}</span>
+                            <span className="text-white text-sm font-bold uppercase tracking-tight">{cityLine}</span>
+                        </div>
                     </div>
                 </div>
             )}
             
             {countryLine && (
-                <div className="flex items-center gap-3">
-                    <MdOutlinePublic className="w-5 h-5 text-slate-500 shrink-0" />
-                    <span className="text-slate-400 text-sm">{countryLine}</span>
+                <div className="flex items-start gap-4 group">
+                    <div className="bg-slate-950 p-2 rounded-lg border border-white/5 text-slate-600 group-hover:text-teal-500/50 transition-colors">
+                        <IconRenderer icon="🌐" size={16} />
+                    </div>
+                    <div>
+                        <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Région / Pays</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">{countryLine}</p>
+                    </div>
                 </div>
             )}
         </div>

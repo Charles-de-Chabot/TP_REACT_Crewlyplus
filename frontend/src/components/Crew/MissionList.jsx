@@ -18,9 +18,9 @@ const MissionCard = ({ mission, onAccept, onRefuse, isProcessing, userId }) => {
     const month = startDate.toLocaleString('default', { month: 'short' });
 
     return (
-        <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[2rem] hover:border-teal-500/30 transition-all group">
+        <div className="bg-slate-950/40 backdrop-blur-sm border border-white/5 border-t-white/10 p-6 rounded-2xl hover:border-teal-500/30 transition-all group shadow-lg shadow-black/20">
             <div className="flex items-center gap-6">
-                <div className="flex flex-col items-center justify-center w-16 h-16 bg-slate-950 rounded-2xl border border-white/5 shadow-inner">
+                <div className="flex flex-col items-center justify-center w-16 h-16 bg-slate-950 rounded-xl border border-white/5 shadow-inner">
                     <span className="text-[10px] font-black text-teal-500 uppercase tracking-tighter mb-0.5">{month}.</span>
                     <span className="text-2xl font-black text-white italic leading-none font-mono tracking-tighter">{day}</span>
                 </div>

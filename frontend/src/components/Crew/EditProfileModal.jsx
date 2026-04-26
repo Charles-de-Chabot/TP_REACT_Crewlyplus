@@ -55,7 +55,7 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
             
-            <div className="bg-slate-900 border border-white/10 w-full max-w-xl rounded-[3rem] p-10 relative z-10 shadow-2xl animate-scale-in">
+            <div className="bg-slate-900 border border-white/10 w-full max-w-xl rounded-2xl p-10 relative z-10 shadow-2xl animate-scale-in">
                 <button onClick={onClose} className="absolute top-8 right-8 text-slate-500 hover:text-white transition-all p-2 hover:bg-white/5 rounded-xl">
                     <IconRenderer icon="❌" size={24} />
                 </button>

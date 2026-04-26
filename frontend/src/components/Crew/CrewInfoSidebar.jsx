@@ -6,7 +6,7 @@ const CrewInfoSidebar = ({ theme, user, onEdit }) => {
     const location = address ? `${address.city}, ${address.postcode}` : "Emplacement non défini";
 
     return (
-        <div className={`p-8 rounded-[3rem] border ${theme.border} relative overflow-hidden bg-gradient-to-br ${theme.gradient} backdrop-blur-3xl`}>
+        <div className={`p-8 rounded-2xl border ${theme.border} relative overflow-hidden bg-gradient-to-br ${theme.gradient} backdrop-blur-3xl`}>
             {/* Ambient Background Icon */}
             <div className={`absolute -top-10 -right-10 opacity-[0.03] ${theme.primary}`}>
                 <IconRenderer icon="⚓" size={200} />

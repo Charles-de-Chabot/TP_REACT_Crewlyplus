@@ -35,7 +35,7 @@ const ConfiguratorBasket = ({ onPayment, bookingError }) => {
     if (!boat) return null;
 
     return (
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-8 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col shadow-2xl">
+        <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-8 sticky top-32 max-h-[calc(100vh-160px)] flex flex-col shadow-2xl shadow-black/50">
             <h2 className="text-xl font-black text-white mb-8 shrink-0 italic uppercase tracking-tighter">Votre Panier</h2>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-6 space-y-6">

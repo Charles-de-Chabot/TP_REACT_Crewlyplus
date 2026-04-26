@@ -87,7 +87,7 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={onClose} />
             
-            <div className="relative bg-slate-900 border border-white/10 w-full max-w-xl rounded-[2.5rem] overflow-hidden shadow-2xl animate-slideup">
+            <div className="relative bg-slate-900 border border-white/10 w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl animate-slideup">
                 <div className="p-8 border-b border-white/5 flex justify-between items-center text-white">
                     <h2 className="text-2xl font-black italic uppercase tracking-tighter">Modifier mon profil</h2>
                     <button onClick={onClose} className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">

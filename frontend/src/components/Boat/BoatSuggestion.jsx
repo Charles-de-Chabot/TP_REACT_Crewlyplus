@@ -40,8 +40,11 @@ const BoatSuggestion = ({ currentBoat }) => {
     if (suggestedBoats.length === 0) return null;
 
     return (
-        <div className="mt-16 pt-8 border-t border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-8">Ces bateaux pourraient aussi vous plaire</h3>
+        <div className="mt-20 pt-12 border-t border-white/5">
+            <div className="flex items-center gap-4 mb-10">
+                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Suggestions techniques similaires</h3>
+                <div className="flex-1 h-[1px] bg-white/5" />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {suggestedBoats.map(boat => (
                     <BoatCard key={boat.id} data={boat} />

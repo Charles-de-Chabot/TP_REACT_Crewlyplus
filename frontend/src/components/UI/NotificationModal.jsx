@@ -11,7 +11,7 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
             onClick={onClose}
         >
             <div 
-                className="bg-slate-900 border border-white/10 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-slideup cursor-default"
+                className="bg-slate-900 border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slideup cursor-default"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="p-6 border-b border-white/5 flex justify-between items-center">
