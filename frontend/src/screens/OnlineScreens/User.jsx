@@ -4,22 +4,31 @@ import UserInfoCard from '../../components/User/UserInfoCard';
 import BookingHistory from '../../components/User/BookingHistory';
 import PageLoader from '../../components/Loader/PageLoader';
 import ProfileEditModal from '../../components/User/ProfileEditModal';
+import CancelBookingModal from '../../components/User/CancelBookingModal';
 import useFetchUser from '../../hooks/useFetchUser';
+import SailingCV from '../../components/User/SailingCV';
 
 const User = () => {
     const { userData, loading, refresh } = useFetchUser();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-    const handleCancel = async (bookingId) => {
-        if (!window.confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) return;
+    const handleCancelClick = (bookingId) => {
+        const booking = userData.rentals.find(r => r.id === bookingId);
+        setSelectedBooking(booking);
+        setIsCancelModalOpen(true);
+    };
 
+    const confirmCancel = async (bookingId) => {
         try {
             const api = (await import('../../api/axios')).default;
             await api.patch(`/api/rentals/${bookingId}`, 
                 { status: 'cancelled' },
                 { headers: { 'Content-Type': 'application/merge-patch+json' } }
             );
-            refresh(); // Recharger les données utilisateur pour voir le changement
+            setIsCancelModalOpen(false);
+            refresh();
         } catch (error) {
             console.error("Erreur lors de l'annulation:", error);
             alert("Une erreur est survenue lors de l'annulation.");
@@ -41,6 +50,9 @@ const User = () => {
                     onAvatarUpdate={refresh}
                 />
 
+                {/* CV Nautique (Sailing Profile) */}
+                <SailingCV profile={userData?.sailingProfile} />
+
                 {/* Corps de la page Profil */}
                 <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                     
@@ -56,7 +68,7 @@ const User = () => {
                     <div className="md:col-span-2">
                         <BookingHistory 
                             bookings={userData?.rentals} 
-                            onCancel={handleCancel}
+                            onCancel={handleCancelClick}
                         />
                     </div>
                 </div>
@@ -68,6 +80,14 @@ const User = () => {
                 onClose={() => setIsEditModalOpen(false)}
                 userData={userData}
                 onUpdate={refresh}
+            />
+
+            {/* Modale d'annulation avec politique de remboursement */}
+            <CancelBookingModal 
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
+                onConfirm={confirmCancel}
+                booking={selectedBooking}
             />
         </div>
     );

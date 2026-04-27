@@ -38,17 +38,17 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                         notifications.map((notif) => (
                             <div 
                                 key={notif.id} 
-                                onClick={() => !notif.is_open && onRead(notif.id)}
+                                onClick={() => !notif.isOpen && onRead(notif.id)}
                                 className={`p-4 border rounded-2xl transition-all group relative cursor-pointer ${
-                                    notif.is_open 
+                                    notif.isOpen 
                                     ? 'bg-white/2 border-white/5 opacity-40 grayscale-[0.5]' 
                                     : 'bg-white/5 hover:bg-white/10 border-white/10'
                                 }`}
                             >
-                                {!notif.is_open && (
+                                {!notif.isOpen && (
                                     <div className="absolute top-4 right-4 w-2 h-2 bg-teal-500 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.5)]"></div>
                                 )}
-                                <p className={`text-sm font-medium mb-3 leading-relaxed ${notif.is_open ? 'text-slate-400' : 'text-white'}`}>
+                                <p className={`text-sm font-medium mb-3 leading-relaxed ${notif.isOpen ? 'text-slate-400' : 'text-white'}`}>
                                     {notif.label}
                                 </p>
                                 <div className="flex justify-between items-center">
@@ -56,11 +56,11 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                                         to={isStaff ? "/crew/dashboard" : "/user"} 
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            if (!notif.is_open) onRead(notif.id);
+                                            if (!notif.isOpen) onRead(notif.id);
                                             onClose();
                                         }}
                                         className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
-                                            notif.is_open ? 'text-slate-500 hover:text-teal-500' : 'text-teal-500 hover:text-teal-400'
+                                            notif.isOpen ? 'text-slate-500 hover:text-teal-500' : 'text-teal-500 hover:text-teal-400'
                                         }`}
                                     >
                                         Voir mon dashboard

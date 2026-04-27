@@ -39,7 +39,7 @@ const Topbar = () => {
           const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
           const data = res.data['member'] || res.data['hydra:member'] || [];
           setNotifications(data);
-          const unreadCount = data.filter(n => !n.is_open).length;
+          const unreadCount = data.filter(n => !n.isOpen).length;
           setUnreadNotifications(unreadCount);
         } catch (err) {
           console.error("Error fetching notifications", err);
@@ -92,7 +92,7 @@ const Topbar = () => {
       const res = await api.get(`/api/notifications?user.id=${userId}&order[id]=desc&page=1`);
       const data = res.data['member'] || res.data['hydra:member'] || [];
       setNotifications(data);
-      const unreadCount = data.filter(n => !n.is_open).length;
+      const unreadCount = data.filter(n => !n.isOpen).length;
       setUnreadNotifications(unreadCount);
     } catch (err) {
       console.error("Error deleting notification", err);
@@ -101,10 +101,10 @@ const Topbar = () => {
 
   const handleReadNotification = async (notifId) => {
     try {
-      await api.patch(`/api/notifications/${notifId}`, { is_open: true }, {
+      await api.patch(`/api/notifications/${notifId}`, { isOpen: true }, {
         headers: { 'Content-Type': 'application/merge-patch+json' }
       });
-      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_open: true } : n));
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isOpen: true } : n));
       setUnreadNotifications(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error("Error marking notification as read", err);

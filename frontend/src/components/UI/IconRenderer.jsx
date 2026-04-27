@@ -14,6 +14,11 @@ const ICON_MAP = {
     '📛': LuIcons.LuBadge,
     'Role': LuIcons.LuAnchor,
     
+    // Équipage (Crew)
+    '👨‍✈️': LuIcons.LuUserCheck || LuIcons.LuUser,
+    '👨‍🍳': LuIcons.LuUtensils || LuIcons.LuChefHat,
+    '⚜️': LuIcons.LuSparkles || LuIcons.LuCrown,
+    
     // Actions & Statut
     '📷': LuIcons.LuCamera,
     '⌛': LuIcons.LuLoader,
@@ -37,6 +42,7 @@ const ICON_MAP = {
     
     // Finance & Dates
     '💰': LuIcons.LuWallet,
+    '💳': LuIcons.LuCreditCard,
     '📅': LuIcons.LuCalendar,
     '⏰': LuIcons.LuTimer || LuIcons.LuClock,
     '📊': LuIcons.LuBarChart || LuIcons.LuBarChart3,
