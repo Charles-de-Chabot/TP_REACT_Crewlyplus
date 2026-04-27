@@ -51,6 +51,14 @@ class Regatta
     #[Groups(['regatta:read', 'regatta:write'])]
     private ?float $registrationPrice = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['regatta:read', 'regatta:write'])]
+    private ?float $latitude = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['regatta:read', 'regatta:write'])]
+    private ?float $longitude = null;
+
     /**
      * @var Collection<int, User>
      */
@@ -144,6 +152,30 @@ class Regatta
     public function setRegistrationPrice(?float $registrationPrice): static
     {
         $this->registrationPrice = $registrationPrice;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }

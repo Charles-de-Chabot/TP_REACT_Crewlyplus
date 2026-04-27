@@ -23,10 +23,10 @@ use App\Controller\RegistrationController;
             uriTemplate: '/teams/{id}/registration-package',
             controller: RegistrationController::class,
             name: 'team_registration_package',
-            openapiContext: [
-                'summary' => 'Génère le dossier d\'inscription ZIP (Leader uniquement)',
-                'description' => 'Agrège les documents de tous les membres et les infos du CV nautique.'
-            ]
+            openapi: new \ApiPlatform\OpenApi\Model\Operation(
+                summary: 'Génère le dossier d\'inscription ZIP (Leader uniquement)',
+                description: 'Agrège les documents de tous les membres et les infos du CV nautique.'
+            )
         )
     ],
     normalizationContext: ['groups' => ['team:read']],

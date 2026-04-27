@@ -18,10 +18,10 @@ use App\Controller\MediaController;
             uriTemplate: '/media/{id}/download',
             controller: MediaController::class,
             name: 'media_download',
-            openapiContext: [
-                'summary' => 'Télécharge un document sécurisé du coffre-fort',
-                'description' => 'Nécessite d\'être membre de la team du propriétaire du document.'
-            ]
+            openapi: new \ApiPlatform\OpenApi\Model\Operation(
+                summary: 'Télécharge un document sécurisé du coffre-fort',
+                description: 'Nécessite d\'être membre de la team du propriétaire du document.'
+            )
         )
     ],
     normalizationContext: ['groups' => ['media:read']],
