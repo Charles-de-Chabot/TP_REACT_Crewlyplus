@@ -12,6 +12,7 @@ use App\Entity\Media;
 use App\Entity\Fitting;
 use App\Entity\Formula;
 use App\Entity\Role;
+use App\Entity\SailingProfile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -84,7 +85,21 @@ class AppFixtures extends Fixture
         $premium->setLastname('Premium');
         $premium->setPassword($this->passwordHasher->hashPassword($premium, 'password'));
         $premium->setRole($this->getReference('role_ROLE_PREMIUM', Role::class));
+        
+        // Création de son CV Nautique
+        $profile = new SailingProfile();
+        $profile->setMilesSailed(1500);
+        $profile->setBoatTypes(['Monocoque', 'Foil', 'Catamaran']);
+        $profile->setAchievements([
+            ['race' => 'Spi Ouest-France 2024', 'rank' => '3ème'],
+            ['race' => 'Giraglia 2025', 'rank' => '1er IRC']
+        ]);
+        $profile->setCurrentPosition('Tactitien');
+        $profile->setUser($premium);
+        
         $manager->persist($premium);
+        $manager->persist($profile);
+        $this->addReference('user_premium', $premium);
 
         // 3. Crew Members
         $crewData = [

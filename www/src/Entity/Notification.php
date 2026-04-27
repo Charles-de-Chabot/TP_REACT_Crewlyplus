@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['notification:write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['user.id' => 'exact'])]
-#[ApiFilter(BooleanFilter::class, properties: ['is_open'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isOpen'])]
 class Notification
 {
     #[ORM\Id]
@@ -31,11 +31,11 @@ class Notification
 
     #[ORM\Column]
     #[Groups(['notification:read', 'notification:write'])]
-    private ?bool $is_open = null;
+    private ?bool $isOpen = null;
 
     #[ORM\Column]
     #[Groups(['notification:read'])]
-    private ?\DateTime $created_at = null;
+    private ?\DateTime $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'notification')]
     private ?User $user = null;
@@ -57,26 +57,26 @@ class Notification
         return $this;
     }
 
-    public function isOpen(): ?bool
+    public function getIsOpen(): ?bool
     {
-        return $this->is_open;
+        return $this->isOpen;
     }
 
-    public function setIsOpen(bool $is_open): static
+    public function setIsOpen(bool $isOpen): static
     {
-        $this->is_open = $is_open;
+        $this->isOpen = $isOpen;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTime
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $created_at): static
+    public function setCreatedAt(\DateTime $createdAt): static
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

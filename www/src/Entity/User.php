@@ -84,6 +84,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:write'])]
     private ?Address $address = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: SailingProfile::class, cascade: ['persist', 'remove'])]
+    #[Groups(['user:read', 'user:write'])]
+    private ?SailingProfile $sailingProfile = null;
+
+    #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'members')]
+    #[Groups(['user:read', 'user:write'])]
+    private ?Team $currentTeam = null;
+
+    /**
+     * @var Collection<int, Regatta>
+     */
+    #[ORM\ManyToMany(targetEntity: Regatta::class, inversedBy: 'participants')]
+    #[Groups(['user:read', 'user:write'])]
+    private Collection $participatingRegattas;
+
     /**
      * @var Collection<int, Media>
      */
@@ -127,6 +142,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notification = new ArrayCollection();
         $this->innovices = new ArrayCollection();
         $this->rentals = new ArrayCollection();
+        $this->participatingRegattas = new ArrayCollection();
         // Initialisation des valeurs par défaut à la création
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
@@ -450,6 +466,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
+    }
+
+    public function getSailingProfile(): ?SailingProfile
+    {
+        return $this->sailingProfile;
+    }
+
+    public function setSailingProfile(SailingProfile $sailingProfile): static
+    {
+        // set the owning side of the relation if necessary
+        if ($sailingProfile->getUser() !== $this) {
+            $sailingProfile->setUser($this);
+        }
+
+        $this->sailingProfile = $sailingProfile;
+
+        return $this;
+    }
+
+    public function getCurrentTeam(): ?Team
+    {
+        return $this->currentTeam;
+    }
+
+    public function setCurrentTeam(?Team $currentTeam): static
+    {
+        $this->currentTeam = $currentTeam;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Regatta>
+     */
+    public function getParticipatingRegattas(): Collection
+    {
+        return $this->participatingRegattas;
+    }
+
+    public function addParticipatingRegatta(Regatta $regatta): static
+    {
+        if (!$this->participatingRegattas->contains($regatta)) {
+            $this->participatingRegattas->add($regatta);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipatingRegatta(Regatta $regatta): static
+    {
+        $this->participatingRegattas->removeElement($regatta);
+
+        return $this;
     }
 
     public function eraseCredentials(): void
