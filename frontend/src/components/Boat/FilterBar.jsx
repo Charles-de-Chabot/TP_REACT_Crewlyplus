@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BoatCalendar from './BoatCalendar';
+import CustomSelect from '../ui/CustomSelect';
+import { Ship, Anchor, MapPin, X } from 'lucide-react';
 
 const FilterBar = ({ 
     userId, filters, handleFilterChange, handleDateChange, resetFilters, 
     types, availableModels, cities, activeCount, isLoading 
 }) => {
     return (
-        <div className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-8 mb-12 shadow-xl shadow-black/30">
+        <div className="backdrop-blur-md p-12 md:p-20">
             {/* Invitation à la connexion */}
             {!userId && (
                 <div className="mb-8 pb-8 border-b border-white/5">
@@ -26,16 +28,16 @@ const FilterBar = ({
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sélecteurs de Dates */}
                 {userId && (
-                    <div className="w-full lg:w-auto flex-shrink-0 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-white/5 pb-8 lg:pb-0 lg:pr-8">
-                        <h4 className="block text-sm font-bold text-slate-300 mb-4">Dates de reservation</h4>
+                    <div className="w-full lg:w-auto flex-shrink-0 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5 pb-8 lg:pb-0 lg:pr-8">
                         <BoatCalendar 
+                            label="Dates de séjour"
                             startDate={filters.start} 
                             endDate={filters.end} 
                             onDateChange={handleDateChange} 
                         />
                         {filters.start && (
-                            <button onClick={() => handleDateChange('', '')} className="mt-3 text-sm text-red-500 hover:text-red-400 font-medium transition-colors">
-                                Effacer la sélection
+                            <button onClick={() => handleDateChange('', '')} className="mt-3 text-[10px] text-red-500 hover:text-red-400 font-black uppercase tracking-widest transition-colors flex items-center gap-1">
+                                <X size={12} /> Effacer les dates
                             </button>
                         )}
                     </div>
@@ -43,39 +45,48 @@ const FilterBar = ({
 
                 {/* Filtres Dropdowns */}
                 <div className="flex-grow flex flex-col justify-center">
-                    <h4 className="block text-sm font-bold text-slate-300 mb-4 lg:hidden">Critères de recherche</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-end">
-                        <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">Type de bateau</label>
-                            <select name="type" value={filters.type} onChange={handleFilterChange} disabled={isLoading || types.length === 0} className="bg-slate-950/50 border border-white/10 text-white text-sm rounded-xl focus:ring-teal-500 focus:border-teal-500 block w-full p-3 transition-colors disabled:opacity-50">
-                                <option value="0">{isLoading ? "Chargement..." : "Tous les types"}</option>
-                                {types.map(type => (<option key={type.id} value={type.id}>{type.label || type.name}</option>))}
-                            </select>
-                        </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-end">
+                        <CustomSelect 
+                            label="Type de bateau"
+                            value={filters.type}
+                            options={types}
+                            onChange={handleFilterChange}
+                            placeholder="Tous les types"
+                            icon={Ship}
+                            disabled={isLoading}
+                        />
+
+                        <CustomSelect 
+                            label="Modèle"
+                            value={filters.model}
+                            options={availableModels}
+                            onChange={handleFilterChange}
+                            placeholder="Tous les modèles"
+                            icon={Anchor}
+                            disabled={isLoading}
+                        />
+
+                        <CustomSelect 
+                            label="Port d'attache"
+                            value={filters.city}
+                            options={cities.map(c => ({ id: c, name: c }))}
+                            onChange={handleFilterChange}
+                            placeholder="Toutes les villes"
+                            icon={MapPin}
+                            disabled={isLoading}
+                        />
 
                         <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">Modèle</label>
-                            <select name="model" value={filters.model} onChange={handleFilterChange} disabled={isLoading || availableModels.length === 0} className="bg-slate-950/50 border border-white/10 text-white text-sm rounded-xl focus:ring-teal-500 focus:border-teal-500 block w-full p-3 transition-colors disabled:opacity-50">
-                                <option value="0">{isLoading ? "Chargement..." : "Tous les modèles"}</option>
-                                {availableModels.map(model => (<option key={model.id} value={model.id}>{model.label || model.name}</option>))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">Port d'attache</label>
-                            <select name="city" value={filters.city} onChange={handleFilterChange} disabled={isLoading || cities.length === 0} className="bg-slate-950/50 border border-white/10 text-white text-sm rounded-xl focus:ring-teal-500 focus:border-teal-500 block w-full p-3 transition-colors disabled:opacity-50">
-                                <option value="0">{isLoading ? "Chargement..." : "Toutes les villes"}</option>
-                                {cities.map(city => (<option key={city} value={city}>{city}</option>))}
-                            </select>
-                        </div>
-
-                        <div>
+                            <label className="block text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2 ml-1">
+                                Actions
+                            </label>
                             {activeCount > 0 ? (
-                                <button onClick={resetFilters} className="w-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium p-3 rounded-xl border border-white/10 transition-colors">
+                                <button onClick={resetFilters} className="w-full flex items-center justify-center bg-slate-950/60 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 text-sm text-white transition-all shadow-lg hover:shadow-cyan-500/10 active:scale-95 group">
+                                    <X size={14} className="mr-2 text-white/40 group-hover:text-red-400 transition-colors" />
                                     Réinitialiser
                                 </button>
                             ) : (
-                                <div className="w-full bg-slate-900/30 text-slate-600 text-sm font-medium p-3 rounded-xl border border-white/5 text-center cursor-not-allowed">Filtres inactifs</div>
+                                <div className="w-full bg-slate-950/30 text-white/10 text-sm flex items-center justify-center px-4 py-3 rounded-xl border border-white/5 cursor-not-allowed">Filtres inactifs</div>
                             )}
                         </div>
                     </div>

@@ -25,9 +25,7 @@ const Boats = () => {
                 backPath="/"
                 backLabel="Retour à l'accueil"
             />
-            <BoatHero />
-
-            <div className="container mx-auto px-4 py-12">
+            <BoatHero>
                 <FilterBar 
                     userId={userId}
                     filters={filters}
@@ -40,7 +38,9 @@ const Boats = () => {
                     activeCount={activeCount}
                     isLoading={loading}
                 />
+            </BoatHero>
 
+            <div className="container mx-auto px-4 py-12">
                 {/* Entête des résultats */}
                 <div className="mb-6 flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-white">Résultats de recherche</h2>
