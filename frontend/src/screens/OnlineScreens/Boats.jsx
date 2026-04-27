@@ -7,6 +7,8 @@ import NoResults from '../../components/Boat/NoResults';
 import Layout from '../../components/UI/Layout';
 import useBoatsFilter from '../../hooks/useBoatsFilter';
 
+import PageHeader from '../../components/UI/PageHeader';
+
 const Boats = () => {
     const { userId } = useAuthContext();
     const {
@@ -17,6 +19,11 @@ const Boats = () => {
     return (
         <Layout>
             <BoatHero />
+            <PageHeader 
+                title="La" 
+                subtitle="Flotte" 
+                description="Réservez votre navire d'exception"
+            />
 
             <div className="container mx-auto px-4 py-12">
                 <FilterBar 

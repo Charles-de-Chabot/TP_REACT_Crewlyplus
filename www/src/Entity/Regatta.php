@@ -14,9 +14,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RegattaRepository::class)]
 #[ApiResource(
+    operations: [
+        new \ApiPlatform\Metadata\Get(),
+        new \ApiPlatform\Metadata\GetCollection(),
+        new \ApiPlatform\Metadata\Post(security: "is_granted('ROLE_PREMIUM')"),
+        new \ApiPlatform\Metadata\Patch(security: "is_granted('ROLE_PREMIUM')"),
+        new \ApiPlatform\Metadata\Put(security: "is_granted('ROLE_PREMIUM')"),
+        new \ApiPlatform\Metadata\Delete(security: "is_granted('ROLE_PREMIUM')")
+    ],
     normalizationContext: ['groups' => ['regatta:read']],
-    denormalizationContext: ['groups' => ['regatta:write']],
-    security: "is_granted('ROLE_PREMIUM')"
+    denormalizationContext: ['groups' => ['regatta:write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'location' => 'ipartial'])]
 class Regatta

@@ -12,6 +12,8 @@ import PaymentStatus from "../components/Stripe/PaymentStatus";
 import CrewDashboard from "../screens/OnlineScreens/CrewDashboard";
 import CrewRegister from "../screens/OnlineScreens/CrewRegister";
 import Regattas from "../screens/OnlineScreens/Regattas";
+import RegattaDetails from "../screens/OnlineScreens/RegattaDetails";
+import TeamWorkspace from "../screens/OnlineScreens/TeamWorkspace";
 
 const OnlineRouter = createBrowserRouter([
     {
@@ -25,6 +27,8 @@ const OnlineRouter = createBrowserRouter([
             },
             { path: "/boats", element: <Boats/> },
             { path: "/regattas", element: <Regattas /> },
+            { path: "/regattas/:id", element: <RegattaDetails /> },
+            { path: "/regattas/:id/team", element: <TeamWorkspace /> },
             { path: "/boats/:id", element: <DetailBoat /> },
             { path: "/configurator", element: <Configurator /> },
             { path: "/checkout", element: <CheckoutScreen /> },

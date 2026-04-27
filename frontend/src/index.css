@@ -21,9 +21,15 @@
   --animate-shake: shake 0.5s ease-in-out;
   --animate-scanline: scanline 2s linear infinite;
   --animate-stagger-fade: staggerFade 0.5s ease-out forwards;
-  --animate-pulse-cyan: pulseCyan 2s infinite;
+  --animate-pulse-cyan: pulse-cyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scan: scan 4s linear infinite;
 
-  @keyframes pulseCyan {
+  @keyframes scan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(1000%); }
+  }
+
+  @keyframes pulse-cyan {
     0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.4); }
     70% { box-shadow: 0 0 0 10px rgba(0, 242, 255, 0); }
     100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }

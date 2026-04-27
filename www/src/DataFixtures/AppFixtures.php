@@ -13,6 +13,7 @@ use App\Entity\Fitting;
 use App\Entity\Formula;
 use App\Entity\Role;
 use App\Entity\SailingProfile;
+use App\Entity\Regatta;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -38,6 +39,7 @@ class AppFixtures extends Fixture
         $this->loadFitting($manager);
         $this->loadUser($manager);
         $this->loadBoat($manager);
+        $this->loadRegatta($manager);
 
         $manager->flush();
     }
@@ -1013,6 +1015,83 @@ class AppFixtures extends Fixture
             $fitting->setFittingPrice($value['fittingPrice']);
 
             $manager->persist($fitting);
+        }
+    }
+
+    //==============================
+    // Création des régates
+    //==============================
+    public function loadRegatta(ObjectManager $manager)
+    {
+        $regattas = [
+            [
+                'name' => 'Spi Ouest-France Banque Populaire',
+                'location' => 'La Trinité-sur-Mer, Bretagne',
+                'description' => "Le pèlerinage printanier de la voile française. La Baie de Quiberon offre un terrain de jeu tactique complexe avec des effets de courant et de côte permanents. L'Avis de l'Expert : C'est LA régate test pour vos JPK 10.10 et J/99. Si vous gagnez ici, vous gagnez partout.",
+                'startDate' => new \DateTime('2026-04-03'),
+                'endDate' => new \DateTime('2026-04-06'),
+                'latitude' => 47.5833,
+                'longitude' => -3.0333,
+            ],
+            [
+                'name' => 'SNIM (Semaine Nautique Internationale de Méditerranée)',
+                'location' => 'Marseille, Vieux-Port',
+                'description' => "Le coup d'envoi magistral de la saison méditerranéenne. Marseille offre une lumière unique et un accueil chaleureux au pied du Mucem. L'Avis de l'Expert : Une régate physique et rapide. Votre Farr 40 y trouvera des conditions idéales.",
+                'startDate' => new \DateTime('2026-04-03'),
+                'endDate' => new \DateTime('2026-04-06'),
+                'latitude' => 43.2964,
+                'longitude' => 5.3700,
+            ],
+            [
+                'name' => 'Loro Piana Giraglia',
+                'location' => 'Saint-Tropez -> Gênes',
+                'description' => "Le monument offshore entre la France et l'Italie. Le passage de nuit autour du rocher de la Giraglia est un moment mystique et stratégique. L'Avis de l'Expert : Le Nautor Swan 45 est né pour cette course, mélange parfait de confort et de performance.",
+                'startDate' => new \DateTime('2026-06-11'),
+                'endDate' => new \DateTime('2026-06-17'),
+                'latitude' => 43.2727,
+                'longitude' => 6.6386,
+            ],
+            [
+                'name' => 'Rolex Swan Cup',
+                'location' => 'Porto Cervo, Sardaigne',
+                'description' => "L'exclusivité absolue dans le sanctuaire de Porto Cervo. Le passage de 'Bomb Alley' exige des manœuvres millimétrées entre les rochers. L'Avis de l'Expert : Une compétition monotype pour vos Swan 45. Aucune erreur n'est permise.",
+                'startDate' => new \DateTime('2026-09-13'),
+                'endDate' => new \DateTime('2026-09-19'),
+                'latitude' => 41.1350,
+                'longitude' => 9.5317,
+            ],
+            [
+                'name' => 'Les Voiles de Saint-Tropez',
+                'location' => 'Saint-Tropez',
+                'description' => "Le festival de Cannes de la voile. Un musée à ciel ouvert où les centenaires côtoient les prototypes en carbone. L'Avis de l'Expert : Pour le Grand Soleil 37 ou le Farr 40, c'est l'occasion de briller par son esthétique devant le monde entier.",
+                'startDate' => new \DateTime('2026-09-26'),
+                'endDate' => new \DateTime('2026-10-04'),
+                'latitude' => 43.2727,
+                'longitude' => 6.6386,
+            ],
+            [
+                'name' => 'Copa del Rey MAPFRE',
+                'location' => 'Palma de Majorque, Baléares',
+                'description' => "Le temple de la performance sous le vent thermique 'Embat' qui se lève à 13h00 précise. L'Avis de l'Expert : C'est le terrain de jeu favori des J/99. Rapide et agile, ce bateau excelle dans ces conditions stables.",
+                'startDate' => new \DateTime('2026-08-01'),
+                'endDate' => new \DateTime('2026-08-08'),
+                'latitude' => 39.5696,
+                'longitude' => 2.6502,
+            ],
+        ];
+
+        foreach ($regattas as $data) {
+            $regatta = new Regatta();
+            $regatta->setName($data['name']);
+            $regatta->setLocation($data['location']);
+            $regatta->setDescription($data['description']);
+            $regatta->setStartDate($data['startDate']);
+            $regatta->setEndDate($data['endDate']);
+            $regatta->setLatitude($data['latitude']);
+            $regatta->setLongitude($data['longitude']);
+            
+            $manager->persist($regatta);
+            $this->addReference('regatta_' . str_replace(' ', '_', strtolower($data['name'])), $regatta);
         }
     }
 }

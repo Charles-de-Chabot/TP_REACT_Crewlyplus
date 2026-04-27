@@ -7,6 +7,8 @@ import ProfileEditModal from '../../components/User/ProfileEditModal';
 import CancelBookingModal from '../../components/User/CancelBookingModal';
 import useFetchUser from '../../hooks/useFetchUser';
 import SailingCV from '../../components/User/SailingCV';
+import DocumentVault from '../../components/User/DocumentVault';
+import PageHeader from '../../components/UI/PageHeader';
 
 const User = () => {
     const { userData, loading, refresh } = useFetchUser();
@@ -40,7 +42,12 @@ const User = () => {
     }
 
     return (
-        <div className="flex flex-col w-full min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden pt-24 pb-12 animate-slideup">
+        <div className="flex flex-col w-full min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden pb-12 animate-slideup">
+            <PageHeader 
+                title="Mon" 
+                subtitle="Profil" 
+                description="Espace Personnel & Documents"
+            />
             <div className="container mx-auto px-4 max-w-5xl">
                 
                 {/* En-tête avec l'avatar et les informations principales */}

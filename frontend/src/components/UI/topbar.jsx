@@ -9,6 +9,8 @@ import IconRenderer from './IconRenderer'
 import { useDispatch } from 'react-redux'
 import { resetBooking } from '../../store/booking/bookingSlice'
 
+import { Crown } from 'lucide-react';
+
 // Configuration visuelle par rôle
 const ROLE_CONFIG = {
   'ROLE_ADMIN': { label: 'Administrateur', color: 'text-red-400', border: 'border-red-500/30', bg: 'bg-red-500/10' },
@@ -128,11 +130,12 @@ const Topbar = () => {
                   key={item.path} 
                   to={item.path}
                   className={({ isActive }) => `
-                    text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300
+                    text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-1.5
                     ${isActive ? 'text-accent-role' : 'text-slate-500 hover:text-white'}
                   `}
                 >
                   {item.label}
+                  {item.label === 'Régates' && <Crown size={12} className="mb-0.5" />}
                 </NavLink>
               ))}
             </div>

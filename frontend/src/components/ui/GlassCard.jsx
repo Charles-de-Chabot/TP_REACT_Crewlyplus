@@ -1,12 +1,15 @@
 import React from 'react';
 
-const GlassCard = ({ children, className = '', hover = false }) => {
+const GlassCard = ({ children, className = '', hover = false, ...props }) => {
   return (
-    <div className={`
-      glass-card p-6 rounded-2xl 
-      ${hover ? 'hover:border-white/20 hover:bg-white/5 transition-all duration-500' : ''} 
-      ${className}
-    `}>
+    <div 
+      {...props}
+      className={`
+        glass-card p-6 rounded-2xl 
+        ${hover ? 'hover:border-white/20 hover:bg-white/5 transition-all duration-500' : ''} 
+        ${className}
+      `}
+    >
       {children}
     </div>
   );

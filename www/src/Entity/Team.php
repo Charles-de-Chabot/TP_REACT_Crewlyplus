@@ -13,12 +13,25 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use App\Controller\RegistrationController;
+use App\Controller\JoinTeamController;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
 #[ApiResource(
     operations: [
+        new \ApiPlatform\Metadata\GetCollection(),
         new Get(),
+        new Post(),
+        new Post(
+            uriTemplate: '/teams/join',
+            controller: JoinTeamController::class,
+            name: 'team_join',
+            openapi: new \ApiPlatform\OpenApi\Model\Operation(
+                summary: 'Rejoindre une équipe via un code d\'invitation',
+                description: 'Permet à l\'utilisateur connecté de rejoindre une équipe en fournissant son code unique.'
+            )
+        ),
         new Get(
             uriTemplate: '/teams/{id}/registration-package',
             controller: RegistrationController::class,
@@ -30,9 +43,14 @@ use App\Controller\RegistrationController;
         )
     ],
     normalizationContext: ['groups' => ['team:read']],
-    denormalizationContext: ['groups' => ['team:write']]
+    denormalizationContext: ['groups' => ['team:write']],
+    processor: \App\State\TeamProcessor::class
 )]
-#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'regatta' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: [
+    'name' => 'ipartial', 
+    'regatta' => 'exact',
+    'members.id' => 'exact'
+])]
 class Team
 {
     #[ORM\Id]
@@ -65,6 +83,10 @@ class Team
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups(['team:read', 'team:write'])]
     private ?array $provisioningList = null;
+
+    #[ORM\Column(length: 10, unique: true, nullable: true)]
+    #[Groups(['team:read'])]
+    private ?string $inviteCode = null;
 
     public function __construct()
     {
@@ -150,6 +172,18 @@ class Team
     public function setProvisioningList(?array $provisioningList): static
     {
         $this->provisioningList = $provisioningList;
+
+        return $this;
+    }
+
+    public function getInviteCode(): ?string
+    {
+        return $this->inviteCode;
+    }
+
+    public function setInviteCode(?string $inviteCode): static
+    {
+        $this->inviteCode = $inviteCode;
 
         return $this;
     }
