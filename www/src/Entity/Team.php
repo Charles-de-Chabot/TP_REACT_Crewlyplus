@@ -12,8 +12,23 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+use ApiPlatform\Metadata\Get;
+use App\Controller\RegistrationController;
+
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
 #[ApiResource(
+    operations: [
+        new Get(),
+        new Get(
+            uriTemplate: '/teams/{id}/registration-package',
+            controller: RegistrationController::class,
+            name: 'team_registration_package',
+            openapiContext: [
+                'summary' => 'Génère le dossier d\'inscription ZIP (Leader uniquement)',
+                'description' => 'Agrège les documents de tous les membres et les infos du CV nautique.'
+            ]
+        )
+    ],
     normalizationContext: ['groups' => ['team:read']],
     denormalizationContext: ['groups' => ['team:write']]
 )]
