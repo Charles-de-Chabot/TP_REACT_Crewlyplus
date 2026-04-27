@@ -7,13 +7,33 @@ use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+use ApiPlatform\Metadata\Get;
+use App\Controller\MediaController;
+
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 #[ApiResource(
+    operations: [
+        new Get(),
+        new Get(
+            uriTemplate: '/media/{id}/download',
+            controller: MediaController::class,
+            name: 'media_download',
+            openapiContext: [
+                'summary' => 'Télécharge un document sécurisé du coffre-fort',
+                'description' => 'Nécessite d\'être membre de la team du propriétaire du document.'
+            ]
+        )
+    ],
     normalizationContext: ['groups' => ['media:read']],
     denormalizationContext: ['groups' => ['media:write']]
 )]
 class Media
 {
+    public const CATEGORY_IDENTITY = 'IDENTITY';
+    public const CATEGORY_LICENSE = 'LICENSE';
+    public const CATEGORY_MEDICAL = 'MEDICAL';
+    public const CATEGORY_BOAT_IMAGE = 'BOAT_IMAGE';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
