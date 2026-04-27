@@ -29,14 +29,9 @@ const RegattaDetails = () => {
                 title="Détails" 
                 subtitle="Course" 
                 description={`Informations tactiques : ${regatta.name}`}
-            >
-                <Link 
-                    to="/regattas" 
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-white/5"
-                >
-                    <ChevronLeft size={14} /> Retour au calendrier
-                </Link>
-            </PageHeader>
+                backPath="/regattas"
+                backLabel="Retour au calendrier"
+            />
 
             {/* Hero légèrement réduit */}
             <div className="h-[350px]">

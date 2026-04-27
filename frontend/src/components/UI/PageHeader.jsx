@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 
-const PageHeader = ({ title, subtitle, description, children }) => {
+const PageHeader = ({ title, subtitle, description, backPath, backLabel, children }) => {
     return (
         <div className="px-8 py-4 border-b border-white/5 bg-[#050810] flex items-center justify-between">
             <div className="flex items-center gap-4 md:gap-6">
@@ -12,11 +14,19 @@ const PageHeader = ({ title, subtitle, description, children }) => {
                     {description}
                 </span>
             </div>
-            {children && (
-                <div className="flex items-center gap-4">
-                    {children}
-                </div>
-            )}
+
+            <div className="flex items-center gap-4">
+                {backPath && (
+                    <Link 
+                        to={backPath} 
+                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-white/5 group"
+                    >
+                        <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" /> 
+                        {backLabel || 'Retour'}
+                    </Link>
+                )}
+                {children}
+            </div>
         </div>
     );
 };

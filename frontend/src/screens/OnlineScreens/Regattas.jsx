@@ -31,6 +31,8 @@ const Regattas = () => {
                     title="Explorer" 
                     subtitle="Régates" 
                     description="Calendrier de Course 2026"
+                    backPath="/"
+                    backLabel="Retour à l'accueil"
                 />
 
                 {/* Main Content Area */}

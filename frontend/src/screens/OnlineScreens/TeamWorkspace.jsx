@@ -26,25 +26,19 @@ const TeamWorkspace = () => {
                 title="Espace" 
                 subtitle="Équipage" 
                 description={team ? `Équipe : ${team.name}` : "Gestion de l'équipage"}
+                backPath={`/regattas/${id}`}
+                backLabel="Détails Course"
             >
-                <div className="flex items-center gap-3">
-                    <Link 
-                        to={`/regattas/${id}`} 
-                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-white/5"
+                {team && (
+                    <button 
+                        onClick={exportPack}
+                        disabled={isExporting}
+                        className={`px-6 py-2.5 bg-gold-sanded hover:bg-[#b38f4d] text-black text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(197,160,89,0.3)] ${isExporting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                        <ChevronLeft size={14} /> Détails Course
-                    </Link>
-                    {team && (
-                        <button 
-                            onClick={exportPack}
-                            disabled={isExporting}
-                            className={`px-6 py-2.5 bg-gold-sanded hover:bg-[#b38f4d] text-black text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(197,160,89,0.3)] ${isExporting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                        >
-                            {isExporting ? <Clock className="animate-spin" size={14} /> : <Download size={14} />}
-                            {isExporting ? 'GÉNÉRATION...' : 'EXPORT DOSSIER'}
-                        </button>
-                    )}
-                </div>
+                        {isExporting ? <Clock className="animate-spin" size={14} /> : <Download size={14} />}
+                        {isExporting ? 'GÉNÉRATION...' : 'EXPORT DOSSIER'}
+                    </button>
+                )}
             </PageHeader>
 
             <div className="container mx-auto px-4 py-8">
