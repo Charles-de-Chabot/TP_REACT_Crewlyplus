@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import BoatCalendar from './BoatCalendar';
 import CustomSelect from '../ui/CustomSelect';
@@ -8,6 +8,21 @@ const FilterBar = ({
     userId, filters, handleFilterChange, handleDateChange, resetFilters, 
     types, availableModels, cities, activeCount, isLoading 
 }) => {
+    const [openMenus, setOpenMenus] = useState([]);
+
+    const handleToggle = useCallback((label, isOpen) => {
+        setOpenMenus(prev => {
+            if (isOpen) {
+                if (prev.includes(label)) return prev;
+                return [...prev, label];
+            } else {
+                return prev.filter(item => item !== label);
+            }
+        });
+    }, []);
+
+    const isShifted = openMenus.length > 0;
+
     return (
         <div className="backdrop-blur-md p-12 md:p-20">
             {/* Invitation à la connexion */}
@@ -26,7 +41,7 @@ const FilterBar = ({
             )}
 
             <div className="flex flex-col lg:flex-row gap-8">
-                {/* Sélecteurs de Dates */}
+                {/* Sélecteurs de Dates (Reste statique) */}
                 {userId && (
                     <div className="w-full lg:w-auto flex-shrink-0 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5 pb-8 lg:pb-0 lg:pr-8">
                         <BoatCalendar 
@@ -43,37 +58,43 @@ const FilterBar = ({
                     </div>
                 )}
 
-                {/* Filtres Dropdowns */}
-                <div className="flex-grow flex flex-col justify-center">
+                {/* Filtres Dropdowns (S'anime vers le haut) */}
+                <div className={`flex-grow flex flex-col justify-center transition-all duration-500 ease-out transform ${isShifted ? '-translate-y-8 lg:-translate-y-16' : 'translate-y-0'}`}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-end">
                         <CustomSelect 
+                            name="type"
                             label="Type de bateau"
                             value={filters.type}
                             options={types}
                             onChange={handleFilterChange}
-                            placeholder="Tous les types"
+                            placeholder="Tous"
                             icon={Ship}
                             disabled={isLoading}
+                            onToggle={handleToggle}
                         />
 
                         <CustomSelect 
+                            name="model"
                             label="Modèle"
                             value={filters.model}
                             options={availableModels}
                             onChange={handleFilterChange}
-                            placeholder="Tous les modèles"
+                            placeholder="Tous"
                             icon={Anchor}
                             disabled={isLoading}
+                            onToggle={handleToggle}
                         />
 
                         <CustomSelect 
+                            name="city"
                             label="Port d'attache"
                             value={filters.city}
                             options={cities.map(c => ({ id: c, name: c }))}
                             onChange={handleFilterChange}
-                            placeholder="Toutes les villes"
+                            placeholder="Tous"
                             icon={MapPin}
                             disabled={isLoading}
+                            onToggle={handleToggle}
                         />
 
                         <div>

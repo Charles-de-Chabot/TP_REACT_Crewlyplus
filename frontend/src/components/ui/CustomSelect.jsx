@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
-const CustomSelect = ({ label, value, options, onChange, placeholder, icon: Icon, disabled }) => {
+const CustomSelect = ({ name, label, value, options, onChange, placeholder, icon: Icon, disabled, onToggle }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
+
+    // Notifier le parent du changement d'état avec le label pour identification
+    useEffect(() => {
+        if (onToggle) onToggle(label, isOpen);
+    }, [isOpen, onToggle, label]);
 
     // Fermer le menu si on clique à l'extérieur
     useEffect(() => {
@@ -19,8 +24,8 @@ const CustomSelect = ({ label, value, options, onChange, placeholder, icon: Icon
     const selectedOption = options.find(opt => String(opt.id) === String(value));
 
     const handleSelect = (optionId) => {
-        // Simuler un événement pour rester compatible avec handleFilterChange
-        onChange({ target: { name: label.toLowerCase() === 'modèle' ? 'model' : label.toLowerCase() === 'type de bateau' ? 'type' : 'city', value: optionId } });
+        // On force la valeur en string pour la compatibilité avec useBoatsFilter
+        onChange({ target: { name, value: String(optionId) } });
         setIsOpen(false);
     };
 
@@ -37,7 +42,7 @@ const CustomSelect = ({ label, value, options, onChange, placeholder, icon: Icon
             >
                 <div className="flex items-center gap-3 overflow-hidden">
                     {Icon && <Icon size={16} className="text-cyan-400 flex-shrink-0" />}
-                    <span className="truncate">
+                    <span className="truncate text-left">
                         {selectedOption ? (selectedOption.label || selectedOption.name) : placeholder}
                     </span>
                 </div>
@@ -46,7 +51,7 @@ const CustomSelect = ({ label, value, options, onChange, placeholder, icon: Icon
 
             {isOpen && (
                 <div className="absolute z-[100] mt-2 w-full bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-slideup min-w-[200px]">
-                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                    <div className="max-h-80 overflow-y-auto custom-scrollbar">
                         <div 
                             onClick={() => handleSelect('0')}
                             className="px-4 py-3 text-xs text-white/60 hover:bg-white/5 hover:text-cyan-400 cursor-pointer transition-colors flex items-center justify-between"
