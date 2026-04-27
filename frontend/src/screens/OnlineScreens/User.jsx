@@ -47,6 +47,8 @@ const User = () => {
                 title="Mon" 
                 subtitle="Profil" 
                 description="Espace Personnel & Documents"
+                backPath="/"
+                backLabel="Retour à l'accueil"
             />
             <div className="container mx-auto px-4 max-w-5xl">
                 

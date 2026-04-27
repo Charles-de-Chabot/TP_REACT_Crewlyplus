@@ -11,6 +11,7 @@ import ConfiguratorHeader from '../../components/Configurator/ConfiguratorHeader
 // Custom Hook
 import { useConfigurator } from '../../hooks/useConfigurator';
 import { useNavigate } from 'react-router-dom';
+import PageHeader from '../../components/UI/PageHeader';
 
 const Configurator = () => {
     const navigate = useNavigate();
@@ -30,7 +31,14 @@ const Configurator = () => {
     if (loading || !boat) return <PageLoader />;
 
     return (
-        <Layout className="pt-32 pb-20 bg-slate-950 min-h-screen relative overflow-hidden">
+        <Layout className="pb-20 bg-slate-950 min-h-screen relative overflow-hidden">
+            <PageHeader 
+                title="Configuration" 
+                subtitle="Réservation" 
+                description={`Personnalisez votre séjour sur le ${boat.name}`}
+                backPath={`/boat/${boat.id}`}
+                backLabel="Retour au bateau"
+            />
             {/* Background Decor */}
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-teal-500/5 rounded-full blur-[150px] -z-10 animate-pulse" />
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] -z-10" />

@@ -7,6 +7,7 @@ import Layout from '../../components/UI/Layout';
 import CheckoutForm from '../../components/Stripe/CheckoutForm';
 import CheckoutSummary, { StripeTrustBadges } from '../../components/Stripe/CheckoutSummary';
 import { selectStripeClientSecret, selectTotalPrice, selectSelectedBoat } from '../../store/booking/bookingSelectors';
+import PageHeader from '../../components/UI/PageHeader';
 
 const stripePromise = loadStripe('pk_test_51TLB0IGpNFFeiWtxVr7bdvlQBUR9lsjI9lsUgcGFuj2pjSGk1AfK8kF8Vt1TtxzdBWpoclT32XhIIDdvjT0tDreq00FjyGhLDD');
 
@@ -35,7 +36,14 @@ const CheckoutScreen = () => {
     if (!clientSecret) return null;
 
     return (
-        <Layout className="pt-24 pb-12">
+        <Layout className="pb-12">
+            <PageHeader 
+                title="Paiement" 
+                subtitle="Sécurisé" 
+                description="Finalisez votre réservation"
+                backPath="/configurator"
+                backLabel="Retour au configurateur"
+            />
             <div className="container mx-auto px-4 max-w-2xl">
                 
                 <CheckoutSummary 

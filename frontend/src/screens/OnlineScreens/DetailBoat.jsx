@@ -8,6 +8,7 @@ import BookingCard from '../../components/Rental/BookingCard';
 import Layout from '../../components/UI/Layout';
 import PageLoader from '../../components/Loader/PageLoader';
 import useBoatDetail from '../../hooks/useBoatDetail';
+import PageHeader from '../../components/UI/PageHeader';
 
 const DetailBoat = () => {
     const { id } = useParams();
@@ -19,7 +20,14 @@ const DetailBoat = () => {
     }
 
     return (
-        <Layout className="pt-24 pb-12">
+        <Layout className="pb-12">
+            <PageHeader 
+                title="Détails" 
+                subtitle="Bateau" 
+                description={boatDetail ? `${boatDetail.name} - ${boatDetail.model?.name}` : "Caractéristiques du navire"}
+                backPath="/boats"
+                backLabel="Retour à la flotte"
+            />
             <div className="container mx-auto px-4">
                 
                 {/* En-tête avec l'image et les infos principales */}

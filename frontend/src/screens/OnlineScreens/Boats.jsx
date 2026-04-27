@@ -18,12 +18,14 @@ const Boats = () => {
 
     return (
         <Layout>
-            <BoatHero />
             <PageHeader 
                 title="La" 
                 subtitle="Flotte" 
                 description="Réservez votre navire d'exception"
+                backPath="/"
+                backLabel="Retour à l'accueil"
             />
+            <BoatHero />
 
             <div className="container mx-auto px-4 py-12">
                 <FilterBar 

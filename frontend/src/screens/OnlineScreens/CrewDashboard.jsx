@@ -12,6 +12,7 @@ import ProfileEditModal from '../../components/User/ProfileEditModal';
 
 // Custom Hook
 import { useCrewDashboard } from '../../hooks/useCrewDashboard';
+import PageHeader from '../../components/UI/PageHeader';
 
 const CrewDashboard = () => {
     const {
@@ -38,7 +39,14 @@ const CrewDashboard = () => {
     if (loading) return <PageLoader />;
 
     return (
-        <Layout className="pt-32 pb-20 bg-slate-950 min-h-screen">
+        <Layout className="pb-20 bg-slate-950 min-h-screen">
+            <PageHeader 
+                title="Tableau" 
+                subtitle="De Bord Pro" 
+                description={`Bienvenue à bord, ${firstname}`}
+                backPath="/"
+                backLabel="Retour à l'accueil"
+            />
             <div className="container mx-auto px-6 max-w-7xl">
                 <CrewHeader 
                     theme={theme}
