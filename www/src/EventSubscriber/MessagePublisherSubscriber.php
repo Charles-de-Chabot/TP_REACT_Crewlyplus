@@ -31,7 +31,7 @@ class MessagePublisherSubscriber
         }
 
         // Sérialisation du message avec le groupe de lecture
-        $data = $this->serializer->serialize($message, 'json', ['groups' => ['message:read', 'team:read']]);
+        $data = $this->serializer->serialize($message, 'json', ['groups' => ['message:read']]);
 
         // Définition du topic spécifique à la team
         $topic = sprintf('https://crewly.plus/teams/%d/messages', $team->getId());
@@ -40,7 +40,7 @@ class MessagePublisherSubscriber
         $update = new Update(
             $topic,
             $data,
-            true // Private update : nécessite un JWT pour s'abonner
+            false // Public update : permet l'abonnement anonyme (pour le TP)
         );
 
         // Publication sur le Hub

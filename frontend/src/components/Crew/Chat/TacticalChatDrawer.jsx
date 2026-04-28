@@ -9,7 +9,7 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
     const { messages, sendMessage, connected, loading } = useChat();
     const { userId } = useAuthContext();
     const scrollRef = useRef(null);
-    const [activeTab, setActiveTab] = useState('ALL');
+    const [activeTab, setActiveTab] = useState('PASSERELLE');
 
     // Auto-scroll au dernier message
     useEffect(() => {
@@ -20,48 +20,60 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
 
     if (!isOpen) return null;
 
-    const filteredMessages = activeTab === 'ALL' 
-        ? messages 
-        : messages.filter(m => m.category === activeTab);
+    const filteredMessages = messages.filter(m => m.category === activeTab);
 
     return (
-        <div className={`fixed inset-y-0 right-0 w-full sm:w-[400px] bg-slate-950/95 border-l border-white/10 backdrop-blur-2xl z-[100] shadow-2xl transition-transform duration-500 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`fixed top-[100px] bottom-[30px] right-[20px] w-full sm:w-[380px] bg-slate-950/80 border border-cyan-500/30 backdrop-blur-3xl z-[9999] shadow-[-20px_0_80px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out transform rounded-[32px] flex flex-col overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+40px)]'}`}>
+            <style>
+                {`
+                    .chat-scroll::-webkit-scrollbar { width: 4px; }
+                    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+                    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.2); border-radius: 10px; }
+                    .chat-scroll::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.5); }
+                `}
+            </style>
+            
+            {/* Glossy Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
+
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/50">
-                <div className="flex items-center gap-3">
+            <div className="relative p-6 border-b border-white/10 flex items-center justify-between bg-slate-900/40">
+                <div className="flex items-center gap-4">
                     <div className="relative">
-                        <Radio size={20} className={connected ? 'text-cyan-500 animate-pulse' : 'text-slate-500'} />
-                        <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-slate-950 ${connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <div className={`absolute -inset-1 rounded-full blur-sm ${connected ? 'bg-cyan-500/50 animate-pulse' : 'bg-red-500/50'}`} />
+                        <div className={`relative w-3 h-3 rounded-full border-2 border-slate-900 ${connected ? 'bg-cyan-400' : 'bg-red-500'}`} />
                     </div>
                     <div>
-                        <h2 className="text-xs font-black text-white uppercase tracking-widest">Canal Tactique</h2>
-                        <p className="text-[9px] text-white/40 uppercase font-bold">
-                            {connected ? 'Système en ligne' : 'Déconnexion...'}
-                        </p>
+                        <h2 className="text-[11px] font-black text-white uppercase tracking-[0.3em]">Tactical Feed v2.4</h2>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[8px] text-cyan-400/60 font-mono uppercase tracking-widest">
+                                {connected ? 'System.Encrypted.Active' : 'System.Link.Failure'}
+                            </span>
+                        </div>
                     </div>
                 </div>
+                
                 <button 
                     onClick={onClose}
-                    className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors"
+                    className="group relative p-2 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/50 rounded-xl transition-all duration-300"
                 >
-                    <X size={20} />
+                    <X size={18} className="text-white/40 group-hover:text-red-400 group-hover:rotate-90 transition-all duration-300" />
                 </button>
             </div>
 
-            {/* Tabs */}
-            <div className="flex border-b border-white/5 bg-slate-950/50">
-                {['ALL', 'PASSERELLE', 'TACTIQUE', 'LOGISTIQUE'].map((tab) => (
+            {/* Navigation Tabs (Command Console Style) */}
+            <div className="flex p-2 gap-1 bg-black/20 border-b border-white/5">
+                {['PASSERELLE', 'TACTIQUE', 'LOGISTIQUE'].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`flex-1 py-3 text-[9px] font-black uppercase tracking-tighter transition-all relative ${
-                            activeTab === tab ? 'text-cyan-500' : 'text-white/30 hover:text-white/60'
+                        className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${
+                            activeTab === tab 
+                                ? 'bg-cyan-500/10 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.1)] border border-cyan-500/20' 
+                                : 'text-white/20 hover:text-white/50 hover:bg-white/5'
                         }`}
                     >
-                        {tab === 'ALL' ? 'Tous' : tab}
-                        {activeTab === tab && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
-                        )}
+                        {tab}
                     </button>
                 ))}
             </div>
@@ -69,7 +81,7 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
             {/* Message List */}
             <div 
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar scroll-smooth h-[calc(100vh-220px)]"
+                className="flex-1 overflow-y-auto p-6 space-y-6 chat-scroll scroll-smooth"
             >
                 {loading && messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center gap-3 opacity-20">
@@ -95,7 +107,11 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
             </div>
 
             {/* Input */}
-            <ChatInput onSend={sendMessage} connected={connected} />
+            <ChatInput 
+                onSend={sendMessage} 
+                connected={connected} 
+                forcedCategory={activeTab} 
+            />
         </div>
     );
 };

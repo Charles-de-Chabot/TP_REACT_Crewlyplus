@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
@@ -32,15 +33,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read', 'rental:read', 'team:read'])]
+    #[Groups(['user:read', 'rental:read', 'team:read', 'message:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write', 'rental:read', 'team:read'])]
+    #[Groups(['user:read', 'user:write', 'rental:read', 'team:read', 'message:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'message:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -72,7 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $is_active = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:write', 'message:read'])]
     private ?string $position = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
@@ -96,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, TeamMembership>
      */
     #[ORM\OneToMany(targetEntity: TeamMembership::class, mappedBy: 'user', orphanRemoval: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'message:read'])]
     private Collection $memberships;
 
     /**
@@ -141,6 +142,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $rentals;
 
 
+
+    #[Groups(['message:read'])]
+    public function getTacticalPosition(): string
+    {
+        // 1. Chercher dans les memberships actifs d'abord (plus précis)
+        foreach ($this->memberships as $membership) {
+            if (!$membership->getLeftAt()) {
+                if ($membership->getPosition()) {
+                    return $membership->getPosition()->getLabel();
+                }
+                // Si c'est le leader de cette team
+                if ($membership->getTeam()->getLeader() && $membership->getTeam()->getLeader()->getId() === $this->getId()) {
+                    return 'Skipper';
+                }
+            }
+        }
+
+        // 2. Fallback sur le champ statique ou défaut
+        return $this->position ?? 'Équipier';
+    }
+
+    #[Groups(['message:read'])]
+    #[SerializedName('isSkipper')]
+    public function isSkipper(): bool
+    {
+        foreach ($this->memberships as $membership) {
+            if (!$membership->getLeftAt()) {
+                $team = $membership->getTeam();
+                if ($team && $team->getLeader() && $team->getLeader()->getId() === $this->getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public function __construct()
     {

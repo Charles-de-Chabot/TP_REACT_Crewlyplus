@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { Send, Radio, Shield, Anchor } from 'lucide-react';
+import { Send, Radio, Shield, Anchor, Image as ImageIcon } from 'lucide-react';
 
-const ChatInput = ({ onSend, connected }) => {
+const ChatInput = ({ onSend, connected, forcedCategory }) => {
     const [text, setText] = useState('');
-    const [category, setCategory] = useState('PASSERELLE');
-
     const [isUploading, setIsUploading] = useState(false);
 
-    const categories = [
-        { id: 'PASSERELLE', icon: Anchor, color: 'text-slate-400', label: 'Général' },
-        { id: 'TACTIQUE', icon: Radio, color: 'text-cyan-400', label: 'Tactique' },
-        { id: 'LOGISTIQUE', icon: Shield, color: 'text-purple-400', label: 'Logistique' },
-    ];
+    const categories = {
+        'PASSERELLE': { icon: Anchor, color: 'text-slate-400', label: 'Passerelle' },
+        'TACTIQUE': { icon: Radio, color: 'text-cyan-400', label: 'Tactique' },
+        'LOGISTIQUE': { icon: Shield, color: 'text-purple-400', label: 'Logistique' },
+    };
+
+    const currentCat = categories[forcedCategory] || categories['PASSERELLE'];
+    const Icon = currentCat.icon;
 
     const compressImage = (file) => {
+        // ... (logique de compression inchangée)
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -26,10 +28,9 @@ const ChatInput = ({ onSend, connected }) => {
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scale;
-
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compression à 70%
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
             };
         });
@@ -38,13 +39,10 @@ const ChatInput = ({ onSend, connected }) => {
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         setIsUploading(true);
         try {
             const compressedBase64 = await compressImage(file);
-            // Pour simplifier, on envoie le base64 dans le content pour le type FILE
-            // Dans une version de prod, on ferait un vrai upload vers un service de stockage
-            onSend("Photo partagée", category, 'FILE', { imageData: compressedBase64 });
+            onSend("Photo partagée", forcedCategory, 'FILE', { imageData: compressedBase64 });
         } catch (err) {
             console.error("Erreur compression:", err);
         } finally {
@@ -54,58 +52,60 @@ const ChatInput = ({ onSend, connected }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!text.trim() || !connected) return;
-        onSend(text, category);
+        if (!text.trim()) return;
+        onSend(text, forcedCategory);
         setText('');
     };
 
     return (
-        <div className="p-4 bg-slate-900/80 border-t border-white/5 backdrop-blur-md">
-            <div className="flex gap-2 mb-3 overflow-x-auto pb-1 no-scrollbar">
-                {categories.map((cat) => {
-                    const Icon = cat.icon;
-                    const isActive = category === cat.id;
-                    return (
-                        <button
-                            key={cat.id}
-                            onClick={() => setCategory(cat.id)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border ${
-                                isActive 
-                                    ? `bg-white/10 border-white/20 ${cat.color}` 
-                                    : 'bg-transparent border-transparent text-white/30 hover:text-white/60'
-                            }`}
-                        >
-                            <Icon size={12} />
-                            {cat.label}
-                        </button>
-                    );
-                })}
+        <div className="p-6 bg-slate-950/80 border-t border-white/10 backdrop-blur-3xl relative">
+            {/* Input Status Line */}
+            <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center gap-2">
+                    <div className={`p-1 rounded-md bg-white/5 border border-white/10`}>
+                        <Icon size={10} className={currentCat.color} />
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${currentCat.color}`}>
+                        Transmission : {currentCat.label}
+                    </span>
+                </div>
+                {connected && (
+                    <span className="text-[8px] font-mono text-cyan-400/40 animate-pulse uppercase tracking-widest">Link.Sync.Stable</span>
+                )}
             </div>
             
-            <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
-                <label className={`p-3 rounded-xl border border-white/10 bg-white/5 text-white/40 hover:text-cyan-500 hover:border-cyan-500/50 cursor-pointer transition-all ${isUploading ? 'animate-pulse' : ''}`}>
-                    <ImageIcon size={18} />
+            <form onSubmit={handleSubmit} className="relative flex items-center gap-3">
+                <label className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer ${
+                    isUploading 
+                        ? 'bg-cyan-500/20 border-cyan-500 animate-pulse text-cyan-400' 
+                        : 'bg-white/5 border-white/10 text-white/40 hover:text-cyan-400 hover:border-cyan-400/50 hover:bg-cyan-400/5'
+                }`}>
+                    <ImageIcon size={20} />
                     <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
                 </label>
 
-                <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder={connected ? "Envoyer un message..." : "Connexion au Hub..."}
-                    disabled={!connected}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 transition-all"
-                />
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder="Saisir une commande ou un message..."
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all duration-300"
+                    />
+                    {/* Inner Input Glow */}
+                    <div className="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent pointer-events-none" />
+                </div>
+
                 <button
                     type="submit"
-                    disabled={!text.trim() || !connected}
-                    className={`p-3 rounded-xl transition-all ${
-                        text.trim() && connected 
-                            ? 'bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)] scale-100' 
-                            : 'bg-white/5 text-white/20 scale-95 opacity-50'
+                    disabled={!text.trim()}
+                    className={`p-3.5 rounded-2xl transition-all duration-500 ${
+                        text.trim()
+                            ? 'bg-cyan-500 text-black shadow-[0_0_25px_rgba(6,182,212,0.5)] scale-100 hover:rotate-6 active:scale-90' 
+                            : 'bg-white/5 text-white/10 scale-95 opacity-50 grayscale'
                     }`}
                 >
-                    <Send size={18} />
+                    <Send size={20} />
                 </button>
             </form>
         </div>

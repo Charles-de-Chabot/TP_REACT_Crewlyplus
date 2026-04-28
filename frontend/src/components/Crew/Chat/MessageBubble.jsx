@@ -2,11 +2,19 @@ import React, { memo } from 'react';
 import { USER_URL } from '../../../constants/apiConstant';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { BarChart2, Image as ImageIcon } from 'lucide-react';
+import { BarChart2, Image as ImageIcon, Star } from 'lucide-react';
 
 const MessageBubble = memo(({ message, isMe }) => {
     const { author, content, createdAt, category, type, metadata } = message;
     
+    // Debug pour voir les infos reçues du serveur
+    if (isMe) {
+        console.log("👤 Infos auteur (Moi):", { 
+            name: author?.firstname, 
+            pos: author?.tacticalPosition, 
+            skipper: author?.isSkipper 
+        });
+    }
     // Rendu spécial pour les statistiques partagées
     const renderActionContent = () => {
         if (type === 'ACTION' && metadata?.chartData) {
@@ -42,18 +50,45 @@ const MessageBubble = memo(({ message, isMe }) => {
         return <div className="text-sm">{content}</div>;
     };
     
-    // Déterminer la couleur selon la catégorie
-    const categoryColors = {
-        'TACTIQUE': 'border-cyan-500 text-cyan-400',
-        'LOGISTIQUE': 'border-purple-500 text-purple-400',
-        'PASSERELLE': 'border-slate-500 text-slate-400'
+    const positionColors = {
+        'Skipper': 'border-yellow-400 text-yellow-400 bg-yellow-400/5',
+        'Barreur': 'border-indigo-500 text-indigo-400 bg-indigo-500/5',
+        'Tacticien': 'border-fuchsia-500 text-fuchsia-400 bg-fuchsia-500/5',
+        'Régleur GV': 'border-lime-500 text-lime-400 bg-lime-500/5',
+        'Régleur Bâbord': 'border-emerald-500 text-emerald-400 bg-emerald-500/5',
+        'Régleur Tribord': 'border-teal-500 text-teal-400 bg-teal-500/5',
+        'Piano': 'border-orange-500 text-orange-400 bg-orange-500/5',
+        'Numéro 1': 'border-pink-500 text-pink-400 bg-pink-500/5',
+        'Numéro 2 (Mât)': 'border-rose-500 text-rose-400 bg-rose-500/5',
+    };
+
+    const getPositionStyle = () => {
+        return positionColors[author?.tacticalPosition] || 'border-white/20 text-white/40 bg-white/5';
     };
 
     return (
-        <div className={`flex flex-col mb-4 ${isMe ? 'items-end' : 'items-start'}`}>
-            <div className={`flex items-end gap-2 max-w-[85%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                {/* Avatar */}
-                <div className="h-8 w-8 rounded-full bg-slate-900 border border-white/10 overflow-hidden flex-shrink-0">
+        <div className={`flex flex-col mb-6 ${isMe ? 'items-end' : 'items-start'} group animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+            {/* Meta Info */}
+            <div className={`flex items-center gap-3 mb-1.5 px-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+                    {isMe ? 'Vous' : `${author?.firstname} ${author?.lastname || ''}`}
+                </span>
+                <span className={`text-[8px] font-black px-2 py-0.5 border rounded-md uppercase tracking-tighter flex items-center gap-1 transition-all duration-500 ${getPositionStyle()} ${
+                    author?.isSkipper ? 'shadow-[0_0_10px_rgba(234,179,8,0.15)] border-yellow-500/30' : ''
+                }`}>
+                    {author?.isSkipper && <Star size={10} fill="currentColor" className="text-yellow-400 animate-pulse" />}
+                    {author?.tacticalPosition || 'Équipier'}
+                </span>
+                <span className="text-[9px] font-mono text-white/20">
+                    {format(new Date(createdAt), 'HH:mm:ss', { locale: fr })}
+                </span>
+            </div>
+
+            <div className={`flex items-start gap-3 max-w-[90%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                {/* Avatar with Glow */}
+                <div className={`h-10 w-10 rounded-2xl bg-slate-900 border overflow-hidden flex-shrink-0 transition-all duration-300 ${
+                    isMe ? 'border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'border-white/10'
+                }`}>
                     {author?.media?.[0]?.media_path ? (
                         <img 
                             src={`${USER_URL}/${author.media[0].media_path}`} 
@@ -61,32 +96,28 @@ const MessageBubble = memo(({ message, isMe }) => {
                             className="w-full h-full object-cover"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-white/40">
+                        <div className="w-full h-full flex items-center justify-center text-sm font-black text-white/30 bg-gradient-to-br from-slate-800 to-slate-900">
                             {author?.firstname?.charAt(0) || 'U'}
                         </div>
                     )}
                 </div>
 
-                {/* Bulle */}
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-1 px-1">
-                        <span className="text-[10px] font-bold text-white/60">{author?.firstname}</span>
-                        <span className={`text-[8px] font-black border px-1.5 rounded-full ${categoryColors[category] || categoryColors.PASSERELLE}`}>
-                            {category}
-                        </span>
-                    </div>
+                {/* Message Box */}
+                <div className={`relative px-5 py-4 rounded-3xl border transition-all duration-300 ${
+                    isMe 
+                        ? 'bg-cyan-500/5 border-cyan-500/30 text-white rounded-tr-none hover:bg-cyan-500/10' 
+                        : 'bg-white/5 border-white/10 text-white/90 rounded-tl-none hover:bg-white/10'
+                }`}>
+                    {/* Corner Tech Accent */}
+                    <div className={`absolute top-0 ${isMe ? 'right-0' : 'left-0'} w-3 h-3 border-t-2 border-l-2 ${isMe ? 'border-cyan-500/40' : 'border-white/20'} -translate-x-[1px] -translate-y-[1px]`} />
                     
-                    <div className={`px-4 py-2.5 rounded-2xl transition-all ${
-                        isMe 
-                            ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-50 rounded-tr-none' 
-                            : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
-                    }`}>
-                        {renderActionContent()}
-                    </div>
-                    
-                    <span className="text-[9px] text-white/20 mt-1 px-1">
-                        {format(new Date(createdAt), 'HH:mm', { locale: fr })}
-                    </span>
+                    {renderActionContent()}
+
+                    {isMe && (
+                        <div className="absolute -bottom-5 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[7px] font-black text-cyan-500/40 uppercase tracking-[0.2em]">Data.Link.Confirmed</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

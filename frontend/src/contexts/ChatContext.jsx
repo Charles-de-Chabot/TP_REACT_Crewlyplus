@@ -34,11 +34,14 @@ export const ChatProvider = ({ children, teamId }) => {
     useEffect(() => {
         if (!teamId || !token) return;
 
-        // Configuration de l'URL du Hub
-        const hubUrl = new URL('http://localhost:3000/.well-known/mercure');
-        hubUrl.searchParams.append('topic', `https://crewly.plus/teams/${teamId}/messages`);
+        // Extraction de l'ID pur (au cas où c'est une IRI /api/teams/ID)
+        const cleanId = String(teamId).split('/').pop();
+        
+        // Configuration de l'URL du Hub (127.0.0.1 est plus robuste que localhost)
+        const hubUrl = new URL('http://127.0.0.1:3000/.well-known/mercure');
+        hubUrl.searchParams.append('topic', `https://crewly.plus/teams/${cleanId}/messages`);
 
-        const eventSource = new EventSource(hubUrl, { withCredentials: true });
+        const eventSource = new EventSource(hubUrl);
 
         eventSource.onopen = () => {
             console.log(`📡 Connecté au Canal Tactique de la Team ${teamId}`);
@@ -70,7 +73,20 @@ export const ChatProvider = ({ children, teamId }) => {
 
     // 3. Envoyer un message
     const sendMessage = async (content, category = 'PASSERELLE', type = 'TEXT', metadata = {}) => {
-        if (!content.trim() || !teamId || !userId) return;
+        console.log("🚀 Tentative d'envoi:", { content, category, teamId, userId });
+        
+        if (!content.trim()) {
+            console.warn("⚠️ Envoi annulé: Le message est vide.");
+            return;
+        }
+        if (!teamId) {
+            console.warn("⚠️ Envoi annulé: ID de l'équipe manquant.");
+            return;
+        }
+        if (!userId || userId === "") {
+            console.warn("⚠️ Envoi annulé: ID de l'utilisateur manquant.");
+            return;
+        }
 
         const tempId = `temp-${Date.now()}`;
         const optimisticMessage = {
@@ -86,20 +102,25 @@ export const ChatProvider = ({ children, teamId }) => {
 
         setMessages(prev => [...prev, optimisticMessage]);
 
+        const cleanTeamId = String(teamId).includes('/api/') ? teamId : `/api/teams/${teamId}`;
+        const cleanUserId = String(userId).includes('/api/') ? userId : `/api/users/${userId}`;
+
         try {
             const response = await api.post('/api/messages', {
                 content,
                 category,
                 type,
                 metadata,
-                team: `/api/teams/${teamId}`,
-                author: `/api/users/${userId}`
+                team: cleanTeamId,
+                author: cleanUserId
             });
+
+            console.log("✅ Message envoyé avec succès:", response.data);
 
             // Remplacer le message temporaire par le message officiel
             setMessages(prev => prev.map(m => m.id === tempId ? response.data : m));
         } catch (error) {
-            console.error("Erreur d'envoi du message:", error);
+            console.error("❌ Échec de l'envoi du message:", error.response?.data || error.message);
             setMessages(prev => prev.filter(m => m.id !== tempId));
         }
     };

@@ -39,7 +39,7 @@ class TeamMembership
 
     #[ORM\ManyToOne(inversedBy: 'memberships')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['membership:read', 'membership:write', 'user:read'])]
+    #[Groups(['membership:read', 'membership:write', 'user:read', 'message:read'])]
     private ?Team $team = null;
 
     #[ORM\ManyToOne]

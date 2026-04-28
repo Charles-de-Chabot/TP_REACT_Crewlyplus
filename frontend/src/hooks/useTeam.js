@@ -109,6 +109,17 @@ export const useTeam = () => {
             }, {
                 headers: { 'Content-Type': 'application/merge-patch+json' }
             });
+
+            // Synchronisation du champ 'position' sur le profil User pour le chat
+            const selectedPos = positions.find(p => String(p.id) === String(positionId));
+            if (selectedPos) {
+                await api.patch(`/api/users/${userId}`, {
+                    position: selectedPos.label
+                }, {
+                    headers: { 'Content-Type': 'application/merge-patch+json' }
+                });
+            }
+
             await fetchTeamData();
         } catch (err) {
             console.error("Error updating position", err);
