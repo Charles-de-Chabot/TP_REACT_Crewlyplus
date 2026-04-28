@@ -1,6 +1,6 @@
 import React from 'react';
 import GlassCard from '../ui/GlassCard';
-import { Trophy, Gauge, Wind, BarChart3, ChevronRight, X } from 'lucide-react';
+import { Trophy, Gauge, Wind, BarChart3, ChevronRight, X, Share } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 // 1. Compteurs de Statistiques
@@ -30,12 +30,23 @@ const StatItem = ({ label, value, unit, icon }) => (
 );
 
 // 2. Graphiques de Performance
-export const PerformanceCharts = ({ stats }) => (
+export const PerformanceCharts = ({ stats, onShare }) => (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <GlassCard className="p-6 h-[300px] flex flex-col">
-            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Trophy size={14} className="text-gold-sanded" /> Évolution du Classement
-            </h4>
+            <div className="flex items-center justify-between mb-4">
+                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest flex items-center gap-2">
+                    <Trophy size={14} className="text-gold-sanded" /> Évolution du Classement
+                </h4>
+                {onShare && (
+                    <button 
+                        onClick={() => onShare(`Notre classement est passé au rang ${stats[stats.length-1]?.ranking || '--'} !`, 'TACTIQUE', 'ACTION', { chartData: true, score: 100 - (stats[stats.length-1]?.ranking * 10) })}
+                        className="p-1.5 hover:bg-white/10 rounded-lg text-white/20 hover:text-cyan-500 transition-all"
+                        title="Partager au Canal Tactique"
+                    >
+                        <Share size={12} />
+                    </button>
+                )}
+            </div>
             <div className="flex-1 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={stats}>
@@ -50,9 +61,20 @@ export const PerformanceCharts = ({ stats }) => (
         </GlassCard>
 
         <GlassCard className="p-6 h-[300px] flex flex-col">
-            <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Gauge size={14} className="text-cyan-400" /> Courbe de Vitesse
-            </h4>
+            <div className="flex items-center justify-between mb-4">
+                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Gauge size={14} className="text-cyan-400" /> Courbe de Vitesse
+                </h4>
+                {onShare && (
+                    <button 
+                        onClick={() => onShare(`Vitesse max enregistrée : ${Math.max(...stats.map(s => s.maxSpeed || 0))} kts`, 'TACTIQUE', 'ACTION', { chartData: true, score: Math.max(...stats.map(s => s.maxSpeed || 0)) * 2 })}
+                        className="p-1.5 hover:bg-white/10 rounded-lg text-white/20 hover:text-cyan-500 transition-all"
+                        title="Partager au Canal Tactique"
+                    >
+                        <Share size={12} />
+                    </button>
+                )}
+            </div>
             <div className="flex-1 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={stats}>

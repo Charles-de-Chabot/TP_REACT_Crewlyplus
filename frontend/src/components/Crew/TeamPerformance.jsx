@@ -3,8 +3,10 @@ import GlassCard from '../ui/GlassCard';
 import { Plus, X, BarChart3, Wind } from 'lucide-react';
 import DailyStatForm from './DailyStatForm';
 import { PerformanceStats, PerformanceCharts, PerformanceJournal } from './PerformanceComponents';
+import { useChat } from '../../contexts/ChatContext';
 
 const TeamPerformance = ({ registrations, isLeader, onRefresh }) => {
+    const { sendMessage } = useChat();
     const [selectedReg, setSelectedReg] = useState(registrations[0] || null);
     const [showForm, setShowForm] = useState(false);
     const [viewStat, setViewStat] = useState(null);
@@ -139,7 +141,7 @@ const TeamPerformance = ({ registrations, isLeader, onRefresh }) => {
                             </div>
                         </GlassCard>
                     ) : (
-                        <PerformanceCharts stats={stats} />
+                        <PerformanceCharts stats={stats} onShare={sendMessage} />
                     )}
                 </div>
             </div>

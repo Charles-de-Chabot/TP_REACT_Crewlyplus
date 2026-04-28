@@ -5,11 +5,52 @@ const ChatInput = ({ onSend, connected }) => {
     const [text, setText] = useState('');
     const [category, setCategory] = useState('PASSERELLE');
 
+    const [isUploading, setIsUploading] = useState(false);
+
     const categories = [
         { id: 'PASSERELLE', icon: Anchor, color: 'text-slate-400', label: 'Général' },
         { id: 'TACTIQUE', icon: Radio, color: 'text-cyan-400', label: 'Tactique' },
         { id: 'LOGISTIQUE', icon: Shield, color: 'text-purple-400', label: 'Logistique' },
     ];
+
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compression à 70%
+                };
+            };
+        });
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const compressedBase64 = await compressImage(file);
+            // Pour simplifier, on envoie le base64 dans le content pour le type FILE
+            // Dans une version de prod, on ferait un vrai upload vers un service de stockage
+            onSend("Photo partagée", category, 'FILE', { imageData: compressedBase64 });
+        } catch (err) {
+            console.error("Erreur compression:", err);
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -42,6 +83,11 @@ const ChatInput = ({ onSend, connected }) => {
             </div>
             
             <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
+                <label className={`p-3 rounded-xl border border-white/10 bg-white/5 text-white/40 hover:text-cyan-500 hover:border-cyan-500/50 cursor-pointer transition-all ${isUploading ? 'animate-pulse' : ''}`}>
+                    <ImageIcon size={18} />
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
+                </label>
+
                 <input
                     type="text"
                     value={text}

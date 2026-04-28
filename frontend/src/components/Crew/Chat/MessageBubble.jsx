@@ -2,9 +2,45 @@ import React, { memo } from 'react';
 import { USER_URL } from '../../../constants/apiConstant';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { BarChart2, Image as ImageIcon } from 'lucide-react';
 
 const MessageBubble = memo(({ message, isMe }) => {
-    const { author, content, createdAt, category, type } = message;
+    const { author, content, createdAt, category, type, metadata } = message;
+    
+    // Rendu spécial pour les statistiques partagées
+    const renderActionContent = () => {
+        if (type === 'ACTION' && metadata?.chartData) {
+            return (
+                <div className="mt-2 p-3 bg-slate-900/50 rounded-xl border border-cyan-500/20">
+                    <div className="flex items-center gap-2 mb-2">
+                        <BarChart2 size={14} className="text-cyan-500" />
+                        <span className="text-[10px] font-black uppercase text-white/60">Statistiques de Performance</span>
+                    </div>
+                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                            className="h-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]" 
+                            style={{ width: `${metadata.score || 70}%` }}
+                        ></div>
+                    </div>
+                    <p className="text-[10px] text-white/40 mt-2 italic">"{content}"</p>
+                </div>
+            );
+        }
+
+        if (type === 'FILE' && metadata?.imageData) {
+            return (
+                <div className="mt-2">
+                    <img 
+                        src={metadata.imageData} 
+                        alt="Shared" 
+                        className="rounded-xl border border-white/10 max-h-60 w-full object-cover cursor-zoom-in" 
+                    />
+                </div>
+            );
+        }
+
+        return <div className="text-sm">{content}</div>;
+    };
     
     // Déterminer la couleur selon la catégorie
     const categoryColors = {
@@ -40,12 +76,12 @@ const MessageBubble = memo(({ message, isMe }) => {
                         </span>
                     </div>
                     
-                    <div className={`px-4 py-2.5 rounded-2xl text-sm transition-all ${
+                    <div className={`px-4 py-2.5 rounded-2xl transition-all ${
                         isMe 
                             ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-50 rounded-tr-none' 
                             : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
                     }`}>
-                        {content}
+                        {renderActionContent()}
                     </div>
                     
                     <span className="text-[9px] text-white/20 mt-1 px-1">
