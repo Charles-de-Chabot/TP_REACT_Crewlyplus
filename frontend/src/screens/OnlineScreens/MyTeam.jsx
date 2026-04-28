@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../../components/UI/Layout';
 import PageHeader from '../../components/UI/PageHeader';
 import GlassCard from '../../components/ui/GlassCard';
@@ -13,6 +13,8 @@ import DocumentVault from '../../components/User/DocumentVault';
 import { useTeam } from '../../hooks/useTeam';
 import api from '../../api/axios';
 import { ChatProvider } from '../../contexts/ChatContext';
+import TacticalChatDrawer from '../../components/Crew/Chat/TacticalChatDrawer';
+import { MessageSquare } from 'lucide-react';
 
 const MyTeam = () => {
     const { userId } = useAuthContext();
@@ -20,6 +22,8 @@ const MyTeam = () => {
         team, positions, myMembership, loading, updating, error,
         createTeam, joinTeam, updatePosition, refreshTeam
     } = useTeam();
+
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const handleCreate = async (name, desc, file) => {
         try {
@@ -184,6 +188,20 @@ const MyTeam = () => {
                             <TeamNoTeamView onCreate={handleCreate} onJoin={handleJoin} updating={updating} />
                         )}
                     </div>
+
+                    {/* Floating Chat Button */}
+                    {team && (
+                        <button
+                            onClick={() => setIsChatOpen(true)}
+                            className="fixed bottom-8 right-8 z-[90] w-14 h-14 bg-cyan-500 text-black rounded-2xl shadow-[0_0_25px_rgba(6,182,212,0.5)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all group"
+                        >
+                            <MessageSquare size={24} className="group-hover:rotate-12 transition-transform" />
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-slate-950 rounded-full animate-bounce"></div>
+                        </button>
+                    )}
+
+                    {/* Tactical Drawer */}
+                    <TacticalChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
                 </div>
             </div>
         </Layout>
