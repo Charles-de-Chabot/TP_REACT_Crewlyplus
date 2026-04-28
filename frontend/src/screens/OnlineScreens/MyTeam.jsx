@@ -12,6 +12,7 @@ import TeamRegattaList from '../../components/Crew/TeamRegattaList';
 import DocumentVault from '../../components/User/DocumentVault';
 import { useTeam } from '../../hooks/useTeam';
 import api from '../../api/axios';
+import { ChatProvider } from '../../contexts/ChatContext';
 
 const MyTeam = () => {
     const { userId } = useAuthContext();
@@ -69,7 +70,8 @@ const MyTeam = () => {
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
                             </div>
                         ) : team ? (
-                            <div className="max-w-[1700px] mx-auto">
+                            <ChatProvider teamId={team.id}>
+                                <div className="max-w-[1700px] mx-auto">
                                 <TeamHeader team={team} />
 
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -177,7 +179,8 @@ const MyTeam = () => {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
+                        </ChatProvider>
+                    ) : (
                             <TeamNoTeamView onCreate={handleCreate} onJoin={handleJoin} updating={updating} />
                         )}
                     </div>
