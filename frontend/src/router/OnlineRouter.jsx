@@ -14,6 +14,8 @@ import CrewRegister from "../screens/OnlineScreens/CrewRegister";
 import Regattas from "../screens/OnlineScreens/Regattas";
 import RegattaDetails from "../screens/OnlineScreens/RegattaDetails";
 import TeamWorkspace from "../screens/OnlineScreens/TeamWorkspace";
+import MyTeam from "../screens/OnlineScreens/MyTeam";
+import TeamHistoryDetail from "../screens/OnlineScreens/TeamHistoryDetail";
 
 const OnlineRouter = createBrowserRouter([
     {
@@ -28,16 +30,18 @@ const OnlineRouter = createBrowserRouter([
             { path: "/boats", element: <Boats/> },
             { path: "/regattas", element: <Regattas /> },
             { path: "/regattas/:id", element: <RegattaDetails /> },
-            { path: "/regattas/:id/team", element: <TeamWorkspace /> },
+            { path: "/regattas/:id/team", element: <Navigate to="/my-team" replace /> },
             { path: "/boats/:id", element: <DetailBoat /> },
             { path: "/configurator", element: <Configurator /> },
             { path: "/checkout", element: <CheckoutScreen /> },
             
             // 2. Les routes privées
             { path: "/user", element: <User/> },
-            { path: "/crew/dashboard", element: <CrewDashboard /> },
-            { path: "/crew/register", element: <CrewRegister /> },
+            { path: "/crew/dashboard", element: <Navigate to="/my-team" replace /> },
+            { path: "/crew/register", element: <Navigate to="/my-team" replace /> },
             { path: "/register_premium", element: <RegisterPremium /> },
+            { path: "/my-team", element: <MyTeam /> },
+            { path: "/my-team/history/:id", element: <TeamHistoryDetail /> },
             { path: "/payment-success", element: <PaymentStatus /> },
 
             // 3. Redirections pour les pages hors-ligne si l'utilisateur est déjà connecté

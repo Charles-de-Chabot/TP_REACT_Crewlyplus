@@ -25,7 +25,7 @@ const Regattas = () => {
 
     return (
         <Layout>
-            <div className="flex flex-col h-[calc(100vh-80px)]">
+            <div className="min-h-screen bg-[#050810]">
                 
                 <PageHeader 
                     title="Explorer" 
@@ -36,10 +36,10 @@ const Regattas = () => {
                 />
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex overflow-hidden">
+                <div className="flex flex-col lg:flex-row">
                     
-                    {/* Left Sidebar - Regatta List (WIDER) */}
-                    <div className="w-[500px] border-r border-white/5 overflow-y-auto bg-[#050810]/50 p-6 space-y-6 custom-scrollbar">
+                    {/* Left Sidebar - Regatta List (Sticky) */}
+                    <div className="w-full lg:w-[450px] border-r border-white/5 bg-[#050810]/80 backdrop-blur-xl p-6 space-y-6 lg:sticky lg:top-[80px] lg:h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
                         {error && (
                             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-xs flex items-center gap-3">
                                 <AlertCircle size={14} />
@@ -63,8 +63,8 @@ const Regattas = () => {
                         )}
                     </div>
 
-                    {/* Right Area - Radar + Details */}
-                    <div className="flex-1 overflow-y-auto bg-[#020408] custom-scrollbar p-8">
+                    {/* Right Area - Details (Global Scroll) */}
+                    <div className="flex-1 bg-[#020408] p-8 lg:p-12 min-h-screen">
                         {selectedRegatta ? (
                             <div className="max-w-4xl mx-auto space-y-8">
                                 

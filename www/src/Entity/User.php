@@ -32,11 +32,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read', 'rental:read'])]
+    #[Groups(['user:read', 'rental:read', 'team:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write', 'rental:read'])]
+    #[Groups(['user:read', 'user:write', 'rental:read', 'team:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
@@ -110,15 +110,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Media>
      */
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'team:read'])]
     private Collection $media;
 
 
     /**
      * @var Collection<int, Message>
      */
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'user')]
-    private Collection $message;
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'author')]
+    private Collection $messages;
 
     /**
      * @var Collection<int, Notification>
@@ -145,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->media = new ArrayCollection();
-        $this->message = new ArrayCollection();
+        $this->messages = new ArrayCollection();
         $this->notification = new ArrayCollection();
         $this->innovices = new ArrayCollection();
         $this->rentals = new ArrayCollection();
@@ -345,16 +345,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Message>
      */
-    public function getMessage(): Collection
+    public function getMessages(): Collection
     {
-        return $this->message;
+        return $this->messages;
     }
 
     public function addMessage(Message $message): static
     {
-        if (!$this->message->contains($message)) {
-            $this->message->add($message);
-            $message->setUser($this);
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setAuthor($this);
         }
 
         return $this;
@@ -362,10 +362,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeMessage(Message $message): static
     {
-        if ($this->message->removeElement($message)) {
+        if ($this->messages->removeElement($message)) {
             // set the owning side to null (unless already changed)
-            if ($message->getUser() === $this) {
-                $message->setUser(null);
+            if ($message->getAuthor() === $this) {
+                $message->setAuthor(null);
             }
         }
 

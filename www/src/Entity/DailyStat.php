@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DailyStatRepository::class)]
+#[ORM\UniqueConstraint(name: 'unique_day_per_reg', columns: ['registration_id', 'day_number'])]
 #[ApiResource(
     operations: [
         new GetCollection(),
@@ -39,27 +40,27 @@ class DailyStat
     private ?Registration $registration = null;
 
     #[ORM\Column]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?int $dayNumber = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?int $ranking = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?float $avgSpeed = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?float $maxSpeed = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?string $windConditions = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['dailystat:read', 'dailystat:write'])]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?string $notes = null;
 
     #[ORM\Column]

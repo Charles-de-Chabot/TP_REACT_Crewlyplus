@@ -2,10 +2,10 @@ import React from 'react';
 import GlassCard from '../ui/GlassCard';
 
 const WindyMap = ({ lat, lon, name, fullHeight = false }) => {
-    const isValidCoords = lat !== null && lon !== null && !isNaN(lat) && !isNaN(lon);
+    const isValidCoords = lat !== undefined && lon !== undefined && lat !== null && lon !== null && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon));
     
     const windyUrl = isValidCoords 
-        ? `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&zoom=11&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1`
+        ? `https://embed.windy.com/embed2.html?lat=${parseFloat(lat)}&lon=${parseFloat(lon)}&zoom=11&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1`
         : null;
 
     return (

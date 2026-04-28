@@ -96,10 +96,14 @@ class Team
     #[Groups(['team:read'])]
     private Collection $members;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['team:read', 'team:write'])]
+    private ?string $emblem = null;
+
     /**
      * @var Collection<int, TeamMembership>
      */
-    #[ORM\OneToMany(targetEntity: TeamMembership::class, mappedBy: 'team', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: TeamMembership::class, mappedBy: 'team', orphanRemoval: true, cascade: ['persist'])]
     #[Groups(['team:read'])]
     private Collection $memberships;
 
@@ -111,8 +115,15 @@ class Team
      * @var Collection<int, Registration>
      */
     #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'team', orphanRemoval: true)]
-    #[Groups(['team:read'])]
+    #[Groups(['team:read', 'registration:read'])]
     private Collection $registrations;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'team', orphanRemoval: true)]
+    #[Groups(['team:read'])]
+    private Collection $messages;
 
     #[ORM\Column(length: 10, unique: true, nullable: true)]
     #[Groups(['team:read'])]
@@ -123,6 +134,7 @@ class Team
         $this->members = new ArrayCollection();
         $this->registrations = new ArrayCollection();
         $this->memberships = new ArrayCollection();
+        $this->messages = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -181,6 +193,16 @@ class Team
         if (!$this->members->contains($member)) {
             $this->members->add($member);
             $member->setCurrentTeam($this);
+
+            // Créer le membership historique
+            $membership = new TeamMembership();
+            $membership->setUser($member);
+            $membership->setTeam($this);
+            // On vérifie si ce membre est le leader défini
+            $isLeader = ($this->getLeader() && $this->getLeader()->getId() === $member->getId());
+            $membership->setRole($isLeader ? 'LEADER' : 'MEMBER');
+            $membership->setJoinedAt(new \DateTimeImmutable());
+            $this->addMembership($membership);
         }
 
         return $this;
@@ -258,6 +280,18 @@ class Team
         return $this;
     }
 
+    public function getEmblem(): ?string
+    {
+        return $this->emblem;
+    }
+
+    public function setEmblem(?string $emblem): static
+    {
+        $this->emblem = $emblem;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Registration>
      */
@@ -294,5 +328,57 @@ class Team
     public function getMemberships(): Collection
     {
         return $this->memberships;
+    }
+
+    public function addMembership(TeamMembership $membership): static
+    {
+        if (!$this->memberships->contains($membership)) {
+            $this->memberships->add($membership);
+            $membership->setTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMembership(TeamMembership $membership): static
+    {
+        if ($this->memberships->removeElement($membership)) {
+            // set the owning side to null (unless already changed)
+            if ($membership->getTeam() === $this) {
+                $membership->setTeam(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            // set the owning side to null (unless already changed)
+            if ($message->getTeam() === $this) {
+                $message->setTeam(null);
+            }
+        }
+
+        return $this;
     }
 }

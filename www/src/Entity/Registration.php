@@ -42,7 +42,7 @@ class Registration
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['registration:read', 'registration:write'])]
+    #[Groups(['registration:read', 'registration:write', 'team:read'])]
     private ?Regatta $regatta = null;
 
     #[ORM\Column(length: 20)]
@@ -65,7 +65,7 @@ class Registration
      * @var Collection<int, DailyStat>
      */
     #[ORM\OneToMany(targetEntity: DailyStat::class, mappedBy: 'registration', orphanRemoval: true)]
-    #[Groups(['registration:read'])]
+    #[Groups(['registration:read', 'team:read'])]
     private Collection $dailyStats;
 
     #[ORM\Column]

@@ -43,7 +43,7 @@ class Regatta
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['regatta:read', 'regatta:write'])]
+    #[Groups(['regatta:read', 'regatta:write', 'team:read'])]
     private ?string $location = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

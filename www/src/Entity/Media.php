@@ -41,7 +41,7 @@ class Media
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['media:read', 'media:write', 'boat:read', 'user:read'])]
+    #[Groups(['media:read', 'media:write', 'boat:read', 'user:read', 'team:read'])]
     private ?string $media_path = null;
 
     

@@ -1,8 +1,8 @@
 import React from 'react';
 import GlassCard from '../ui/GlassCard';
-import { ShieldCheck, Download } from 'lucide-react';
-
-const RegistrationBox = ({ onRegister }) => {
+import { ShieldCheck, Download, CheckCircle } from 'lucide-react';
+ 
+const RegistrationBox = ({ onRegister, isRegistered }) => {
     return (
         <GlassCard className="p-8 border-cyan-500/30">
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
@@ -25,10 +25,24 @@ const RegistrationBox = ({ onRegister }) => {
             </div>
             <button 
                 onClick={onRegister}
-                className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg transition-all flex items-center justify-center gap-2 group"
+                disabled={isRegistered}
+                className={`w-full py-4 rounded-lg transition-all flex items-center justify-center gap-2 group font-bold ${
+                    isRegistered 
+                    ? 'bg-green-500/20 border border-green-500/30 text-green-400 cursor-default' 
+                    : 'bg-cyan-500 hover:bg-cyan-400 text-black shadow-lg shadow-cyan-500/20'
+                }`}
             >
-                <Download size={20} className="group-hover:translate-y-0.5 transition-transform" />
-                Inscription One-Click
+                {isRegistered ? (
+                    <>
+                        <CheckCircle size={20} />
+                        Équipe Inscrite
+                    </>
+                ) : (
+                    <>
+                        <Download size={20} className="group-hover:translate-y-0.5 transition-transform" />
+                        Inscription One-Click
+                    </>
+                )}
             </button>
             <p className="text-[10px] text-white/40 mt-4 text-center">
                 Vos documents (Licence, CNI) seront automatiquement joints au dossier.

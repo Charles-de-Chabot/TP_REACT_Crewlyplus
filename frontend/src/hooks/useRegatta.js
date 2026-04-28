@@ -50,7 +50,26 @@ const useRegatta = (id) => {
         if (id) fetchRegatta();
     }, [id, fetchWeather]);
 
-    return { regatta, weather, loading, error };
+    const registerTeam = async (teamId) => {
+        try {
+            await api.post('/api/registrations', {
+                team: `/api/teams/${teamId}`,
+                regatta: `/api/regattas/${id}`,
+                status: 'CONFIRMED'
+            }, {
+                headers: { 'Content-Type': 'application/ld+json' }
+            });
+            // Recharger la régate pour voir le statut
+            const response = await api.get(`/api/regattas/${id}`);
+            setRegatta(response.data);
+            return true;
+        } catch (err) {
+            console.error("Error registering team", err);
+            throw err;
+        }
+    };
+
+    return { regatta, weather, loading, error, registerTeam };
 };
 
 // Utilitaire pour convertir les degrés en texte (NE, SW, etc.)

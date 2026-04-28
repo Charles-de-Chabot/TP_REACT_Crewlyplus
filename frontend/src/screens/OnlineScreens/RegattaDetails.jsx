@@ -7,11 +7,28 @@ import WindyMap from '../../components/Regatta/WindyMap';
 import RegattaHero from '../../components/Regatta/RegattaHero';
 import RegistrationBox from '../../components/Regatta/RegistrationBox';
 import PageHeader from '../../components/UI/PageHeader';
-import { Trophy, Users, FileText, Anchor, ArrowRight, Wind, Thermometer, Gauge, Navigation, ChevronLeft } from 'lucide-react';
+import { useAuthContext } from '../../contexts/authContext';
+import { useTeam } from '../../hooks/useTeam';
+import { Trophy, Users, FileText, Anchor, ArrowRight, Wind, Thermometer, Gauge, Navigation, ChevronLeft, CheckCircle } from 'lucide-react';
 
 const RegattaDetails = () => {
     const { id } = useParams();
-    const { regatta, weather, loading } = useRegatta(id);
+    const { userId } = useAuthContext();
+    const { team } = useTeam();
+    const { regatta, weather, loading, registerTeam } = useRegatta(id);
+
+    const handleRegister = async () => {
+        if (!team) {
+            alert("Vous devez avoir une écurie pour vous inscrire.");
+            return;
+        }
+        try {
+            await registerTeam(team.id);
+            alert("Inscription réussie !");
+        } catch (err) {
+            alert("Erreur lors de l'inscription.");
+        }
+    };
 
     if (loading) return (
         <Layout>
@@ -22,6 +39,9 @@ const RegattaDetails = () => {
     );
 
     if (!regatta) return <Layout><div className="text-white p-20 text-center">Régate introuvable.</div></Layout>;
+
+    // Vérifier si déjà inscrit
+    const isRegistered = regatta.registrations?.some(r => r.team?.id === team?.id || r.team === `/api/teams/${team?.id}`);
 
     return (
         <Layout>
@@ -111,7 +131,11 @@ const RegattaDetails = () => {
 
                     {/* Right Column - Registration & Workspace */}
                     <div className="space-y-6">
-                        <RegistrationBox regatta={regatta} />
+                        <RegistrationBox 
+                            regatta={regatta} 
+                            onRegister={handleRegister} 
+                            isRegistered={isRegistered}
+                        />
 
                         <GlassCard className="p-6 border-white/5 bg-white/5">
                             <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
@@ -121,7 +145,7 @@ const RegattaDetails = () => {
                                 Gérez vos équipiers, centralisez les documents et préparez votre logistique.
                             </p>
                             <Link 
-                                to={`/regattas/${regatta.id}/team`}
+                                to="/my-team"
                                 className="flex items-center justify-between w-full p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all group"
                             >
                                 <span className="text-white text-sm font-bold tracking-wider">ESPACE ÉQUIPE</span>

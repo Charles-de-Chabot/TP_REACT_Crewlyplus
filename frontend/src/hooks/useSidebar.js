@@ -14,6 +14,7 @@ export const useSidebar = (userRole) => {
         const roleLinks = [
             // --- PREMIUM UNIQUEMENT ---
             { label: 'Régates', path: '/regattas', allowed: ['premium'] },
+            { label: 'Ma Team', path: '/my-team', allowed: ['premium'] },
 
             // --- ADMIN UNIQUEMENT ---
             { label: 'Gestion Utilisateurs', path: '/admin/users', allowed: ['admin'] },

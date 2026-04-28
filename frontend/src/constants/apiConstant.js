@@ -33,3 +33,5 @@ export const IMAGE_URL = `${API_ROOT}/images`
 export const BOAT_URL = `${API_ROOT}/uploads/boats`
 
 export const USER_URL = `${API_ROOT}/uploads/users`
+
+export const TEAM_URL = `${API_ROOT}/uploads/teams`

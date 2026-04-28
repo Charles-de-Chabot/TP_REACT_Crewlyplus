@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/authContext';
 import { useDispatch } from 'react-redux';
 import { resetBooking } from '../../store/booking/bookingSlice';
+import api from '../../api/axios';
 
 // 1. On charge Stripe
 const stripePromise = loadStripe('pk_test_51TLB0IGpNFFeiWtxVr7bdvlQBUR9lsjI9lsUgcGFuj2pjSGk1AfK8kF8Vt1TtxzdBWpoclT32XhIIDdvjT0tDreq00FjyGhLDD');
@@ -27,11 +28,19 @@ const PaymentStatusContent = () => {
             return;
         }
 
-        stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+        stripe.retrievePaymentIntent(clientSecret).then(async ({ paymentIntent }) => {
             if (paymentIntent.status === "succeeded") {
-                setStatus('success');
-                dispatch(resetBooking()); // On vide le panier après succès
-                refreshProfile(); // On rafraîchit les infos de l'utilisateur (rôle premium)
+                try {
+                    // Appel de sécurité au backend pour forcer l'upgrade (au cas où le webhook tarde)
+                    await api.post('/api/premium/verify', { paymentIntentId: paymentIntent.id });
+                    
+                    setStatus('success');
+                    dispatch(resetBooking()); // On vide le panier après succès
+                    await refreshProfile(); // On rafraîchit les infos de l'utilisateur (rôle premium)
+                } catch (err) {
+                    console.error("Erreur lors de la vérification premium", err);
+                    setStatus('error');
+                }
             } else {
                 setStatus('error');
             }

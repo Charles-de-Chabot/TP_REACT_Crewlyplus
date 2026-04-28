@@ -30,15 +30,15 @@ class Position
     private ?string $label = null;
 
     #[ORM\Column]
-    #[Groups(['position:read'])]
+    #[Groups(['position:read', 'membership:read', 'team:read'])]
     private ?float $x = null;
 
     #[ORM\Column]
-    #[Groups(['position:read'])]
+    #[Groups(['position:read', 'membership:read', 'team:read'])]
     private ?float $y = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['position:read'])]
+    #[Groups(['position:read', 'membership:read', 'team:read'])]
     private ?string $zone = null;
 
     public function getId(): ?int
