@@ -14,6 +14,7 @@ use App\Entity\Formula;
 use App\Entity\Role;
 use App\Entity\SailingProfile;
 use App\Entity\Regatta;
+use App\Entity\Position;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,6 +33,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $this->loadPosition($manager);
         $this->loadRole($manager);
         $this->loadType($manager);
         $this->loadModel($manager);
@@ -1092,6 +1094,34 @@ class AppFixtures extends Fixture
             
             $manager->persist($regatta);
             $this->addReference('regatta_' . str_replace(' ', '_', strtolower($data['name'])), $regatta);
+        }
+    }
+
+    //==============================
+    // Création des positions de régate
+    //==============================
+    public function loadPosition(ObjectManager $manager)
+    {
+        $positions = [
+            ['label' => 'Numéro 1', 'x' => 50, 'y' => 10, 'zone' => 'Proue'],
+            ['label' => 'Numéro 2 (Mât)', 'x' => 50, 'y' => 30, 'zone' => 'Pied de mât'],
+            ['label' => 'Piano', 'x' => 50, 'y' => 45, 'zone' => 'Milieu'],
+            ['label' => 'Régleur Bâbord', 'x' => 20, 'y' => 60, 'zone' => 'Cockpit Côtés'],
+            ['label' => 'Régleur Tribord', 'x' => 80, 'y' => 60, 'zone' => 'Cockpit Côtés'],
+            ['label' => 'Régleur GV', 'x' => 50, 'y' => 75, 'zone' => 'Cockpit Arrière'],
+            ['label' => 'Barreur', 'x' => 50, 'y' => 85, 'zone' => 'Gouvernail'],
+            ['label' => 'Tacticien', 'x' => 65, 'y' => 90, 'zone' => 'Arrière Droite'],
+        ];
+
+        foreach ($positions as $data) {
+            $position = new Position();
+            $position->setLabel($data['label']);
+            $position->setX($data['x']);
+            $position->setY($data['y']);
+            $position->setZone($data['zone']);
+            $manager->persist($position);
+            
+            $this->addReference('position_' . str_replace([' ', '(', ')'], ['_', '', ''], strtolower($data['label'])), $position);
         }
     }
 }

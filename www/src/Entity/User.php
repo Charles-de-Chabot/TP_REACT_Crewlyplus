@@ -93,6 +93,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Team $currentTeam = null;
 
     /**
+     * @var Collection<int, TeamMembership>
+     */
+    #[ORM\OneToMany(targetEntity: TeamMembership::class, mappedBy: 'user', orphanRemoval: true)]
+    #[Groups(['user:read'])]
+    private Collection $memberships;
+
+    /**
      * @var Collection<int, Regatta>
      */
     #[ORM\ManyToMany(targetEntity: Regatta::class, inversedBy: 'participants')]
@@ -143,6 +150,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->innovices = new ArrayCollection();
         $this->rentals = new ArrayCollection();
         $this->participatingRegattas = new ArrayCollection();
+        $this->memberships = new ArrayCollection();
         // Initialisation des valeurs par défaut à la création
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
@@ -525,5 +533,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, TeamMembership>
+     */
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
     }
 }

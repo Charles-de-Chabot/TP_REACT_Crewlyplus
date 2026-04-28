@@ -14,6 +14,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Controller\RegistrationController;
 use App\Controller\JoinTeamController;
 
@@ -21,8 +23,10 @@ use App\Controller\JoinTeamController;
 #[ApiResource(
     operations: [
         new \ApiPlatform\Metadata\GetCollection(),
-        new Get(),
+        new Get(security: "is_granted('TEAM_VIEW', object)"),
         new Post(),
+        new Patch(security: "is_granted('TEAM_EDIT', object)"),
+        new Delete(security: "is_granted('TEAM_EDIT', object)"),
         new Post(
             uriTemplate: '/teams/join',
             controller: JoinTeamController::class,
@@ -64,9 +68,21 @@ class Team
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'teams')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['team:read', 'team:write'])]
     private ?Regatta $regatta = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['team:read', 'team:write'])]
+    private ?string $description = null;
+
+    #[ORM\Column]
+    #[Groups(['team:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    #[Groups(['team:read'])]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -80,9 +96,23 @@ class Team
     #[Groups(['team:read'])]
     private Collection $members;
 
+    /**
+     * @var Collection<int, TeamMembership>
+     */
+    #[ORM\OneToMany(targetEntity: TeamMembership::class, mappedBy: 'team', orphanRemoval: true)]
+    #[Groups(['team:read'])]
+    private Collection $memberships;
+
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups(['team:read', 'team:write'])]
     private ?array $provisioningList = null;
+
+    /**
+     * @var Collection<int, Registration>
+     */
+    #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'team', orphanRemoval: true)]
+    #[Groups(['team:read'])]
+    private Collection $registrations;
 
     #[ORM\Column(length: 10, unique: true, nullable: true)]
     #[Groups(['team:read'])]
@@ -91,6 +121,10 @@ class Team
     public function __construct()
     {
         $this->members = new ArrayCollection();
+        $this->registrations = new ArrayCollection();
+        $this->memberships = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -186,5 +220,79 @@ class Team
         $this->inviteCode = $inviteCode;
 
         return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Registration>
+     */
+    public function getRegistrations(): Collection
+    {
+        return $this->registrations;
+    }
+
+    public function addRegistration(Registration $registration): static
+    {
+        if (!$this->registrations->contains($registration)) {
+            $this->registrations->add($registration);
+            $registration->setTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistration(Registration $registration): static
+    {
+        if ($this->registrations->removeElement($registration)) {
+            // set the owning side to null (unless already changed)
+            if ($registration->getTeam() === $this) {
+                $registration->setTeam(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TeamMembership>
+     */
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
     }
 }
