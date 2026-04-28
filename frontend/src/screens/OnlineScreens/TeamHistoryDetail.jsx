@@ -7,6 +7,7 @@ import { useAuthContext } from '../../contexts/authContext';
 import { useTeam } from '../../hooks/useTeam';
 import TeamPerformance from '../../components/Crew/TeamPerformance';
 import { Anchor, ChevronLeft, Trophy, Calendar } from 'lucide-react';
+import { ChatProvider } from '../../contexts/ChatContext';
 
 const TeamHistoryDetail = () => {
     const { id } = useParams();
@@ -35,7 +36,8 @@ const TeamHistoryDetail = () => {
 
     return (
         <Layout>
-            <div className="min-h-screen bg-slate-950 pb-20">
+            <ChatProvider teamId={team.id}>
+                <div className="min-h-screen bg-slate-950 pb-20">
                 <PageHeader 
                     title={registration.regatta?.name} 
                     subtitle="Analyse de Performance" 
@@ -52,6 +54,7 @@ const TeamHistoryDetail = () => {
                     />
                 </div>
             </div>
+        </ChatProvider>
         </Layout>
     );
 };

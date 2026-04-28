@@ -1,7 +1,39 @@
 import React from 'react';
 import GlassCard from '../ui/GlassCard';
-import { Trophy, Gauge, Wind, BarChart3, ChevronRight, X, Share } from 'lucide-react';
+import { Trophy, Gauge, Wind, BarChart3, ChevronRight, X, Share, CheckCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+
+const ShareButton = ({ onClick }) => {
+    const [sent, setSent] = React.useState(false);
+
+    const handleShare = () => {
+        onClick();
+        setSent(true);
+        setTimeout(() => setSent(false), 2000);
+    };
+
+    return (
+        <button 
+            onClick={handleShare}
+            disabled={sent}
+            className={`p-1.5 rounded-lg transition-all duration-300 flex items-center gap-2 group ${
+                sent 
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                    : 'bg-white/5 border border-white/10 text-white/20 hover:text-cyan-400 hover:border-cyan-400/30 hover:bg-cyan-400/5'
+            }`}
+            title="Partager au Canal Tactique"
+        >
+            {sent ? (
+                <>
+                    <CheckCircle size={12} className="animate-in zoom-in duration-300" />
+                    <span className="text-[8px] font-black uppercase tracking-widest">Partagé</span>
+                </>
+            ) : (
+                <Share size={12} className="group-hover:scale-110 transition-transform" />
+            )}
+        </button>
+    );
+};
 
 // 1. Compteurs de Statistiques
 export const PerformanceStats = ({ stats }) => {
@@ -38,13 +70,9 @@ export const PerformanceCharts = ({ stats, onShare }) => (
                     <Trophy size={14} className="text-gold-sanded" /> Évolution du Classement
                 </h4>
                 {onShare && (
-                    <button 
+                    <ShareButton 
                         onClick={() => onShare(`Notre classement est passé au rang ${stats[stats.length-1]?.ranking || '--'} !`, 'TACTIQUE', 'ACTION', { chartData: true, score: 100 - (stats[stats.length-1]?.ranking * 10) })}
-                        className="p-1.5 hover:bg-white/10 rounded-lg text-white/20 hover:text-cyan-500 transition-all"
-                        title="Partager au Canal Tactique"
-                    >
-                        <Share size={12} />
-                    </button>
+                    />
                 )}
             </div>
             <div className="flex-1 w-full">
@@ -66,13 +94,9 @@ export const PerformanceCharts = ({ stats, onShare }) => (
                     <Gauge size={14} className="text-cyan-400" /> Courbe de Vitesse
                 </h4>
                 {onShare && (
-                    <button 
+                    <ShareButton 
                         onClick={() => onShare(`Vitesse max enregistrée : ${Math.max(...stats.map(s => s.maxSpeed || 0))} kts`, 'TACTIQUE', 'ACTION', { chartData: true, score: Math.max(...stats.map(s => s.maxSpeed || 0)) * 2 })}
-                        className="p-1.5 hover:bg-white/10 rounded-lg text-white/20 hover:text-cyan-500 transition-all"
-                        title="Partager au Canal Tactique"
-                    >
-                        <Share size={12} />
-                    </button>
+                    />
                 )}
             </div>
             <div className="flex-1 w-full">
