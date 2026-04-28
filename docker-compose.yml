@@ -81,6 +81,21 @@ services:
     mem_limit: 1g
     cpus: 1.0
 
+  mercure:
+    image: dunglas/mercure
+    container_name: mercure_crewlyplus
+    restart: unless-stopped
+    environment:
+      # Secret pour signer les JWT (doit correspondre à Symfony)
+      - MERCURE_JWT_KEY=${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      - MERCURE_PUBLISH_ALLOWED_ORIGINS=http://apache_crewlyplus
+      - SERVER_NAME=:80
+      - MERCURE_EXTRA_DIRECTIVES=cors_origins http://localhost:5173
+    ports:
+      - "3000:80"
+    networks:
+      - app_network
+
 networks:
   app_network:
     # réseau personnalisé pour isoler les services
