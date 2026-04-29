@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -24,6 +27,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['message:write']],
     order: ['createdAt' => 'ASC']
 )]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
+#[ApiFilter(SearchFilter::class, properties: ['team' => 'exact', 'category' => 'exact'])]
 class Message
 {
     #[ORM\Id]

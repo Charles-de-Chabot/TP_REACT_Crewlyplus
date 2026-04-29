@@ -16,10 +16,7 @@ class MeController extends AbstractController
     {
         $user = $this->getUser();
 
-        // L'attribut #[IsGranted] devrait empêcher ce cas, mais c'est une bonne pratique
-        // de s'assurer qu'on a bien le bon objet User.
         if (!$user instanceof User) {
-            // Ce cas ne devrait pas être atteint si la sécurité est bien configurée.
             return new JsonResponse(['message' => 'Utilisateur non authentifié ou invalide.'], 401);
         }
 
@@ -67,6 +64,18 @@ class MeController extends AbstractController
                 'media_path' => $m->getMediaPath(),
                 'type'       => $m->getType(),
             ], $user->getMedia()->toArray()),
+            'currentTeam' => $user->getCurrentTeam() ? [
+                'id' => $user->getCurrentTeam()->getId(),
+                'name' => $user->getCurrentTeam()->getName(),
+            ] : null,
+            'memberships' => array_map(fn($m) => [
+                'id' => $m->getId(),
+                'team' => [
+                    'id' => $m->getTeam()?->getId(),
+                    'name' => $m->getTeam()?->getName(),
+                ],
+                'leftAt' => $m->getLeftAt() ? $m->getLeftAt()->format(\DateTimeInterface::ATOM) : null,
+            ], $user->getMemberships()->toArray()),
         ]);
     }
 }

@@ -5,22 +5,40 @@ import { useAuthContext } from '../../../contexts/authContext';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 
-const TacticalChatDrawer = ({ isOpen, onClose }) => {
-    const { messages, sendMessage, connected, loading } = useChat();
+const TacticalChatDrawer = () => {
+    const { 
+        isChatOpen, 
+        setIsChatOpen, 
+        messages, 
+        sendMessage, 
+        connected, 
+        loading, 
+        activeCategory, 
+        setActiveCategory, 
+        unreadCounts 
+    } = useChat();
     const { userId } = useAuthContext();
+
+    // Alias pour la compatibilité avec le reste du composant
+    const isOpen = isChatOpen;
+    const onClose = () => setIsChatOpen(false);
     const scrollRef = useRef(null);
-    const [activeTab, setActiveTab] = useState('PASSERELLE');
 
     // Auto-scroll au dernier message
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        if (isOpen && scrollRef.current) {
+            // Utiliser requestAnimationFrame pour s'assurer que le rendu est fini
+            requestAnimationFrame(() => {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }
+            });
         }
-    }, [messages]);
+    }, [messages, isOpen]); // Scroller aussi quand on ouvre le chat
 
     if (!isOpen) return null;
 
-    const filteredMessages = messages.filter(m => m.category === activeTab);
+    const filteredMessages = messages.filter(m => m.category === activeCategory);
 
     return (
         <div className={`fixed top-[100px] bottom-[30px] right-[20px] w-full sm:w-[380px] bg-slate-950/80 border border-cyan-500/30 backdrop-blur-3xl z-[9999] shadow-[-20px_0_80px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out transform rounded-[32px] flex flex-col overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+40px)]'}`}>
@@ -66,14 +84,19 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
                 {['PASSERELLE', 'TACTIQUE', 'LOGISTIQUE'].map((tab) => (
                     <button
                         key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg ${
-                            activeTab === tab 
+                        onClick={() => setActiveCategory(tab)}
+                        className={`flex-1 py-3 text-[9px] font-black uppercase tracking-[0.2em] transition-all rounded-lg flex items-center justify-center gap-2 ${
+                            activeCategory === tab 
                                 ? 'bg-cyan-500/10 text-cyan-400 shadow-[inset_0_0_15px_rgba(6,182,212,0.1)] border border-cyan-500/20' 
                                 : 'text-white/20 hover:text-white/50 hover:bg-white/5'
                         }`}
                     >
-                        {tab}
+                        <span className="relative">
+                            {tab}
+                            {unreadCounts[tab] > 0 && (
+                                <div className="absolute -top-1.5 -right-2.5 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse" />
+                            )}
+                        </span>
                     </button>
                 ))}
             </div>
@@ -110,7 +133,7 @@ const TacticalChatDrawer = ({ isOpen, onClose }) => {
             <ChatInput 
                 onSend={sendMessage} 
                 connected={connected} 
-                forcedCategory={activeTab} 
+                forcedCategory={activeCategory} 
             />
         </div>
     );

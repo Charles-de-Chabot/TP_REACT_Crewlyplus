@@ -7,14 +7,6 @@ import { BarChart2, Image as ImageIcon, Star } from 'lucide-react';
 const MessageBubble = memo(({ message, isMe }) => {
     const { author, content, createdAt, category, type, metadata } = message;
     
-    // Debug pour voir les infos reçues du serveur
-    if (isMe) {
-        console.log("👤 Infos auteur (Moi):", { 
-            name: author?.firstname, 
-            pos: author?.tacticalPosition, 
-            skipper: author?.isSkipper 
-        });
-    }
     // Rendu spécial pour les statistiques partagées
     const renderActionContent = () => {
         if (type === 'ACTION' && metadata?.chartData) {

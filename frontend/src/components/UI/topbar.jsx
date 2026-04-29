@@ -8,8 +8,8 @@ import NotificationModal from './NotificationModal'
 import IconRenderer from './IconRenderer'
 import { useDispatch } from 'react-redux'
 import { resetBooking } from '../../store/booking/bookingSlice'
-
-import { Crown } from 'lucide-react';
+import { MessageSquare, Crown } from 'lucide-react';
+import { useChat } from '../../contexts/ChatContext';
 
 // Configuration visuelle par rôle
 const ROLE_CONFIG = {
@@ -23,6 +23,7 @@ const ROLE_CONFIG = {
 
 const Topbar = () => {
   const { firstname, email, role, roleLabel, signOut, userId } = useAuthContext()
+  const { setIsChatOpen, totalUnreadCount } = useChat()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const [notifications, setNotifications] = useState([])
@@ -138,10 +139,24 @@ const Topbar = () => {
                   {item.label === 'Régates' && <Crown size={12} className="mb-0.5" />}
                 </NavLink>
               ))}
+
+              {/* 💬 Onglet Messages (Global) */}
+              <button 
+                onClick={() => setIsChatOpen(true)}
+                className="text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-1.5 text-slate-500 hover:text-white relative"
+              >
+                MESSAGES
+                <MessageSquare size={12} className="mb-0.5" />
+                {totalUnreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-slate-950 animate-bounce">
+                    {totalUnreadCount}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             {isAuthenticated ? (
               <div className="flex items-center space-x-5 pl-5 border-l border-white/10">
                 
@@ -219,7 +234,7 @@ const Topbar = () => {
           </div>
 
           <button 
-            className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" 
+            className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <IconRenderer icon={isMobileMenuOpen ? "❌" : "🍔"} size={28} />
@@ -228,7 +243,7 @@ const Topbar = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-white/5 p-6 shadow-2xl animate-fade-in">
+        <div className="lg:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-white/5 p-6 shadow-2xl animate-fade-in">
            <div className="space-y-4 mb-8">
               {navItems.map((item) => (
                   <Link 
@@ -240,6 +255,19 @@ const Topbar = () => {
                     {item.label}
                   </Link>
               ))}
+              
+              {/* 💬 Messages Mobile */}
+              <button 
+                onClick={() => { setIsChatOpen(true); setIsMobileMenuOpen(false); }}
+                className="flex items-center gap-3 text-2xl font-black text-white hover:text-cyan-400 italic uppercase tracking-tighter"
+              >
+                MESSAGES
+                {totalUnreadCount > 0 && (
+                  <span className="w-6 h-6 bg-red-500 text-white text-xs font-black rounded-full flex items-center justify-center">
+                    {totalUnreadCount}
+                  </span>
+                )}
+              </button>
            </div>
            <hr className="border-white/5 mb-8" />
            {isAuthenticated ? (
