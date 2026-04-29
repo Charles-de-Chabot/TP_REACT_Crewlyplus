@@ -87,12 +87,11 @@ services:
     restart: unless-stopped
     environment:
       # Secret pour signer les JWT (doit correspondre à Symfony)
-      - MERCURE_PUBLISHER_JWT_KEY=${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      - MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      - MERCURE_PUBLISH_ALLOWED_ORIGINS=http://apache_crewlyplus
+      - MERCURE_PUBLISHER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
+      - MERCURE_SUBSCRIBER_JWT_KEY=!ChangeThisMercureHubJWTSecretKey!
       - SERVER_NAME=:80
       - MERCURE_ANONYMOUS=1
-      - MERCURE_EXTRA_DIRECTIVES=cors_origins http://localhost:5173
+      - MERCURE_EXTRA_DIRECTIVES=cors_origins *
     ports:
       - "3000:80"
     networks:
