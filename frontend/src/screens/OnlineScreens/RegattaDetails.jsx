@@ -23,10 +23,13 @@ const RegattaDetails = () => {
             return;
         }
         try {
-            await registerTeam(team.id);
-            alert("Inscription réussie !");
+            const success = await registerTeam(team.id);
+            if (success) {
+                // Le refresh est déjà géré dans useRegatta.registerTeam
+                alert("Félicitations ! Votre équipe est maintenant inscrite.");
+            }
         } catch (err) {
-            alert("Erreur lors de l'inscription.");
+            alert("Erreur lors de l'inscription. Vérifiez que vous n'êtes pas déjà inscrit.");
         }
     };
 
@@ -40,8 +43,11 @@ const RegattaDetails = () => {
 
     if (!regatta) return <Layout><div className="text-white p-20 text-center">Régate introuvable.</div></Layout>;
 
-    // Vérifier si déjà inscrit
-    const isRegistered = regatta.registrations?.some(r => r.team?.id === team?.id || r.team === `/api/teams/${team?.id}`);
+    // Vérifier si déjà inscrit de manière robuste (IRI ou Object ID)
+    const isRegistered = regatta.registrations?.some(r => {
+        const regTeamId = r.team?.id || (typeof r.team === 'string' ? r.team.split('/').pop() : null);
+        return String(regTeamId) === String(team?.id);
+    });
 
     return (
         <Layout>

@@ -15,8 +15,15 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity(repositoryClass: RegistrationRepository::class)]
-#[ApiResource(
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+ 
+ #[ORM\Entity(repositoryClass: RegistrationRepository::class)]
+ #[ORM\UniqueConstraint(name: 'UNIQ_REGISTRATION_TEAM_REGATTA', columns: ['team_id', 'regatta_id'])]
+ #[UniqueEntity(
+     fields: ['team', 'regatta'],
+     message: 'Votre équipe est déjà inscrite à cette régate.'
+ )]
+ #[ApiResource(
     operations: [
         new GetCollection(),
         new Get(security: "is_granted('REGISTRATION_VIEW', object)"),
@@ -37,7 +44,7 @@ class Registration
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['registration:read', 'registration:write'])]
+    #[Groups(['registration:read', 'registration:write', 'regatta:read'])]
     private ?Team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
