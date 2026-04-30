@@ -32,12 +32,23 @@ class TeamProcessor implements ProcessorInterface
                 $data->setLeader($user);
                 $data->addMember($user); // Le leader est aussi membre
                 
-                // Assigner le poste "Équipier" par défaut au leader
-                $equipierPos = $this->positionRepository->findOneBy(['label' => 'Équipier']);
-                if ($equipierPos) {
+                // Assigner le poste (Profil ou Équipier par défaut)
+                $userPosLabel = $user->getPosition();
+                $targetPos = null;
+
+                if ($userPosLabel) {
+                    $targetPos = $this->positionRepository->findOneBy(['label' => $userPosLabel]);
+                }
+
+                if (!$targetPos) {
+                    $targetPos = $this->positionRepository->findOneBy(['label' => 'Équipier']);
+                }
+
+                if ($targetPos) {
                     foreach ($data->getMemberships() as $membership) {
                         if ($membership->getUser() === $user) {
-                            $membership->setPosition($equipierPos);
+                            $membership->setPosition($targetPos);
+                            $user->setPosition($targetPos->getLabel());
                         }
                     }
                 }

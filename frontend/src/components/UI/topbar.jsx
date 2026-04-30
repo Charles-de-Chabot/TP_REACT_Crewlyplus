@@ -115,6 +115,23 @@ const Topbar = () => {
     }
   }
 
+  const handleJoinTeam = async (inviteCode, notifId) => {
+    try {
+      await api.post('/api/teams/join', { inviteCode }, {
+        headers: { 'Content-Type': 'application/ld+json' }
+      });
+      alert("Félicitations ! Vous avez rejoint l'équipe.");
+      // On marque la notification comme lue et on redirige
+      await handleReadNotification(notifId);
+      navigate('/user');
+      setIsNotifModalOpen(false);
+      window.location.reload(); // Pour rafraîchir l'état de l'équipe partout
+    } catch (err) {
+      console.error("Error joining team", err);
+      alert(err.response?.data?.message || "Erreur lors de l'adhésion à l'équipe.");
+    }
+  }
+
   return (
     <>
       <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/30">
@@ -312,6 +329,7 @@ const Topbar = () => {
       notifications={notifications}
       onDelete={handleDeleteNotifications}
       onRead={handleReadNotification}
+      onJoinTeam={handleJoinTeam}
       isStaff={isStaff}
     />
     </>

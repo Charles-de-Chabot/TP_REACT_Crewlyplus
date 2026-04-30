@@ -98,7 +98,7 @@ class AppFixtures extends Fixture
             ['race' => 'Spi Ouest-France 2024', 'rank' => '3ème'],
             ['race' => 'Giraglia 2025', 'rank' => '1er IRC']
         ]);
-        $profile->setCurrentPosition('Tactitien');
+        $profile->setCurrentPosition('Tacticien');
         $profile->setUser($premium);
         
         $manager->persist($premium);

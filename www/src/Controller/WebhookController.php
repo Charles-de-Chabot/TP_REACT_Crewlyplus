@@ -169,6 +169,7 @@ class WebhookController extends AbstractController
         }
 
         $user->setRole($premiumRole);
+        $user->setPosition('Équipier'); // Poste par défaut
         $this->em->flush();
     }
 

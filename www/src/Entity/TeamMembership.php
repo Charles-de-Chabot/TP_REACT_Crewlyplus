@@ -56,7 +56,7 @@ class TeamMembership
     private ?\DateTimeImmutable $joinedAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['membership:read'])]
+    #[Groups(['membership:read', 'membership:write'])]
     private ?\DateTimeImmutable $leftAt = null;
 
     public function __construct()

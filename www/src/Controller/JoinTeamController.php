@@ -36,13 +36,28 @@ class JoinTeamController extends AbstractController
         // Ajouter l'utilisateur à l'équipe
         $team->addMember($user);
         
-        // Assigner le poste "Équipier" par défaut
+        // Stratégie de poste : 
+        // 1. On regarde si l'utilisateur a déjà un poste défini sur son profil
+        // 2. On cherche l'entité Position correspondante
+        // 3. Sinon on prend "Équipier" par défaut
         $positionRepo = $em->getRepository(\App\Entity\Position::class);
-        $equipierPos = $positionRepo->findOneBy(['label' => 'Équipier']);
-        if ($equipierPos) {
+        $userPosLabel = $user->getPosition();
+        $targetPos = null;
+
+        if ($userPosLabel) {
+            $targetPos = $positionRepo->findOneBy(['label' => $userPosLabel]);
+        }
+
+        if (!$targetPos) {
+            $targetPos = $positionRepo->findOneBy(['label' => 'Équipier']);
+        }
+
+        if ($targetPos) {
             foreach ($team->getMemberships() as $membership) {
-                if ($membership->getUser() === $user) {
-                    $membership->setPosition($equipierPos);
+                if ($membership->getUser() === $user && !$membership->getLeftAt()) {
+                    $membership->setPosition($targetPos);
+                    // On harmonise le profil utilisateur au cas où (ex: si on a pris Équipier par défaut)
+                    $user->setPosition($targetPos->getLabel());
                 }
             }
         }

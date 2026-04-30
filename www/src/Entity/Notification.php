@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['notification:read']],
     denormalizationContext: ['groups' => ['notification:write']]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['user.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['user.id' => 'exact', 'label' => 'ipartial'])]
 #[ApiFilter(BooleanFilter::class, properties: ['isOpen'])]
 class Notification
 {
@@ -25,7 +25,7 @@ class Notification
     #[Groups(['notification:read'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'text')]
     #[Groups(['notification:read', 'notification:write'])]
     private ?string $label = null;
 
@@ -38,7 +38,17 @@ class Notification
     private ?\DateTime $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'notification')]
+    #[Groups(['notification:read', 'notification:write'])]
     private ?User $user = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['notification:read', 'notification:write'])]
+    private ?array $metadata = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -89,6 +99,17 @@ class Notification
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+    public function getMetadata(): ?array
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(?array $metadata): static
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }

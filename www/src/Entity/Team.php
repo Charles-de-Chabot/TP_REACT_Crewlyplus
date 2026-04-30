@@ -129,6 +129,10 @@ class Team
     #[Groups(['team:read'])]
     private ?string $inviteCode = null;
 
+    #[ORM\Column]
+    #[Groups(['team:read', 'team:write'])]
+    private ?bool $isActive = true;
+
     public function __construct()
     {
         $this->members = new ArrayCollection();
@@ -137,6 +141,7 @@ class Team
         $this->messages = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActive = true;
     }
 
     public function getId(): ?int
@@ -378,6 +383,18 @@ class Team
                 $message->setTeam(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

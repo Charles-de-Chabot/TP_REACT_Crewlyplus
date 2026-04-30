@@ -10,8 +10,9 @@ const InviteUserModal = ({ isOpen, onClose, team }) => {
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [filterPosition, setFilterPosition] = useState('All');
+    const [invitedUserIds, setInvitedUserIds] = useState({});
 
-    const positions = ['All', 'Équipier', 'Numéro 1', 'Numéro 2', 'Barreur', 'Tactitien', 'Embraqueur', 'Régleur', 'Piano'];
+    const positions = ['All', 'Équipier', 'Numéro 1', 'Numéro 2', 'Barreur', 'Tacticien', 'Embraqueur', 'Régleur', 'Piano'];
 
     useEffect(() => {
         if (isOpen) {
@@ -36,10 +37,27 @@ const InviteUserModal = ({ isOpen, onClose, team }) => {
             const eligibleUsers = allUsers.filter(u => 
                 u.roleLabel === 'ROLE_PREMIUM' &&
                 u.position && u.position !== '' &&
+                !u.currentTeam && // Exclure ceux qui sont déjà en équipe
+                u.is_active !== false && // Exclure les comptes inactifs
                 !existingMemberIds.includes(u.id)
             );
             
             setUsers(eligibleUsers);
+
+            // Récupérer les invitations déjà envoyées (non lues)
+            // On cherche les notifications non ouvertes qui commencent par "Invitation Équipage"
+            try {
+                const notifRes = await api.get(`/api/notifications?isOpen=false&label=Invitation%20%C3%89quipage%20%3A%20${team.leader?.firstname}`);
+                const activeNotifs = notifRes.data['member'] || notifRes.data['hydra:member'] || [];
+                const invited = {};
+                activeNotifs.forEach(n => {
+                    const uId = n.user?.id || (typeof n.user === 'string' ? n.user.split('/').pop() : null);
+                    if (uId) invited[uId] = true;
+                });
+                setInvitedUserIds(invited);
+            } catch (e) {
+                console.warn("Could not fetch existing invitations state", e);
+            }
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
@@ -59,9 +77,15 @@ const InviteUserModal = ({ isOpen, onClose, team }) => {
             await api.post('/api/notifications', {
                 label: `Invitation Équipage : ${team.leader?.firstname} vous invite à rejoindre "${team.name}". Code : ${team.inviteCode}`,
                 isOpen: false,
-                user: `/api/users/${user.id}`
+                user: `/api/users/${user.id}`,
+                metadata: {
+                    type: 'TEAM_INVITATION',
+                    inviteCode: team.inviteCode,
+                    teamName: team.name
+                }
             });
-            alert(`Invitation envoyée à ${user.firstname} !`);
+            setInvitedUserIds(prev => ({ ...prev, [user.id]: true }));
+            // alert(`Invitation envoyée à ${user.firstname} !`);
         } catch (error) {
             console.error("Error sending invitation:", error);
             alert("Erreur lors de l'envoi de l'invitation.");
@@ -154,10 +178,15 @@ const InviteUserModal = ({ isOpen, onClose, team }) => {
                                     </div>
                                 </div>
                                 <button 
-                                    onClick={() => handleInvite(user)}
-                                    className="p-3 bg-white/5 hover:bg-accent-role text-white hover:text-slate-950 rounded-xl transition-all shadow-lg group-hover:scale-110 active:scale-95"
+                                    onClick={() => !invitedUserIds[user.id] && handleInvite(user)}
+                                    className={`p-3 rounded-xl transition-all shadow-lg group-hover:scale-110 active:scale-95 flex items-center justify-center ${
+                                        invitedUserIds[user.id] 
+                                        ? 'bg-emerald-500/20 text-emerald-500 cursor-default border border-emerald-500/30' 
+                                        : 'bg-white/5 hover:bg-accent-role text-white hover:text-slate-950'
+                                    }`}
+                                    title={invitedUserIds[user.id] ? "Invitation déjà envoyée" : "Inviter dans l'équipage"}
                                 >
-                                    <UserPlus size={18} />
+                                    {invitedUserIds[user.id] ? <ShieldCheck size={18} /> : <UserPlus size={18} />}
                                 </button>
                             </div>
                         ))

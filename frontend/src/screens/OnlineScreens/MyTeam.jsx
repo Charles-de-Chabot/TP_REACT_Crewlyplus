@@ -72,7 +72,7 @@ const MyTeam = () => {
             'NUMéRO 1': '#00f2ff', 
             'NUMéRO 2 (MâT)': '#3d5aff',
             'BARREUR': '#0070ff',
-            'TACTITIEN': '#bf00ff',
+            'TACTICIEN': '#bf00ff',
             'RéGLEUR BâBORD': '#ff8c00',
             'RéGLEUR TRIBORD': '#ff8c00',
             'RéGLEUR GV': '#ff5e00',

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import IconRenderer from './IconRenderer';
 
-const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, isStaff }) => {
+const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, onJoinTeam, isStaff }) => {
     if (!isOpen) return null;
 
     return (
@@ -35,50 +35,79 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, i
                             <p className="text-slate-500 font-bold italic text-sm">Aucune nouvelle notification.</p>
                         </div>
                     ) : (
-                        notifications.map((notif) => (
-                            <div 
-                                key={notif.id} 
-                                onClick={() => !notif.isOpen && onRead(notif.id)}
-                                className={`p-4 border rounded-2xl transition-all group relative cursor-pointer ${
-                                    notif.isOpen 
-                                    ? 'bg-white/2 border-white/5 opacity-40 grayscale-[0.5]' 
-                                    : 'bg-white/5 hover:bg-white/10 border-white/10'
-                                }`}
-                            >
-                                {!notif.isOpen && (
-                                    <div className="absolute top-4 right-4 w-2 h-2 bg-teal-500 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.5)]"></div>
-                                )}
-                                <p className={`text-sm font-medium mb-3 leading-relaxed ${notif.isOpen ? 'text-slate-400' : 'text-white'}`}>
-                                    {notif.label}
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <Link 
-                                        to={isStaff ? "/crew/dashboard" : "/user"} 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (!notif.isOpen) onRead(notif.id);
-                                            onClose();
-                                        }}
-                                        className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
-                                            notif.isOpen ? 'text-slate-500 hover:text-teal-500' : 'text-teal-500 hover:text-teal-400'
-                                        }`}
-                                    >
-                                        Voir mon dashboard
-                                        <IconRenderer icon="➡️" size={12} />
-                                    </Link>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onDelete(notif.id);
-                                        }}
-                                        className="text-[9px] font-bold text-slate-500 hover:text-red-400 uppercase flex items-center gap-1.5 transition-colors"
-                                    >
-                                        <IconRenderer icon="🗑️" size={14} />
-                                        Supprimer
-                                    </button>
+                        notifications.map((notif) => {
+                            const isInvitation = notif.metadata?.type === 'TEAM_INVITATION';
+                            const inviteCode = notif.metadata?.inviteCode;
+
+                            return (
+                                <div 
+                                    key={notif.id} 
+                                    onClick={() => !notif.isOpen && onRead(notif.id)}
+                                    className={`p-4 border rounded-2xl transition-all group relative cursor-pointer ${
+                                        notif.isOpen 
+                                        ? 'bg-white/2 border-white/5 opacity-40 grayscale-[0.5]' 
+                                        : 'bg-white/5 hover:bg-white/10 border-white/10'
+                                    }`}
+                                >
+                                    {!notif.isOpen && (
+                                        <div className="absolute top-4 right-4 w-2 h-2 bg-teal-500 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.5)]"></div>
+                                    )}
+                                    <p className={`text-sm font-medium mb-3 leading-relaxed ${notif.isOpen ? 'text-slate-400' : 'text-white'}`}>
+                                        {notif.label}
+                                    </p>
+
+                                    {isInvitation && !notif.isOpen && (
+                                        <div className="flex gap-2 mb-4">
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onJoinTeam(inviteCode, notif.id);
+                                                }}
+                                                className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+                                            >
+                                                Accepter
+                                            </button>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onRead(notif.id);
+                                                }}
+                                                className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/10 transition-all"
+                                            >
+                                                Ignorer
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-center">
+                                        <Link 
+                                            to={isStaff ? "/crew/dashboard" : "/user"} 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!notif.isOpen) onRead(notif.id);
+                                                onClose();
+                                            }}
+                                            className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
+                                                notif.isOpen ? 'text-slate-500 hover:text-teal-500' : 'text-teal-500 hover:text-teal-400'
+                                            }`}
+                                        >
+                                            {isInvitation ? "Voir l'équipe" : "Voir mon dashboard"}
+                                            <IconRenderer icon="➡️" size={12} />
+                                        </Link>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDelete(notif.id);
+                                            }}
+                                            className="text-[9px] font-bold text-slate-500 hover:text-red-400 uppercase flex items-center gap-1.5 transition-colors"
+                                        >
+                                            <IconRenderer icon="🗑️" size={14} />
+                                            Supprimer
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
 

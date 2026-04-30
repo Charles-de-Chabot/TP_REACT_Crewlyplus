@@ -68,6 +68,18 @@ class TeamManager
         $user->removeParticipatingRegatta($team->getRegatta());
         $user->setCurrentTeam(null);
 
+        // Fermer le membership actif
+        foreach ($team->getMemberships() as $membership) {
+            if ($membership->getUser() === $user && $membership->getLeftAt() === null) {
+                $membership->setLeftAt(new \DateTimeImmutable());
+            }
+        }
+
+        // Si l'équipe est vide, on la désactive
+        if ($team->getMembers()->count() === 0) {
+            $team->setIsActive(false);
+        }
+
         $this->entityManager->flush();
     }
 
