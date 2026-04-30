@@ -66,7 +66,7 @@ const RegattaDetails = () => {
                         
                         {/* Map Container - Reduced size */}
                         <div className="max-w-4xl mx-auto">
-                            <WindyMap lat={regatta.latitude} lon={regatta.longitude} name={regatta.name} />
+                            <WindyMap key={regatta.id} lat={regatta.latitude} lon={regatta.longitude} name={regatta.name} />
                         </div>
 
                         {/* Weather Dashboard - REAL DATA */}

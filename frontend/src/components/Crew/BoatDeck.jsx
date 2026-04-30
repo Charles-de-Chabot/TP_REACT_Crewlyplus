@@ -7,7 +7,14 @@ const BoatDeck = ({ members = [] }) => {
     const renderMember = (membership) => {
         if (!membership.position) return null;
 
-        const { x, y, label } = membership.position;
+        let { x, y, label } = membership.position;
+        
+        // Position par défaut pour l'équipier si non définie en BDD
+        if (label === 'Équipier' && (!x || !y)) {
+            x = 50;
+            y = 70;
+        }
+
         const initials = membership.user?.firstname?.charAt(0) || 'U';
 
         return (

@@ -32,11 +32,22 @@ const UserInfoCard = ({ userData, onEdit }) => {
                     </div>
                 </div>
 
+                {/* Position Section - Réservé aux membres Premium */}
+                {userData?.roleLabel !== 'ROLE_USER' && (
+                    <div className="group/item">
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-accent-role transition-colors">Poste à bord</p>
+                        <div className="flex items-center gap-2">
+                            <IconRenderer icon="⚓" size={16} className="text-accent-role" />
+                            <p className="text-white font-bold">{userData?.position || "Équipier (Par défaut)"}</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Location Section */}
                 <div className="group/item">
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-teal-500 transition-colors">Emplacement</p>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-accent-role transition-colors">Emplacement</p>
                     <div className="flex items-center gap-2">
-                        <IconRenderer icon="📍" size={16} className="text-teal-500" />
+                        <IconRenderer icon="📍" size={16} className="text-accent-role" />
                         <p className="text-white font-bold">{location}</p>
                     </div>
                 </div>

@@ -1,12 +1,16 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import HomeOffline from "../screens/OfflineScreens/HomeOffline";
+import React, { lazy } from "react";
 import ErrorPage from "../screens/ErrorScreens/ErrorPage";
-import Login from "../screens/OfflineScreens/Login";
-import Register from "../screens/OfflineScreens/Register";
 import App from "../App";
-import Home from "../screens/OnlineScreens/Home";
-import Boats from "../screens/OnlineScreens/Boats";
-import DetailBoat from "../screens/OnlineScreens/DetailBoat";
+
+// Lazy loading pour alléger le bundle initial
+const HomeOffline = lazy(() => import("../screens/OfflineScreens/HomeOffline"));
+const Login = lazy(() => import("../screens/OfflineScreens/Login"));
+const Register = lazy(() => import("../screens/OfflineScreens/Register"));
+const Home = lazy(() => import("../screens/OnlineScreens/Home"));
+const Boats = lazy(() => import("../screens/OnlineScreens/Boats"));
+const DetailBoat = lazy(() => import("../screens/OnlineScreens/DetailBoat"));
+
 import PaymentStatus from "../components/Stripe/PaymentStatus";
 
 const OfflineRouter = createBrowserRouter([

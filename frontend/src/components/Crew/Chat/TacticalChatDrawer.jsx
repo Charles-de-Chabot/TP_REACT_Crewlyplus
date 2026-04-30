@@ -1,9 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, Radio, MessageSquare, Activity, Settings } from 'lucide-react';
 import { useChat } from '../../../contexts/ChatContext';
 import { useAuthContext } from '../../../contexts/authContext';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
+
+// Styles pour la scrollbar du chat déplacés hors du composant pour éviter la recréation à chaque render
+const CHAT_STYLES = `
+    .chat-scroll::-webkit-scrollbar { width: 4px; }
+    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.2); border-radius: 10px; }
+    .chat-scroll::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.5); }
+`;
 
 const TacticalChatDrawer = () => {
     const { 
@@ -19,37 +27,31 @@ const TacticalChatDrawer = () => {
     } = useChat();
     const { userId } = useAuthContext();
 
-    // Alias pour la compatibilité avec le reste du composant
     const isOpen = isChatOpen;
     const onClose = () => setIsChatOpen(false);
     const scrollRef = useRef(null);
 
+    // Mémorisation des messages filtrés pour éviter le recalcul si les messages ou la catégorie ne changent pas
+    const filteredMessages = useMemo(() => 
+        messages.filter(m => m.category === activeCategory),
+    [messages, activeCategory]);
+
     // Auto-scroll au dernier message
     useEffect(() => {
         if (isOpen && scrollRef.current) {
-            // Utiliser requestAnimationFrame pour s'assurer que le rendu est fini
             requestAnimationFrame(() => {
                 if (scrollRef.current) {
                     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                 }
             });
         }
-    }, [messages, isOpen]); // Scroller aussi quand on ouvre le chat
+    }, [filteredMessages, isOpen]);
 
     if (!isOpen) return null;
 
-    const filteredMessages = messages.filter(m => m.category === activeCategory);
-
     return (
         <div className={`fixed top-[100px] bottom-[30px] right-[20px] w-full sm:w-[380px] bg-slate-950/80 border border-cyan-500/30 backdrop-blur-3xl z-[9999] shadow-[-20px_0_80px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out transform rounded-[32px] flex flex-col overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+40px)]'}`}>
-            <style>
-                {`
-                    .chat-scroll::-webkit-scrollbar { width: 4px; }
-                    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
-                    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.2); border-radius: 10px; }
-                    .chat-scroll::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.5); }
-                `}
-            </style>
+            <style>{CHAT_STYLES}</style>
             
             {/* Glossy Overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
@@ -79,7 +81,7 @@ const TacticalChatDrawer = () => {
                 </button>
             </div>
 
-            {/* Navigation Tabs (Command Console Style) */}
+            {/* Navigation Tabs */}
             <div className="flex p-2 gap-1 bg-black/20 border-b border-white/5">
                 {['PASSERELLE', 'TACTIQUE', 'LOGISTIQUE'].map((tab) => (
                     <button

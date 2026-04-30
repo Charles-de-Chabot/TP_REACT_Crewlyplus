@@ -51,11 +51,6 @@ export const AuthContextProvider = ({ children }) => {
         setPosition(userData.position || "");
         setAddress(userData.address || null);
 
-        console.log("👤 Hydration User Data:", { 
-            currentTeam: userData.currentTeam, 
-            membershipsCount: userData.memberships?.length 
-        });
-
         // 🎯 Extraction de la Team pour le Chat Global
         if (userData.currentTeam) {
             setTeamId(userData.currentTeam.id || userData.currentTeam);

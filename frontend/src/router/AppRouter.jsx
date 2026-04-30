@@ -14,7 +14,11 @@ const AppRouter = () => {
     }
 
     // On injecte le routeur correspondant à l'état de connexion
-    return <RouterProvider router={userId ? OnlineRouter : OfflineRouter} />;
+    return (
+        <React.Suspense fallback={<PageLoader />}>
+            <RouterProvider router={userId ? OnlineRouter : OfflineRouter} />
+        </React.Suspense>
+    );
 };
 
 export default AppRouter

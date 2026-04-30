@@ -129,6 +129,34 @@ export const useTeam = () => {
         }
     };
 
+    const leaveTeam = async () => {
+        if (!myMembership?.id) return;
+        setUpdating(true);
+        try {
+            // On marque le membership comme quitté
+            await api.patch(`/api/team_memberships/${myMembership.id}`, {
+                leftAt: new Date().toISOString()
+            }, {
+                headers: { 'Content-Type': 'application/merge-patch+json' }
+            });
+
+            // On retire la currentTeam de l'utilisateur
+            await api.patch(`/api/users/${userId}`, {
+                currentTeam: null,
+                position: null
+            }, {
+                headers: { 'Content-Type': 'application/merge-patch+json' }
+            });
+
+            await fetchTeamData();
+        } catch (err) {
+            console.error("Error leaving team", err);
+            alert("Erreur lors de la sortie de l'équipe.");
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     return {
         team,
         positions,
@@ -139,6 +167,7 @@ export const useTeam = () => {
         createTeam,
         joinTeam,
         updatePosition,
+        leaveTeam,
         refreshTeam: fetchTeamData
     };
 };

@@ -42,15 +42,15 @@ class Registration
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['registration:read', 'registration:write', 'team:read'])]
+    #[Groups(['registration:read', 'registration:write', 'team:read', 'user:read'])]
     private ?Regatta $regatta = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['registration:read', 'registration:write'])]
+    #[Groups(['registration:read', 'registration:write', 'user:read'])]
     private ?string $status = 'PENDING';
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['registration:read', 'registration:write'])]
+    #[Groups(['registration:read', 'registration:write', 'user:read'])]
     private ?int $finalPosition = null;
 
     #[ORM\Column(nullable: true)]

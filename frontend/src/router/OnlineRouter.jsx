@@ -1,21 +1,25 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import React, { lazy } from "react";
 import ErrorPage from "../screens/ErrorScreens/ErrorPage";
 import App from "../App";
-import Home from "../screens/OnlineScreens/Home";
-import Boats from "../screens/OnlineScreens/Boats";
-import DetailBoat from "../screens/OnlineScreens/DetailBoat";
-import User from "../screens/OnlineScreens/User";
-import RegisterPremium from "../screens/OnlineScreens/RegisterPremium";
-import Configurator from "../screens/OnlineScreens/Configurator";
-import CheckoutScreen from "../screens/OnlineScreens/CheckoutScreen";
+
+// Lazy loading des pages pour optimiser le bundle initial
+const Home = lazy(() => import("../screens/OnlineScreens/Home"));
+const Boats = lazy(() => import("../screens/OnlineScreens/Boats"));
+const DetailBoat = lazy(() => import("../screens/OnlineScreens/DetailBoat"));
+const User = lazy(() => import("../screens/OnlineScreens/User"));
+const RegisterPremium = lazy(() => import("../screens/OnlineScreens/RegisterPremium"));
+const Configurator = lazy(() => import("../screens/OnlineScreens/Configurator"));
+const CheckoutScreen = lazy(() => import("../screens/OnlineScreens/CheckoutScreen"));
+const CrewDashboard = lazy(() => import("../screens/OnlineScreens/CrewDashboard"));
+const CrewRegister = lazy(() => import("../screens/OnlineScreens/CrewRegister"));
+const Regattas = lazy(() => import("../screens/OnlineScreens/Regattas"));
+const RegattaDetails = lazy(() => import("../screens/OnlineScreens/RegattaDetails"));
+const TeamWorkspace = lazy(() => import("../screens/OnlineScreens/TeamWorkspace"));
+const MyTeam = lazy(() => import("../screens/OnlineScreens/MyTeam"));
+const TeamHistoryDetail = lazy(() => import("../screens/OnlineScreens/TeamHistoryDetail"));
+
 import PaymentStatus from "../components/Stripe/PaymentStatus";
-import CrewDashboard from "../screens/OnlineScreens/CrewDashboard";
-import CrewRegister from "../screens/OnlineScreens/CrewRegister";
-import Regattas from "../screens/OnlineScreens/Regattas";
-import RegattaDetails from "../screens/OnlineScreens/RegattaDetails";
-import TeamWorkspace from "../screens/OnlineScreens/TeamWorkspace";
-import MyTeam from "../screens/OnlineScreens/MyTeam";
-import TeamHistoryDetail from "../screens/OnlineScreens/TeamHistoryDetail";
 
 const OnlineRouter = createBrowserRouter([
     {

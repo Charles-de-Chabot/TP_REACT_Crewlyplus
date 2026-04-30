@@ -58,8 +58,6 @@ export const ChatProvider = ({ children, teamId }) => {
             
             // 🔃 On les remet dans l'ordre chronologique pour l'affichage (asc)
             fetchedMessages = [...fetchedMessages].reverse();
-
-            console.log(`📚 [Chat] ${fetchedMessages.length} messages récupérés (derniers 50)`);
             
             // 🚩 CALCUL DES NON-LUS : Comparaison avec la dernière lecture stockée
             const lastReadMap = JSON.parse(localStorage.getItem(`chat_last_read_${userId}_${teamId}`) || '{}');
@@ -118,7 +116,6 @@ export const ChatProvider = ({ children, teamId }) => {
     // 2. Écouter le Hub Mercure (Temps-réel)
     useEffect(() => {
         if (!teamId || !token) {
-            console.log("⏳ En attente des infos (TeamID/Token) pour Mercure...");
             return;
         }
 
@@ -135,14 +132,12 @@ export const ChatProvider = ({ children, teamId }) => {
         const url = `http://localhost:3000/.well-known/mercure?topic=${topic}&authorization=${systemToken}`;
         
         const sessionID = Math.random().toString(36).substring(7);
-        console.log(`🔌 [Session ${sessionID}] Connexion au Hub Mercure...`);
 
         let eventSource = new EventSource(url);
         eventSourceRef.current = eventSource;
 
         const connect = () => {
             eventSource.onopen = () => {
-                console.log("✅ Connexion Mercure établie et authentifiée");
                 setConnected(true);
             };
 
@@ -152,11 +147,9 @@ export const ChatProvider = ({ children, teamId }) => {
                     const nId = String(newMessage.id).split('/').pop();
                     
                     const now = new Date().getTime();
-                    console.log(`📡 [STREAM ${sessionID}] Message ${nId} reçu à ${now}ms`);
 
                     // 🛑 ANTI-DOUBLON ULTIME : Si déjà traité dans cette session, on ignore
                     if (processedIdsRef.current.has(nId)) {
-                        console.log(`🚫 [STREAM ${sessionID}] Doublon ignoré pour ${nId}`);
                         return;
                     }
                     processedIdsRef.current.add(nId);
@@ -268,7 +261,6 @@ export const ChatProvider = ({ children, teamId }) => {
                 team: cleanTeamId,
                 author: cleanUserId
             });
-            console.log("💾 Message sauvegardé en base:", response.data.content);
             const sId = String(response.data.id).split('/').pop();
             processedIdsRef.current.add(sId);
             setMessages(prev => prev.map(m => m.id === tempId ? response.data : m));

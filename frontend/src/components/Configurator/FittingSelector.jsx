@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleFitting } from '../../store/booking/bookingSlice';
 import { selectSelectedFittings } from '../../store/booking/bookingSelectors';
 import IconRenderer from '../UI/IconRenderer';
 
-const FittingSelector = ({ fitting }) => {
+const FittingSelector = memo(({ fitting }) => {
     const dispatch = useDispatch();
     const selectedFittings = useSelector(selectSelectedFittings);
     const isSelected = selectedFittings.some(s => s.id === fitting.id);
@@ -33,6 +33,6 @@ const FittingSelector = ({ fitting }) => {
             </p>
         </div>
     );
-};
+});
 
 export default FittingSelector;

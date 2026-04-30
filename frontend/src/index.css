@@ -280,3 +280,13 @@
   animation: scanline 4s linear infinite;
   pointer-events: none;
 }
+
+/* Utilitaires pour enlever les flèches des inputs number */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}

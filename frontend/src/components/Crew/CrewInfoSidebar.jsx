@@ -6,62 +6,62 @@ const CrewInfoSidebar = ({ theme, user, onEdit }) => {
     const location = address ? `${address.city}, ${address.postcode}` : "Emplacement non défini";
 
     return (
-        <div className={`p-8 rounded-2xl border ${theme.border} hover:border-accent-role/30 transition-all duration-500 relative overflow-hidden bg-gradient-to-br ${theme.gradient} backdrop-blur-3xl group shadow-2xl shadow-black/50`}>
-            {/* Ambient Background Icon */}
-            <div className={`absolute -top-10 -right-10 opacity-[0.03] text-accent-role`}>
-                <IconRenderer icon="⚓" size={200} />
-            </div>
-
-            <h3 className="text-white font-black text-xl mb-8 italic uppercase tracking-tighter flex items-center gap-3">
-                <IconRenderer icon="ℹ️" size={20} className={theme.primary} />
+        <div className="bg-slate-950/40 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 shadow-2xl shadow-black/50 sticky top-28 overflow-hidden group transition-all duration-500 hover:border-gold-sanded/20">
+            {/* Background Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-gold-sanded/10 rounded-full blur-3xl group-hover:bg-gold-sanded/20 transition-all duration-700" />
+            
+            <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-8 flex items-center gap-3">
+                <IconRenderer icon="ℹ️" size={24} className="text-gold-sanded bg-gold-sanded/10 p-1.5 rounded-lg" />
                 Informations
             </h3>
 
             <div className="space-y-8 relative z-10">
+                {/* Status Section */}
                 <div className="group/item">
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Status professionnel</p>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-gold-sanded transition-colors uppercase tracking-[0.2em]">Disponibilité</p>
                     <div className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
                         <p className="text-white font-bold">{user?.position || "Disponible pour missions"}</p>
                     </div>
                 </div>
 
+                {/* Email/Contact Section */}
                 <div className="group/item">
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Emplacement actuel</p>
-                    <div className="flex items-center gap-3">
-                        <IconRenderer icon="📍" size={16} className={theme.primary} />
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-gold-sanded transition-colors uppercase tracking-[0.2em]">Contact direct</p>
+                    <div className="flex items-center gap-2">
+                        <IconRenderer icon="📞" size={16} className="text-gold-sanded" />
+                        <p className="text-white font-bold truncate tracking-tighter">{user?.phoneNumber || user?.email}</p>
+                    </div>
+                </div>
+
+                {/* Location Section */}
+                <div className="group/item">
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1 group-hover/item:text-gold-sanded transition-colors uppercase tracking-[0.2em]">Emplacement</p>
+                    <div className="flex items-center gap-2">
+                        <IconRenderer icon="📍" size={16} className="text-gold-sanded" />
                         <p className="text-white font-bold">{location}</p>
                     </div>
                 </div>
 
-                <div className="group/item">
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover:text-white transition-colors">Contact</p>
-                    <div className="flex items-center gap-3">
-                        <IconRenderer icon="📞" size={16} className={theme.primary} />
-                        <p className="text-white font-bold truncate">{user?.phoneNumber || user?.email}</p>
-                    </div>
-                </div>
-
+                {/* Address Section */}
                 {address && (
                     <div className="pt-8 border-t border-white/5 group/item">
-                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-3 group-hover:text-white transition-colors">Adresse de facturation</p>
-                        <div className="flex gap-3">
-                            <IconRenderer icon="🗺️" size={16} className="text-slate-600 mt-0.5" />
-                            <p className="text-white/60 text-xs font-bold leading-relaxed">
-                                {address.houseNumber} {address.streetName}<br />
-                                {address.postcode} {address.city}
-                            </p>
-                        </div>
+                        <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 group-hover/item:text-gold-sanded transition-colors uppercase tracking-[0.2em]">Adresse</p>
+                        <p className="text-white/60 text-xs font-bold leading-relaxed font-mono">
+                            {address.houseNumber} {address.streetName}<br />
+                            <span className="tracking-tighter">{address.postcode}</span> {address.city}
+                        </p>
                     </div>
                 )}
             </div>
             
+            {/* Action Button */}
             <button 
                 onClick={onEdit}
-                className={`w-full mt-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-3 group/btn`}
+                className="w-full mt-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase hover:bg-white/10 hover:border-gold-sanded/30 hover:text-gold-sanded transition-all duration-300 flex items-center justify-center gap-3 group/btn"
             >
-                Modifier mon profil
-                <IconRenderer icon="✏️" size={12} className="opacity-40 group-hover/btn:opacity-100 transition-all" />
+                <span>Modifier mon profil</span>
+                <IconRenderer icon="✏️" size={14} className="opacity-40 group-hover/btn:opacity-100 transition-all" />
             </button>
         </div>
     );

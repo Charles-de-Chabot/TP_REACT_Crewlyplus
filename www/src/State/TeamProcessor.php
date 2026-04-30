@@ -13,6 +13,7 @@ class TeamProcessor implements ProcessorInterface
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $persistProcessor,
+        private \App\Repository\PositionRepository $positionRepository,
         private Security $security
     ) {
     }
@@ -30,6 +31,16 @@ class TeamProcessor implements ProcessorInterface
             if ($user && !$data->getLeader()) {
                 $data->setLeader($user);
                 $data->addMember($user); // Le leader est aussi membre
+                
+                // Assigner le poste "Équipier" par défaut au leader
+                $equipierPos = $this->positionRepository->findOneBy(['label' => 'Équipier']);
+                if ($equipierPos) {
+                    foreach ($data->getMemberships() as $membership) {
+                        if ($membership->getUser() === $user) {
+                            $membership->setPosition($equipierPos);
+                        }
+                    }
+                }
             }
         }
 

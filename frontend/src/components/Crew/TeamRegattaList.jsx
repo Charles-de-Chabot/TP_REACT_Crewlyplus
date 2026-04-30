@@ -19,38 +19,42 @@ const TeamRegattaList = ({ registrations }) => {
     }
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-1">
+            <div className="flex items-center justify-between px-2 mb-4">
+                <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] flex items-center gap-2">
+                    <Clock size={12} /> Historique des courses
+                </h3>
+                <div className="h-px flex-1 bg-white/5 mx-6"></div>
+            </div>
+
             {sortedRegs.map((reg) => (
                 <button
                     key={reg.id}
                     onClick={() => navigate(`/my-team/history/${reg.id}`)}
-                    className="w-full group flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-cyan-500/30 transition-all text-left"
+                    className="w-full group flex items-center justify-between py-3 px-4 transition-all duration-300 cursor-pointer rounded-2xl hover:bg-white/[0.02]"
                 >
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-900 flex flex-col items-center justify-center border border-white/10 group-hover:border-cyan-500/50 transition-colors">
-                            <Calendar size={14} className="text-white/40 mb-0.5" />
-                            <span className="text-[7px] font-black text-white/60">
-                                {reg.regatta?.startDate ? new Date(reg.regatta.startDate).getFullYear() : '--'}
-                            </span>
+                    <div className="flex items-center gap-6">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 bg-white/[0.02] border-white/5 text-white/10 group-hover:border-gold-sanded/30 group-hover:text-gold-sanded">
+                            <Trophy size={16} />
                         </div>
                         <div>
-                            <p className="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors truncate max-w-[180px]">
+                            <p className="text-base font-bold text-white/80 group-hover:text-gold-sanded transition-colors truncate max-w-[220px]">
                                 {reg.regatta?.name}
                             </p>
-                            <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">
-                                {reg.regatta?.startDate ? new Date(reg.regatta.startDate).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }) : 'Date inconnue'} • {reg.regatta?.location || 'Lieu non défini'}
+                            <p className="text-[10px] text-white/20 uppercase font-black tracking-[0.2em] flex items-center gap-2">
+                                {reg.regatta?.startDate ? new Date(reg.regatta.startDate).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : 'Date inconnue'} • {reg.regatta?.location || 'Lieu non défini'}
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                         <div className="text-right">
-                            <p className="text-[10px] font-black text-gold-sanded uppercase">
-                                {reg.finalPosition ? `Rang: ${reg.finalPosition}` : 'En cours'}
+                            <p className={`text-[10px] font-black uppercase tracking-widest ${reg.finalPosition ? 'text-gold-sanded/60' : 'text-slate-500'}`}>
+                                {reg.finalPosition ? `${reg.finalPosition}${reg.finalPosition === 1 ? 'er' : 'ème'}` : 'En cours'}
                             </p>
-                            <p className="text-[8px] text-white/20 uppercase font-black">Voir stats</p>
+                            <p className="text-[9px] text-white/10 uppercase font-black tracking-tighter group-hover:text-white/30 transition-colors">Consulter les stats</p>
                         </div>
-                        <ChevronRight size={16} className="text-white/10 group-hover:text-cyan-500 group-hover:translate-x-1 transition-all" />
+                        <ChevronRight size={16} className="text-white/5 group-hover:text-gold-sanded group-hover:translate-x-1 transition-all" />
                     </div>
                 </button>
             ))}

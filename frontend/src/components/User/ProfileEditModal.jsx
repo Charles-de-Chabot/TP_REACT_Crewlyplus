@@ -63,9 +63,31 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                 }
             }
 
+            // 1. Mise à jour du profil utilisateur
             await api.patch(`/api/users/${userData.id}`, patchData, {
                 headers: { 'Content-Type': 'application/merge-patch+json' }
             });
+
+            // 2. Synchronisation avec le membership actif si nécessaire
+            if (formData.position && userData.currentTeam) {
+                // Trouver le membership actif dans l'équipe actuelle
+                const activeMembership = userData.memberships?.find(m => !m.leftAt && (m.team?.id === userData.currentTeam?.id || m.team === userData.currentTeam?.['@id']));
+                
+                if (activeMembership) {
+                    // Récupérer l'ID de la position correspondant au label
+                    const posRes = await api.get('/api/positions');
+                    const positions = posRes.data['member'] || posRes.data['hydra:member'] || [];
+                    const matchedPos = positions.find(p => p.label === formData.position);
+                    
+                    if (matchedPos) {
+                        await api.patch(`/api/team_memberships/${activeMembership.id}`, {
+                            position: `/api/positions/${matchedPos.id}`
+                        }, {
+                            headers: { 'Content-Type': 'application/merge-patch+json' }
+                        });
+                    }
+                }
+            }
             
             if (onUpdate) onUpdate();
             await refreshProfile();
@@ -117,14 +139,37 @@ const ProfileEditModal = ({ isOpen, onClose, userData, onUpdate }) => {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Numéro de téléphone</label>
-                        <input 
-                            type="text"
-                            value={formData.phoneNumber}
-                            onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                            className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-white focus:border-teal-500 outline-none transition-all"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Numéro de téléphone</label>
+                            <input 
+                                type="text"
+                                value={formData.phoneNumber}
+                                onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+                                className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-white focus:border-role outline-none transition-all"
+                            />
+                        </div>
+                        {userData?.roleLabel !== 'ROLE_USER' && (
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Position Tactique</label>
+                                <select 
+                                    value={formData.position}
+                                    onChange={(e) => setFormData({...formData, position: e.target.value})}
+                                    className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-white focus:border-role outline-none transition-all appearance-none cursor-pointer"
+                                >
+                                    <option value="">Non définie</option>
+                                    <option value="Équipier">Équipier</option>
+                                    <option value="Numéro 1">Numéro 1</option>
+                                    <option value="Numéro 2 (Mât)">Numéro 2 (Mât)</option>
+                                    <option value="Piano">Piano</option>
+                                    <option value="Régleur Bâbord">Régleur Bâbord</option>
+                                    <option value="Régleur Tribord">Régleur Tribord</option>
+                                    <option value="Régleur GV">Régleur GV</option>
+                                    <option value="Barreur">Barreur</option>
+                                    <option value="Tactitien">Tactitien</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     <div className="pt-4 border-t border-white/5">

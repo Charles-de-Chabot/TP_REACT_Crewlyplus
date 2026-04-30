@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleCrewRole } from '../../store/booking/bookingSlice';
 import { selectSelectedCrew } from '../../store/booking/bookingSelectors';
 import IconRenderer from '../UI/IconRenderer';
 
-const CrewSelector = ({ roleConfig }) => {
+const CrewSelector = memo(({ roleConfig }) => {
     const dispatch = useDispatch();
     const selectedCrew = useSelector(selectSelectedCrew);
     
@@ -66,6 +66,6 @@ const CrewSelector = ({ roleConfig }) => {
             </div>
         </div>
     );
-};
+});
 
 export default CrewSelector;

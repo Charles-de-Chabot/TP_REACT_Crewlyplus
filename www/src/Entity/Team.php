@@ -69,7 +69,7 @@ class Team
 
     #[ORM\ManyToOne(inversedBy: 'teams')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['team:read', 'team:write'])]
+    #[Groups(['team:read', 'team:write', 'user:read'])]
     private ?Regatta $regatta = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -97,7 +97,7 @@ class Team
     private Collection $members;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['team:read', 'team:write'])]
+    #[Groups(['team:read', 'team:write', 'user:read'])]
     private ?string $emblem = null;
 
     /**
@@ -115,7 +115,7 @@ class Team
      * @var Collection<int, Registration>
      */
     #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'team', orphanRemoval: true)]
-    #[Groups(['team:read', 'registration:read'])]
+    #[Groups(['team:read', 'registration:read', 'user:read'])]
     private Collection $registrations;
 
     /**

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import GlassCard from '../ui/GlassCard';
+import IconRenderer from '../UI/IconRenderer';
 import { Upload, Shield, File, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const DocumentVault = () => {
@@ -9,80 +9,74 @@ const DocumentVault = () => {
     ]);
 
     const docTypes = [
-        { label: 'Carte d\'identité', icon: Shield },
-        { label: 'Licence FFV', icon: CheckCircle },
-        { label: 'Certificat Médical', icon: File }
+        { label: 'Identité', icon: Shield },
+        { label: 'Licence', icon: CheckCircle },
+        { label: 'Médical', icon: File }
     ];
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-heading font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <Shield className="text-cyan-400" size={24} />
-                    Coffre-fort Numérique
-                </h2>
-                <span className="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded border border-cyan-500/30 font-mono">
-                    AES-256 ENCRYPTED
+        <div className="bg-slate-950/40 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 shadow-2xl shadow-black/50 overflow-hidden group transition-all duration-500 hover:border-gold-sanded/20 relative">
+            {/* Background Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-gold-sanded/10 rounded-full blur-3xl group-hover:bg-gold-sanded/20 transition-all duration-700" />
+            
+            <div className="flex items-center justify-between mb-8 relative z-10">
+                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter flex items-center gap-3">
+                    <IconRenderer icon="🛡️" size={24} className="text-gold-sanded bg-gold-sanded/10 p-1.5 rounded-lg" />
+                    Mes Documents
+                </h3>
+                <span className="text-[9px] bg-gold-sanded/10 text-gold-sanded px-2 py-1 rounded border border-gold-sanded/20 font-black uppercase tracking-widest">
+                    Secured
                 </span>
             </div>
 
-            {/* Dropzone */}
-            <div className="border-2 border-dashed border-white/10 rounded-2xl p-10 bg-white/5 hover:bg-white/10 hover:border-cyan-500/50 transition-all group cursor-pointer text-center">
-                <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <Upload className="text-cyan-400" size={32} />
+            <div className="space-y-8 relative z-10">
+                {/* Dropzone */}
+                <div className="border-2 border-dashed border-white/5 rounded-2xl p-8 bg-white/[0.02] hover:bg-white/[0.05] hover:border-gold-sanded/30 transition-all group/drop cursor-pointer text-center">
+                    <div className="flex flex-col items-center">
+                        <Upload className="text-white/20 group-hover/drop:text-gold-sanded transition-colors mb-3" size={24} />
+                        <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">Glisser vos documents</p>
                     </div>
-                    <h3 className="text-white font-bold mb-2">Glissez vos documents ici</h3>
-                    <p className="text-white/40 text-sm max-w-xs mx-auto">
-                        PDF, JPG ou PNG. Vos fichiers sont stockés hors-ligne de manière sécurisée.
-                    </p>
                 </div>
-            </div>
 
-            {/* Types Selection */}
-            <div className="grid grid-cols-3 gap-4">
-                {docTypes.map((type, i) => (
-                    <button key={i} className="p-4 bg-white/5 border border-white/5 rounded-xl hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all text-center group">
-                        <type.icon className="mx-auto mb-2 text-white/40 group-hover:text-cyan-400 transition-colors" size={20} />
-                        <span className="text-[10px] text-white/60 uppercase font-bold">{type.label}</span>
-                    </button>
-                ))}
-            </div>
+                {/* Types Selection */}
+                <div className="grid grid-cols-3 gap-3">
+                    {docTypes.map((type, i) => (
+                        <button key={i} className="py-3 px-1 bg-white/[0.02] border border-white/5 rounded-xl hover:border-gold-sanded/30 hover:bg-gold-sanded/5 transition-all text-center group/type">
+                            <type.icon className="mx-auto mb-1.5 text-white/20 group-hover/type:text-gold-sanded transition-colors" size={14} />
+                            <span className="text-[8px] text-white/40 uppercase font-black tracking-tighter">{type.label}</span>
+                        </button>
+                    ))}
+                </div>
 
-            {/* File List */}
-            <div className="space-y-3">
-                {files.map(file => (
-                    <GlassCard key={file.id} className="p-4 flex items-center justify-between group">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/5 rounded-lg">
-                                <File className="text-white/40" size={20} />
-                            </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-white">{file.name}</h4>
-                                <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-[10px] text-cyan-400 uppercase font-mono">{file.type}</span>
-                                    <span className="text-[10px] text-white/20">•</span>
-                                    <span className="text-[10px] text-white/40">{file.date}</span>
+                {/* File List */}
+                <div className="space-y-2">
+                    {files.map(file => (
+                        <div key={file.id} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group/file hover:bg-white/[0.04] transition-all">
+                            <div className="flex items-center gap-4">
+                                <File className="text-white/20" size={18} />
+                                <div>
+                                    <h4 className="text-xs font-bold text-white/80">{file.name}</h4>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-[9px] text-gold-sanded/60 font-black uppercase tracking-widest">{file.type}</span>
+                                        <span className="text-[9px] text-white/10">•</span>
+                                        <span className="text-[9px] text-white/20 font-mono">{file.date}</span>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div className="flex items-center gap-4">
+                                {file.status === 'verified' ? (
+                                    <CheckCircle size={14} className="text-green-500/60" />
+                                ) : (
+                                    <AlertCircle size={14} className="text-gold-sanded/60" />
+                                )}
+                                <button className="p-1 text-white/10 hover:text-red-500/60 transition-colors">
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
                         </div>
-                        
-                        <div className="flex items-center gap-4">
-                            {file.status === 'verified' ? (
-                                <div className="flex items-center gap-1 text-green-400 text-[10px] font-bold uppercase">
-                                    <CheckCircle size={12} /> Vérifié
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-1 text-gold-sanded text-[10px] font-bold uppercase">
-                                    <AlertCircle size={12} /> En attente
-                                </div>
-                            )}
-                            <button className="p-2 text-white/20 hover:text-red-400 transition-colors">
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    </GlassCard>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

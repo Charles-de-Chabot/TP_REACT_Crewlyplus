@@ -30,7 +30,6 @@ const Login = () => {
             await signIn(email, password);
             // La redirection est gérée automatiquement par le AppRouter qui bascule sur le OnlineRouter
         } catch (error) {
-            console.log(error);
             // On affiche le message d'erreur renvoyé par le contexte
             setErrorMessage(error.message);
         }finally{

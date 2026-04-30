@@ -13,7 +13,7 @@ const stripePromise = loadStripe('pk_test_51TLB0IGpNFFeiWtxVr7bdvlQBUR9lsjI9lsUg
 const PaymentStatusContent = () => {
     const stripe = useStripe();
     const [status, setStatus] = useState('loading');
-    const { refreshProfile } = useAuthContext();
+    const { refreshProfile, userId } = useAuthContext();
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -34,6 +34,15 @@ const PaymentStatusContent = () => {
                     // Appel de sécurité au backend pour forcer l'upgrade (au cas où le webhook tarde)
                     await api.post('/api/premium/verify', { paymentIntentId: paymentIntent.id });
                     
+                    // On attribue par défaut le poste d'Équipier lors du passage en Premium
+                    if (userId) {
+                        await api.patch(`/api/users/${userId}`, { 
+                            position: 'Équipier' 
+                        }, {
+                            headers: { 'Content-Type': 'application/merge-patch+json' }
+                        });
+                    }
+
                     setStatus('success');
                     dispatch(resetBooking()); // On vide le panier après succès
                     await refreshProfile(); // On rafraîchit les infos de l'utilisateur (rôle premium)

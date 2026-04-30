@@ -2,10 +2,22 @@ import React from 'react';
 import GlassCard from '../ui/GlassCard';
 
 const WindyMap = ({ lat, lon, name, fullHeight = false }) => {
-    const isValidCoords = lat !== undefined && lon !== undefined && lat !== null && lon !== null && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon));
+    // Nettoyage et validation ultra-stricte
+    const parsedLat = parseFloat(lat);
+    const parsedLon = parseFloat(lon);
     
-    const windyUrl = isValidCoords 
-        ? `https://embed.windy.com/embed2.html?lat=${parseFloat(lat)}&lon=${parseFloat(lon)}&zoom=11&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=&metricWind=kt&metricTemp=%C2%B0C&radarRange=-1`
+    // On considère comme invalide si :
+    // - Ce n'est pas un nombre
+    // - C'est exactement 0 (souvent signe d'une donnée manquante en base)
+    // - C'est en dehors des limites terrestres
+    const isValid = 
+        !isNaN(parsedLat) && !isNaN(parsedLon) &&
+        isFinite(parsedLat) && isFinite(parsedLon) &&
+        parsedLat !== 0 && parsedLon !== 0 &&
+        Math.abs(parsedLat) <= 90 && Math.abs(parsedLon) <= 180;
+    
+    const windyUrl = isValid 
+        ? `https://embed.windy.com/embed2.html?lat=${parsedLat.toFixed(4)}&lon=${parsedLon.toFixed(4)}&zoom=11&level=surface&overlay=wind&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&metricWind=kt&metricTemp=%C2%B0C`
         : null;
 
     return (
@@ -23,7 +35,7 @@ const WindyMap = ({ lat, lon, name, fullHeight = false }) => {
                 {/* Overlay radar effect */}
                 <div className="absolute inset-0 pointer-events-none z-10 shadow-[inset_0_0_100px_rgba(0,242,255,0.05)]" />
                 
-                {isValidCoords ? (
+                {isValid ? (
                     <iframe 
                         title={`Windy Map - ${name}`}
                         src={windyUrl}

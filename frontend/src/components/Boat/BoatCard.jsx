@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { BOAT_URL } from '../../constants/apiConstant';
 import IconRenderer from '../UI/IconRenderer';
 import PremiumBadge from '../ui/PremiumBadge';
 import { Clock } from 'lucide-react';
 
-const BoatCard = ({ data }) => {
+const BoatCard = memo(({ data }) => {
     const imgBoat = data?.media?.[0]?.media_path ? `${BOAT_URL}/${data.media[0].media_path}` : null;
     const boatId = data?.id ?? 0;
     const boatName = data?.name ?? "Bateau inconnu";
@@ -87,6 +87,6 @@ const BoatCard = ({ data }) => {
             </div>
         </div>
     );
-};
+});
 
 export default BoatCard;

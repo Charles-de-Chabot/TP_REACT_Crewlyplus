@@ -35,6 +35,18 @@ class JoinTeamController extends AbstractController
 
         // Ajouter l'utilisateur à l'équipe
         $team->addMember($user);
+        
+        // Assigner le poste "Équipier" par défaut
+        $positionRepo = $em->getRepository(\App\Entity\Position::class);
+        $equipierPos = $positionRepo->findOneBy(['label' => 'Équipier']);
+        if ($equipierPos) {
+            foreach ($team->getMemberships() as $membership) {
+                if ($membership->getUser() === $user) {
+                    $membership->setPosition($equipierPos);
+                }
+            }
+        }
+        
         $em->flush();
 
         return new JsonResponse([

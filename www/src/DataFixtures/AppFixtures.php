@@ -1111,6 +1111,7 @@ class AppFixtures extends Fixture
             ['label' => 'Régleur GV', 'x' => 50, 'y' => 75, 'zone' => 'Cockpit Arrière'],
             ['label' => 'Barreur', 'x' => 50, 'y' => 85, 'zone' => 'Gouvernail'],
             ['label' => 'Tacticien', 'x' => 65, 'y' => 90, 'zone' => 'Arrière Droite'],
+            ['label' => 'Équipier', 'x' => 50, 'y' => 70, 'zone' => 'Cockpit Centre'],
         ];
 
         foreach ($positions as $data) {

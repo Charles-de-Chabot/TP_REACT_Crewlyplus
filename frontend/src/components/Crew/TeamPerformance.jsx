@@ -42,21 +42,25 @@ const TeamPerformance = ({ registrations, isLeader, onRefresh }) => {
 
             {/* Sélecteur de régate (si plusieurs) */}
             {registrations.length > 1 && (
-                <div className="flex items-center gap-4 overflow-x-auto pb-2 custom-scrollbar">
+                <div className="flex items-center gap-6 overflow-x-auto pb-4 hide-scrollbar px-2">
                     {registrations.map((reg) => (
                         <button
                             key={reg.id}
                             onClick={() => { setSelectedReg(reg); setViewStat(null); }}
-                            className={`flex-shrink-0 px-6 py-3 rounded-2xl border transition-all text-left min-w-[200px] ${
-                                selectedReg.id === reg.id 
-                                ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)]' 
-                                : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                            className={`flex-shrink-0 transition-all duration-300 text-left group ${
+                                selectedReg.id === reg.id ? 'scale-105' : 'opacity-40 hover:opacity-100'
                             }`}
                         >
-                            <p className={`text-[9px] font-black uppercase tracking-widest ${selectedReg.id === reg.id ? 'text-black/60' : 'text-white/40'}`}>
+                            <p className={`text-[9px] font-black uppercase tracking-[0.3em] mb-1 transition-colors ${
+                                selectedReg.id === reg.id ? 'text-gold-sanded' : 'text-white/20'
+                            }`}>
                                 {reg.regatta?.location || 'Régate'}
                             </p>
-                            <p className="text-sm font-bold truncate">{reg.regatta?.name}</p>
+                            <p className={`text-sm font-bold border-b-2 pb-1 transition-all ${
+                                selectedReg.id === reg.id ? 'border-gold-sanded text-white' : 'border-transparent text-white/60'
+                            }`}>
+                                {reg.regatta?.name}
+                            </p>
                         </button>
                     ))}
                 </div>
@@ -71,7 +75,7 @@ const TeamPerformance = ({ registrations, isLeader, onRefresh }) => {
                     {isLeader && (
                         <button 
                             onClick={() => setShowForm(true)}
-                            className="w-full py-5 bg-cyan-500/10 border border-cyan-500/30 border-dashed rounded-2xl text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all flex items-center justify-center gap-2 font-black uppercase tracking-widest text-[10px]"
+                            className="w-full py-5 bg-gold-sanded/5 border border-gold-sanded/20 border-dashed rounded-2xl text-gold-sanded/80 hover:bg-gold-sanded/10 hover:border-gold-sanded/40 transition-all flex items-center justify-center gap-2 font-black uppercase tracking-[0.2em] text-[10px]"
                         >
                             <Plus size={18} /> Saisir les résultats du jour
                         </button>
@@ -95,51 +99,51 @@ const TeamPerformance = ({ registrations, isLeader, onRefresh }) => {
                 {/* Graphiques & Détails (Main View) */}
                 <div className="lg:col-span-8 space-y-8">
                     {viewStat ? (
-                        <GlassCard className="p-8 border-cyan-500/30 animate-in slide-in-from-right-4 duration-300 relative bg-cyan-950/20">
-                            <button onClick={() => setViewStat(null)} className="absolute top-6 right-6 text-white/20 hover:text-white transition-colors">
+                        <div className="p-8 rounded-3xl animate-in slide-in-from-right-4 duration-500 relative bg-white/[0.02] border border-white/5">
+                            <button onClick={() => setViewStat(null)} className="absolute top-6 right-6 text-white/10 hover:text-white transition-colors">
                                 <X size={24} />
                             </button>
                             
-                            <div className="flex items-center gap-6 mb-8 border-b border-white/10 pb-6">
-                                <div className="w-16 h-16 rounded-2xl bg-cyan-500 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                                    <span className="text-2xl font-black text-black">J{viewStat.dayNumber}</span>
+                            <div className="flex items-center gap-8 mb-10 border-b border-white/5 pb-8">
+                                <div className="w-16 h-16 rounded-2xl bg-gold-sanded/10 border border-gold-sanded/30 flex items-center justify-center shadow-lg">
+                                    <span className="text-3xl font-black text-gold-sanded">J{viewStat.dayNumber}</span>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter">Débriefing Tactique</h3>
-                                    <p className="text-xs text-white/40 uppercase font-black tracking-widest">{selectedReg.regatta?.name}</p>
+                                    <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Débriefing Tactique</h3>
+                                    <p className="text-[10px] text-white/20 uppercase font-black tracking-[0.3em]">{selectedReg.regatta?.name}</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                                <div className="space-y-2">
-                                    <p className="text-[10px] text-cyan-400 uppercase font-black flex items-center gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                                <div className="space-y-3">
+                                    <p className="text-[10px] text-gold-sanded/60 uppercase font-black tracking-[0.2em] flex items-center gap-2">
                                         <Wind size={14} /> Météo & Mer
                                     </p>
-                                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-sm text-white/80 italic">
+                                    <div className="p-5 bg-white/[0.02] rounded-2xl border border-white/5 text-sm text-white/60 leading-relaxed italic">
                                         {viewStat.windConditions || 'Non renseigné'}
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-slate-900 rounded-2xl text-center border border-white/5">
-                                        <p className="text-[9px] text-white/30 uppercase font-black mb-1">Classement</p>
-                                        <p className="text-2xl font-black text-white">{viewStat.ranking}</p>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="p-5 bg-white/[0.01] rounded-2xl text-center border border-white/5">
+                                        <p className="text-[9px] text-white/20 uppercase font-black tracking-widest mb-1">Classement</p>
+                                        <p className="text-3xl font-black text-white">{viewStat.ranking}{viewStat.ranking === 1 ? 'er' : 'ème'}</p>
                                     </div>
-                                    <div className="p-4 bg-slate-900 rounded-2xl text-center border border-white/5">
-                                        <p className="text-[9px] text-white/30 uppercase font-black mb-1">Vitesse Max</p>
-                                        <p className="text-2xl font-black text-amber-400">{viewStat.maxSpeed}<span className="text-xs ml-1">kts</span></p>
+                                    <div className="p-5 bg-white/[0.01] rounded-2xl text-center border border-white/5">
+                                        <p className="text-[9px] text-white/20 uppercase font-black tracking-widest mb-1">Vitesse Max</p>
+                                        <p className="text-3xl font-black text-amber-400">{viewStat.maxSpeed}<span className="text-xs ml-1 font-black opacity-20">KTS</span></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <p className="text-[10px] text-cyan-400 uppercase font-black flex items-center gap-2">
+                            <div className="space-y-3">
+                                <p className="text-[10px] text-gold-sanded/60 uppercase font-black tracking-[0.2em] flex items-center gap-2">
                                     <BarChart3 size={14} /> Observations Skipper
                                 </p>
-                                <div className="p-6 bg-slate-900/50 rounded-2xl border border-white/5 text-sm text-white/90 leading-relaxed min-h-[150px]">
-                                    {viewStat.notes || "Aucune note n'a été saisie pour ce débriefing."}
+                                <div className="p-8 bg-white/[0.01] rounded-3xl border border-white/5 text-base text-white/70 leading-relaxed min-h-[180px] italic">
+                                    "{viewStat.notes || "Aucune note n'a été saisie pour ce débriefing."}"
                                 </div>
                             </div>
-                        </GlassCard>
+                        </div>
                     ) : (
                         <PerformanceCharts stats={stats} onShare={sendMessage} />
                     )}

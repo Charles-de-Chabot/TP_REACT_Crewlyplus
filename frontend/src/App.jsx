@@ -7,9 +7,11 @@ import { Toaster } from 'sonner'
 import { ChatProvider } from './contexts/ChatContext'
 import TacticalChatDrawer from './components/Crew/Chat/TacticalChatDrawer'
 import { useAuthContext } from './contexts/authContext'
+import PageLoader from './components/Loader/PageLoader'
 
 const App = () => {
-  const { teamId } = useAuthContext();
+  const { teamId, roleLabel } = useAuthContext()
+  const isPremium = roleLabel !== 'ROLE_USER';
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
@@ -20,10 +22,12 @@ const App = () => {
         <Topbar />
         
         <main className="flex-1 w-full">
-          <Outlet />
+          <React.Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </React.Suspense>
         </main>
 
-        <TacticalChatDrawer />
+        {isPremium && <TacticalChatDrawer />}
       </ChatProvider>
 
       <Footer />

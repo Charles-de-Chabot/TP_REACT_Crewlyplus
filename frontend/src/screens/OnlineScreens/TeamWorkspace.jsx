@@ -65,7 +65,7 @@ const TeamWorkspace = () => {
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                             <div className="lg:col-span-1">
-                                <CrewList members={team.members} />
+                                <CrewList members={team.members} team={team} />
                             </div>
                             <div className="lg:col-span-2">
                                 <DocumentVault documents={[]} />

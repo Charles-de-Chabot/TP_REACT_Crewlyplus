@@ -63,6 +63,30 @@ class DailyStat
     #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
     private ?string $notes = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?float $milesSailed = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?float $upwindAngle = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?string $seaState = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?string $incidents = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?string $sailConfig = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['dailystat:read', 'dailystat:write', 'team:read'])]
+    private ?string $protests = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -169,6 +193,73 @@ class DailyStat
     {
         $this->createdAt = $createdAt;
 
+        return $this;
+    }
+
+    public function getMilesSailed(): ?float
+    {
+        return $this->milesSailed;
+    }
+
+    public function setMilesSailed(?float $milesSailed): static
+    {
+        $this->milesSailed = $milesSailed;
+
+        return $this;
+    }
+
+    public function getUpwindAngle(): ?float
+    {
+        return $this->upwindAngle;
+    }
+
+    public function setUpwindAngle(?float $upwindAngle): static
+    {
+        $this->upwindAngle = $upwindAngle;
+        return $this;
+    }
+
+    public function getSeaState(): ?string
+    {
+        return $this->seaState;
+    }
+
+    public function setSeaState(?string $seaState): static
+    {
+        $this->seaState = $seaState;
+        return $this;
+    }
+
+    public function getIncidents(): ?string
+    {
+        return $this->incidents;
+    }
+
+    public function setIncidents(?string $incidents): static
+    {
+        $this->incidents = $incidents;
+        return $this;
+    }
+
+    public function getSailConfig(): ?string
+    {
+        return $this->sailConfig;
+    }
+
+    public function setSailConfig(?string $sailConfig): static
+    {
+        $this->sailConfig = $sailConfig;
+        return $this;
+    }
+
+    public function getProtests(): ?string
+    {
+        return $this->protests;
+    }
+
+    public function setProtests(?string $protests): static
+    {
+        $this->protests = $protests;
         return $this;
     }
 }

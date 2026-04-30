@@ -71,13 +71,19 @@ const Regattas = () => {
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                                     {/* Square Map */}
                                     <div className="aspect-square w-full shadow-2xl shadow-cyan-500/10">
-                                        <WindyMap 
-                                            key={selectedRegatta.id}
-                                            lat={selectedRegatta.latitude} 
-                                            lon={selectedRegatta.longitude} 
-                                            name={selectedRegatta.name} 
-                                            fullHeight={true}
-                                        />
+                                        {(selectedRegatta.latitude && selectedRegatta.longitude) ? (
+                                            <WindyMap 
+                                                key={selectedRegatta.id}
+                                                lat={selectedRegatta.latitude} 
+                                                lon={selectedRegatta.longitude} 
+                                                name={selectedRegatta.name} 
+                                                fullHeight={true}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-slate-900 flex items-center justify-center rounded-2xl border border-white/5 text-white/20 text-[10px] uppercase tracking-widest text-center px-6">
+                                                Coordonnées tactiques non disponibles
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Quick Stats Panel */}
