@@ -26,71 +26,74 @@ const BookingHistory = ({ bookings = [], onCancel }) => {
                 <span className="w-8 h-[2px] bg-teal-500"></span>
                 Mes Expéditions
             </h3>
-            
-            <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-6">
                 {bookings.map((booking) => {
                     const status = STATUS_LABELS[booking.status] || STATUS_LABELS.pending;
                     return (
-                        <div key={booking.id} className="group bg-slate-900/60 hover:bg-slate-900 border border-white/10 hover:border-white/20 rounded-3xl p-6 transition-all duration-300">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-950 border border-white/5 flex flex-col items-center justify-center shrink-0">
-                                        <span className="text-[10px] font-black text-teal-500 uppercase leading-none mb-1">
-                                            {new Date(booking.rentalStart).toLocaleString('fr-FR', { month: 'short' }).toUpperCase()}
-                                        </span>
-                                        <span className="text-2xl font-black text-white leading-none">
-                                            {new Date(booking.rentalStart).getDate()}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-white font-bold text-lg group-hover:text-teal-400 transition-colors">
-                                            {booking.boat?.name || "Bateau sélectionné"}
-                                        </h4>
-                                        <div className="flex items-center gap-3 mt-1">
-                                            <p className="text-slate-500 text-xs font-medium">
-                                                Du {new Date(booking.rentalStart).toLocaleDateString()} au {new Date(booking.rentalEnd).toLocaleDateString()}
-                                            </p>
-                                            <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                                            <p className="text-teal-500 font-bold text-xs">{booking.rentalPrice} €</p>
-                                        </div>
-
-                                        {/* Crew Progress Tracking */}
-                                        {booking.requestedRoles?.length > 0 && (
-                                            <div className="mt-3 flex flex-wrap gap-2">
-                                                {booking.requestedRoles.map((role, idx) => {
-                                                    const isFilled = booking.crewMembers?.some(m => m.roleLabel === role);
-                                                    return (
-                                                        <span key={idx} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all ${isFilled ? 'bg-teal-500/10 text-teal-400 border-teal-500/30' : 'bg-slate-800/50 text-slate-500 border-white/5'}`}>
-                                                            <span className={`w-1.5 h-1.5 rounded-full ${isFilled ? 'bg-teal-400' : 'bg-slate-600'}`}></span>
-                                                            {role.replace('ROLE_', '')}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
+                        <div key={booking.id} className="group bg-slate-900/60 border border-white/5 rounded-[2.5rem] p-8 transition-all duration-500 hover:bg-slate-900 hover:border-white/10 relative overflow-hidden">
+                            {/* Accent Decoration */}
+                            <div className={`absolute top-0 left-0 w-1.5 h-full ${status.bg.replace('bg-', 'bg-opacity-40 bg-')}`}></div>
+                            
+                            <div className="flex flex-col lg:flex-row lg:items-center gap-8">
+                                {/* Date Block */}
+                                <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 bg-slate-950 rounded-3xl border border-white/5 shadow-xl">
+                                    <span className="text-[10px] font-black text-teal-500 uppercase tracking-widest mb-1">
+                                        {new Date(booking.rentalStart).toLocaleString('fr-FR', { month: 'short' }).toUpperCase()}
+                                    </span>
+                                    <span className="text-3xl font-black text-white italic leading-none">
+                                        {new Date(booking.rentalStart).getDate()}
+                                    </span>
                                 </div>
 
-                                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                    <span className={`px-4 py-1.5 rounded-full border ${status.border} ${status.bg} ${status.color} text-[10px] font-black uppercase tracking-widest`}>
-                                        {status.label}
-                                    </span>
+                                {/* Core Info */}
+                                <div className="flex-grow space-y-3">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                        <h4 className="text-2xl font-black text-white uppercase tracking-tighter italic group-hover:text-teal-400 transition-colors">
+                                            {booking.boat?.name || "Bateau sélectionné"}
+                                        </h4>
+                                        <div className={`hidden sm:block w-1.5 h-1.5 rounded-full ${status.color.replace('text', 'bg')}`}></div>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${status.bg} ${status.color} text-[9px] font-black uppercase tracking-widest`}>
+                                            {status.label}
+                                        </div>
+                                    </div>
                                     
+                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Période</span>
+                                            <p className="text-slate-300 text-sm font-bold">
+                                                {new Date(booking.rentalStart).toLocaleDateString()} — {new Date(booking.rentalEnd).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Montant</span>
+                                            <p className="text-teal-500 font-black text-lg font-mono italic">{booking.rentalPrice} €</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Crew Badges */}
+                                    {booking.requestedRoles?.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            {booking.requestedRoles.map((role, idx) => {
+                                                const isFilled = booking.crewMembers?.some(m => m.roleLabel === role);
+                                                return (
+                                                    <span key={idx} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all ${isFilled ? 'bg-teal-500/10 text-teal-400 border-teal-500/30' : 'bg-slate-800/30 text-slate-600 border-white/5'}`}>
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${isFilled ? 'bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.6)]' : 'bg-slate-700'}`}></div>
+                                                        {role.replace('ROLE_', '')}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex-shrink-0 flex items-center lg:flex-col lg:justify-center gap-4">
                                     {(booking.status === 'pending' || booking.status === 'confirmed') && (
                                         <button 
                                             onClick={() => onCancel && onCancel(booking.id)}
-                                            className="px-4 py-1.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-[10px] font-black uppercase tracking-widest"
-                                            title="Annuler la réservation"
+                                            className="px-8 py-3 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/10 transition-all text-xs font-black uppercase tracking-widest shadow-lg active:scale-95"
                                         >
                                             Annuler
-                                        </button>
-                                    )}
-
-                                    {booking.status === 'confirmed' && (
-                                        <button className="p-2.5 rounded-xl bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all border border-white/5" title="Télécharger la facture">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
                                         </button>
                                     )}
                                 </div>
