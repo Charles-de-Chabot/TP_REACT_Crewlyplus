@@ -42,20 +42,24 @@ final class BoatAvailabilityFilter extends AbstractFilter
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
         
-        // Sous-requête pour trouver les bateaux déjà réservés
+        // Sous-requête pour trouver les bateaux déjà réservés (uniquement payés ou confirmés)
         $subQuery = $queryBuilder->getEntityManager()->createQueryBuilder()
             ->select('r_sub')
             ->from('App\Entity\Rental', 'r_sub')
             ->where('r_sub.boat = ' . $rootAlias)
             ->andWhere('r_sub.rentalStart < :endDate')
             ->andWhere('r_sub.rentalEnd > :startDate')
-            ->andWhere('r_sub.status != :cancelledStatus');
+            ->andWhere('r_sub.status IN (:activeStatuses)');
 
         $queryBuilder
             ->andWhere($queryBuilder->expr()->not($queryBuilder->expr()->exists($subQuery->getDQL())))
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->setParameter('cancelledStatus', 'cancelled');
+            ->setParameter('activeStatuses', [
+                \App\Entity\Rental::STATUS_PENDING, 
+                \App\Entity\Rental::STATUS_CONFIRMED, 
+                \App\Entity\Rental::STATUS_COMPLETED
+            ]);
     }
 
     public function getDescription(string $resourceClass): array

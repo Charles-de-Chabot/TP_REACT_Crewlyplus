@@ -46,6 +46,40 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
         navigate('/configurator');
     };
 
+    const calculatePriceBreakdown = () => {
+        if (!searchDates?.start || !searchDates?.end) return null;
+
+        const start = new Date(searchDates.start);
+        const end = new Date(searchDates.end);
+        const diffTime = Math.abs(end - start);
+        const nbDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (nbDays <= 0) return null;
+
+        const weeks = Math.floor(nbDays / 7);
+        const extraDays = nbDays % 7;
+        
+        const pricePerWeek = boatDetail.weekPrice || 0;
+        const pricePerDay = boatDetail.dayPrice || 0;
+        
+        const boatBase = (weeks * pricePerWeek) + (extraDays * pricePerDay);
+        const discount = isPremiumRegatta ? boatBase * 0.15 : 0;
+        const total = boatBase - discount;
+
+        return {
+            nbDays,
+            weeks,
+            extraDays,
+            boatBase,
+            discount,
+            total,
+            pricePerWeek,
+            pricePerDay
+        };
+    };
+
+    const breakdown = calculatePriceBreakdown();
+
     return (
         <div className="bg-slate-950/60 backdrop-blur-md border border-white/5 border-t-white/15 rounded-2xl p-10 shadow-2xl shadow-black/50">
             <h3 className="text-xl font-black text-white mb-6 italic uppercase tracking-tighter">Dates de Réservation</h3>
@@ -68,6 +102,43 @@ const BookingCard = ({ boatDetail, searchDates, onDateChange }) => {
                     onDateChange={handleDateUpdate} 
                 />
             </div>
+
+            {/* Price Breakdown */}
+            {breakdown && (
+                <div className="mb-8 p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <span>Détail du séjour</span>
+                        <span className="text-white">{breakdown.nbDays} Jours</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                        {breakdown.weeks > 0 && (
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs text-white/60 font-medium">{breakdown.weeks} Semaine{breakdown.weeks > 1 ? 's' : ''} <span className="text-[10px] text-slate-600">({breakdown.pricePerWeek}€/sem)</span></span>
+                                <span className="text-xs text-white font-bold">{breakdown.weeks * breakdown.pricePerWeek}€</span>
+                            </div>
+                        )}
+                        {breakdown.extraDays > 0 && (
+                            <div className="flex justify-between items-center">
+                                <span className="text-xs text-white/60 font-medium">{breakdown.extraDays} Jour{breakdown.extraDays > 1 ? 's' : ''} suppl. <span className="text-[10px] text-slate-600">({breakdown.pricePerDay}€/j)</span></span>
+                                <span className="text-xs text-white font-bold">{breakdown.extraDays * breakdown.pricePerDay}€</span>
+                            </div>
+                        )}
+                        
+                        {isPremiumRegatta && (
+                            <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                                <span className="text-xs text-amber-500 font-bold uppercase tracking-tighter italic">Réduction Premium (-15%)</span>
+                                <span className="text-xs text-amber-500 font-bold">-{Math.round(breakdown.discount * 100) / 100}€</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-between items-end pt-4 border-t border-white/10">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Location</span>
+                        <span className="text-2xl font-black text-white italic tracking-tighter">{Math.round(breakdown.total * 100) / 100}€</span>
+                    </div>
+                </div>
+            )}
 
             <div ref={shakeRef} className="transition-transform duration-200">
                 <button

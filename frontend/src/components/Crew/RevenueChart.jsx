@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const RevenueChart = ({ theme, data = [0, 0, 0, 0, 0, 0, 0] }) => {
-    // We need to scale the data to fit the 150px height
-    const maxVal = Math.max(...data, 100); // Minimum scale of 100 to avoid flat lines
+const RevenueChart = ({ theme, missions = [] }) => {
+    // Calcul des données sur les 7 derniers mois
+    const data = useMemo(() => {
+        const months = new Array(7).fill(0);
+        const now = new Date();
+        
+        // Détermination du taux journalier (même logique que Dashboard)
+        const crewRates = {
+            'Chef': 200,
+            'Capitaine': 250,
+            'Hôtesse': 150
+        };
+        const dailyRate = crewRates[theme?.label] || 200;
+
+        missions.forEach(m => {
+            const startDate = new Date(m.rentalStart);
+            const endDate = new Date(m.rentalEnd);
+            
+            // Calcul de la différence de mois par rapport à aujourd'hui
+            const monthDiff = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+            
+            if (monthDiff >= 0 && monthDiff < 7) {
+                const days = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+                const payout = days * dailyRate * 0.9;
+                months[6 - monthDiff] += payout;
+            }
+        });
+
+        return months;
+    }, [missions, theme]);
+
+    // Scaling the data to fit the 150px height
+    const maxVal = Math.max(...data, 100); 
     const revenuePoints = data.map(v => (v / maxVal) * 100);
     
+    // Smooth curve instead of straight lines if possible, but keep it simple first
     const chartPath = revenuePoints.map((p, i) => `${i * 100},${150 - p}`).join(' L ');
 
     return (
@@ -24,6 +55,7 @@ const RevenueChart = ({ theme, data = [0, 0, 0, 0, 0, 0, 0] }) => {
                         <path 
                             d={`M 0,150 L 0,${150 - revenuePoints[0]} L ${chartPath} L 600,150 Z`} 
                             fill="url(#chartGradient)"
+                            className="transition-all duration-1000 ease-out"
                         />
                     )}
 
@@ -34,7 +66,7 @@ const RevenueChart = ({ theme, data = [0, 0, 0, 0, 0, 0, 0] }) => {
                             fill="none" 
                             stroke="currentColor" 
                             strokeWidth="4" 
-                            className={theme.primary}
+                            className={`${theme.primary} transition-all duration-1000 ease-out`}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         />
@@ -49,7 +81,15 @@ const RevenueChart = ({ theme, data = [0, 0, 0, 0, 0, 0, 0] }) => {
                                 r="6" 
                                 className={`${theme.primary.replace('text', 'fill')} stroke-slate-950 stroke-2 cursor-pointer transition-all hover:r-8`} 
                             />
-                            {/* Simple tooltip on hover could be added here */}
+                            {/* Value on hover */}
+                            <text 
+                                x={i * 100} 
+                                y={150 - p - 15} 
+                                className="fill-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity text-center"
+                                textAnchor="middle"
+                            >
+                                {Math.round(data[i])} €
+                            </text>
                         </g>
                     ))}
                 </svg>

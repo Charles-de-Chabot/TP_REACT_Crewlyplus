@@ -154,11 +154,26 @@
     color: rgba(255, 255, 255, 0.9) !important;
     border-radius: 0.5rem !important;
     transition: all 0.2s !important;
-    line-height: 28px !important; /* Jours plus compacts */
-    height: 28px !important;
-    flex-basis: 28px !important;
-    max-width: 28px !important;
-    margin: 2px !important;
+    line-height: 32px !important; 
+    height: 32px !important;
+    flex-basis: 14.2857143% !important; /* 100% / 7 */
+    max-width: 14.2857143% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.flatpickr-days {
+    width: 100% !important;
 }
 
 .flatpickr-day.flatpickr-disabled, 
@@ -245,8 +260,9 @@
 .flatpickr-weekday {
     color: rgba(255, 255, 255, 0.3) !important;
     font-weight: 700 !important;
-    font-size: 0.7rem !important;
+    font-size: 0.65rem !important;
     text-transform: uppercase;
+    flex: 1 !important;
 }
 
 .flatpickr-months .flatpickr-prev-month, 

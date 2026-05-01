@@ -31,12 +31,35 @@ const CrewDashboard = () => {
         userId,
         avatar,
         theme,
+        balance,
+        stripeAccountId,
+        handleStripeOnboarding,
         refresh
     } = useCrewDashboard();
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     if (loading) return <PageLoader />;
+
+    // Calcul dynamique des revenus
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const crewRates = {
+        'ROLE_CAPITAINE': 250,
+        'ROLE_CHEF': 200,
+        'ROLE_HOTESSE': 150
+    };
+    const dailyRate = crewRates[theme?.label === 'Chef' ? 'ROLE_CHEF' : theme?.label === 'Capitaine' ? 'ROLE_CAPITAINE' : 'ROLE_HOTESSE'] || 200;
+
+    const monthlyEarnings = confirmedMissions.reduce((acc, m) => {
+        const startDate = new Date(m.rentalStart);
+        if (startDate.getMonth() === currentMonth && startDate.getFullYear() === currentYear) {
+            const days = Math.max(1, Math.ceil((new Date(m.rentalEnd) - startDate) / (1000 * 60 * 60 * 24)));
+            return acc + (days * dailyRate * 0.9); // 90% net
+        }
+        return acc;
+    }, 0);
 
     return (
         <Layout className="pb-20 bg-slate-950 min-h-screen">
@@ -63,10 +86,9 @@ const CrewDashboard = () => {
                         <CrewStats 
                             theme={theme}
                             stats={{
-                                monthlyEarnings: 0, 
-                                totalEarnings: 0,
-                                missionCount: confirmedMissions.length,
-                                rating: 5.0
+                                monthlyEarnings: Math.round(monthlyEarnings), 
+                                totalEarnings: balance,
+                                missionCount: confirmedMissions.length
                             }}
                         />
 
@@ -89,8 +111,9 @@ const CrewDashboard = () => {
                     <div className="lg:col-span-4 sticky top-32">
                         <CrewInfoSidebar 
                             theme={theme} 
-                            user={{ id: userId, firstname, lastname, email, phoneNumber, position, address }}
+                            user={{ id: userId, firstname, lastname, email, phoneNumber, position, address, stripeAccountId }}
                             onEdit={() => setIsEditModalOpen(true)}
+                            onStripeOnboarding={handleStripeOnboarding}
                         />
                     </div>
                 </div>

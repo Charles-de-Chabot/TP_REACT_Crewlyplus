@@ -55,8 +55,8 @@ const OnlineRouter = createBrowserRouter([
             { path: "/checkout", element: <CheckoutScreen /> },
             
             { path: "/user", element: <User/> },
-            { path: "/crew/dashboard", element: <Navigate to="/my-team" replace /> },
-            { path: "/crew/register", element: <Navigate to="/my-team" replace /> },
+            { path: "/crew/dashboard", element: <CrewDashboard /> },
+            { path: "/crew/register", element: <CrewRegister /> },
             { path: "/register_premium", element: <RegisterPremium /> },
             { path: "/my-team", element: <MyTeam /> },
             { path: "/my-team/history/:id", element: <TeamHistoryDetail /> },

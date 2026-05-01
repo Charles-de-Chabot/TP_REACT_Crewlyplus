@@ -12,42 +12,36 @@ const InfoDetail = ({ boatDetail }) => {
             {boatDetail?.description || "Aucune description technique disponible pour ce bateau."}
         </p>
         
-        <div className="mt-16 pt-10 border-t border-white/5">
-            <h3 className="text-xl font-black text-white mb-10 italic uppercase tracking-tighter">Caractéristiques techniques</h3>
+        <div className="mt-12 pt-8 border-t border-white/5">
+            <h3 className="text-xl font-black text-white mb-8 italic uppercase tracking-tighter">Caractéristiques techniques</h3>
             
-            <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                 {/* Catégorie : Dimensions */}
                 <div>
-                    <h4 className="flex items-center gap-3 text-[10px] font-black text-accent-role mb-6 uppercase tracking-[0.2em] border-l-2 border-accent-role pl-4">
-                        Dimensions de la coque
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <TechnicalCard label="Longueur" value={boatDetail?.boatinfo?.length} unit="m" icon="length" />
-                        <TechnicalCard label="Largeur" value={boatDetail?.boatinfo?.width} unit="m" icon="width" />
-                        <TechnicalCard label="Tirant d'eau" value={boatDetail?.boatinfo?.draught} unit="m" icon="⚓" />
+                    <h4 className="text-[10px] font-black text-accent-role mb-4 uppercase tracking-[0.2em]">Dimensions</h4>
+                    <div className="space-y-3">
+                        <SpecItem label="Longueur" value={boatDetail?.boatinfo?.length} unit="m" icon="length" />
+                        <SpecItem label="Largeur" value={boatDetail?.boatinfo?.width} unit="m" icon="width" />
+                        <SpecItem label="Tirant d'eau" value={boatDetail?.boatinfo?.draught} unit="m" icon="⚓" />
                     </div>
                 </div>
 
                 {/* Catégorie : Aménagement */}
                 <div>
-                    <h4 className="flex items-center gap-3 text-[10px] font-black text-accent-role mb-6 uppercase tracking-[0.2em] border-l-2 border-accent-role pl-4">
-                        Aménagement & Logistique
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <TechnicalCard label="Capacité max." value={boatDetail?.boatinfo?.maxUser} unit="pers." icon="👥" />
-                        <TechnicalCard label="Cabines" value={boatDetail?.boatinfo?.cabineNumber} unit="" icon="🚪" />
-                        <TechnicalCard label="Couchages" value={boatDetail?.boatinfo?.bedsNumber} unit="" icon="bed" />
+                    <h4 className="text-[10px] font-black text-accent-role mb-4 uppercase tracking-[0.2em]">Aménagement</h4>
+                    <div className="space-y-3">
+                        <SpecItem label="Capacité" value={boatDetail?.boatinfo?.maxUser} unit="pers." icon="👥" />
+                        <SpecItem label="Cabines" value={boatDetail?.boatinfo?.cabineNumber} unit="" icon="🚪" />
+                        <SpecItem label="Couchages" value={boatDetail?.boatinfo?.bedsNumber} unit="" icon="bed" />
                     </div>
                 </div>
 
-                {/* Catégorie : Motorisation */}
-                <div>
-                    <h4 className="flex items-center gap-3 text-[10px] font-black text-accent-role mb-6 uppercase tracking-[0.2em] border-l-2 border-accent-role pl-4">
-                        Propulsion technique
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <TechnicalCard label="Moteur" value={boatDetail?.boatinfo?.powerEngine} unit="" icon="⚙️" fullWidth />
-                        <TechnicalCard label="Carburant" value={boatDetail?.boatinfo?.fuel} unit="" icon="fuel" />
+                {/* Catégorie : Propulsion */}
+                <div className="md:col-span-2">
+                    <h4 className="text-[10px] font-black text-accent-role mb-4 uppercase tracking-[0.2em]">Propulsion</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
+                        <SpecItem label="Motorisation" value={boatDetail?.boatinfo?.powerEngine} unit="" icon="⚙️" />
+                        <SpecItem label="Carburant" value={boatDetail?.boatinfo?.fuel} unit="" icon="fuel" />
                     </div>
                 </div>
             </div>
@@ -56,18 +50,18 @@ const InfoDetail = ({ boatDetail }) => {
   )
 }
 
-const TechnicalCard = ({ label, value, unit, icon, fullWidth }) => (
-    <div className={`bg-slate-950/20 rounded-xl p-5 border border-white/5 border-t-white/10 flex items-center gap-5 hover:bg-slate-900/40 hover:border-white/10 transition-all group ${fullWidth ? 'col-span-full md:col-span-2' : ''}`}>
-        <div className="bg-slate-900 border border-white/5 p-3 rounded-lg text-slate-500 group-hover:text-accent-role transition-colors shrink-0">
-            <IconRenderer icon={icon} size={20} />
+const SpecItem = ({ label, value, unit, icon }) => (
+    <div className="flex items-center justify-between py-2 border-b border-white/[0.03] group transition-colors hover:border-white/10">
+        <div className="flex items-center gap-3">
+            <div className="text-slate-600 group-hover:text-accent-role transition-colors">
+                <IconRenderer icon={icon} size={14} />
+            </div>
+            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{label}</span>
         </div>
-        <div className="min-w-0">
-            <span className="block text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">{label}</span>
-            <span className="text-white font-black font-mono text-base tracking-tighter truncate block">
-                {value || '-'} <span className="text-[10px] font-sans font-bold text-slate-600 ml-1">{unit}</span>
-            </span>
-        </div>
+        <span className="text-white font-black font-mono text-sm tracking-tighter">
+            {value || '-'} <span className="text-[9px] font-sans font-bold text-slate-600 ml-0.5">{unit}</span>
+        </span>
     </div>
 );
 
-export default InfoDetail
+export default InfoDetail;

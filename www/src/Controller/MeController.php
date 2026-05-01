@@ -12,7 +12,7 @@ class MeController extends AbstractController
 {
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function __invoke(): JsonResponse
+    public function __invoke(\Doctrine\ORM\EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -21,17 +21,22 @@ class MeController extends AbstractController
                 return new JsonResponse(['message' => 'Utilisateur non authentifié ou invalide.'], 401);
             }
 
+            // Forcer le rafraîchissement depuis la DB pour éviter le cache Doctrine
+            $entityManager->refresh($user);
+
             // Préparation des données de base
             $data = [
-                'id'        => $user->getId(),
-                'email'     => $user->getEmail(),
-                'firstname'   => $user->getFirstname(),
-                'lastname'    => $user->getLastname(),
-                'nickname'    => $user->getNickname(),
-                'phoneNumber' => $user->getPhoneNumber(),
-                'position'    => $user->getPosition(),
-                'roles'       => $user->getRoles(),
-                'roleLabel'   => $user->getRoleLabel(),
+                'id'              => $user->getId(),
+                'email'           => $user->getEmail(),
+                'firstname'       => $user->getFirstname(),
+                'lastname'        => $user->getLastname(),
+                'nickname'        => $user->getNickname(),
+                'phoneNumber'     => $user->getPhoneNumber(),
+                'position'        => $user->getPosition(),
+                'roles'           => $user->getRoles(),
+                'roleLabel'       => $user->getRoleLabel(),
+                'balance'         => $user->getBalance(),
+                'stripeAccountId' => $user->getStripeAccountId(),
             ];
 
             // Adresse

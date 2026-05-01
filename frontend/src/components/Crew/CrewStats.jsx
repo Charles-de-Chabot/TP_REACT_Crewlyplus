@@ -12,12 +12,15 @@ const CrewStats = ({ theme, stats = {} }) => {
     const statsConfig = [
         { label: 'Revenus ce mois', value: `${monthlyEarnings} €`, icon: '💰' },
         { label: 'Total généré', value: `${totalEarnings} €`, icon: '📈' },
-        { label: 'Missions effectuées', value: missionCount, icon: '⚓' },
-        { label: 'Note moyenne', value: `${rating} / 5`, icon: '⭐' }
+        { label: 'Missions effectuées', value: missionCount, icon: '⚓' }
     ];
 
+    if (rating > 0) {
+        statsConfig.push({ label: 'Note moyenne', value: `${rating} / 5`, icon: '⭐' });
+    }
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${statsConfig.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
             {statsConfig.map((s, i) => (
                 <div 
                     key={i} 

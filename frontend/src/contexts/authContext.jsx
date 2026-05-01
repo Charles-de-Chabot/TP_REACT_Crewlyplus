@@ -14,6 +14,8 @@ const AuthContext = createContext({
     phoneNumber: "",
     position: "",
     address: null,
+    balance: 0,
+    stripeAccountId: "",
     loading: true,
     signIn: async () => {},
     signOut: () => {},
@@ -31,6 +33,8 @@ export const AuthContextProvider = ({ children }) => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [position, setPosition] = useState("");
     const [address, setAddress] = useState(null);
+    const [balance, setBalance] = useState(0);
+    const [stripeAccountId, setStripeAccountId] = useState("");
     const [teamId, setTeamId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("token") || "");
@@ -50,6 +54,8 @@ export const AuthContextProvider = ({ children }) => {
         setPhoneNumber(userData.phoneNumber || userData.phone_number || "");
         setPosition(userData.position || "");
         setAddress(userData.address || null);
+        setBalance(userData.balance || 0);
+        setStripeAccountId(userData.stripeAccountId || "");
 
         // 🎯 Extraction de la Team pour le Chat Global
         if (userData.currentTeam) {
@@ -103,6 +109,8 @@ export const AuthContextProvider = ({ children }) => {
         setPhoneNumber("");
         setPosition("");
         setAddress(null);
+        setBalance(0);
+        setStripeAccountId("");
         setToken("");
         clearAccessToken();
         localStorage.removeItem("token");
@@ -182,6 +190,8 @@ export const AuthContextProvider = ({ children }) => {
         phoneNumber,
         position,
         address,
+        balance,
+        stripeAccountId,
         teamId,
         loading,
         token,

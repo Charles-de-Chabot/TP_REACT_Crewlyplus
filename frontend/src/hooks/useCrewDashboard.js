@@ -36,7 +36,10 @@ export const useCrewDashboard = () => {
         phoneNumber, 
         position, 
         address,
-        avatar
+        avatar,
+        balance,
+        stripeAccountId,
+        refreshProfile
     } = useAuthContext();
     const [missions, setMissions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -96,7 +99,8 @@ export const useCrewDashboard = () => {
                 headers: { 'Content-Type': 'application/merge-patch+json' }
             });
             
-            await fetchData(true); // Rafraîchissement silencieux après acceptation
+            await fetchData(true); // Rafraîchissement silencieux des missions
+            await refreshProfile(); // Mise à jour de la balance utilisateur !
         } catch (err) {
             console.error("Error accepting mission", err);
         } finally {
@@ -112,6 +116,17 @@ export const useCrewDashboard = () => {
             await fetchData(true);
         } catch (err) {
             console.error("Error refusing mission", err);
+        }
+    };
+
+    const handleStripeOnboarding = async () => {
+        try {
+            const res = await api.post('/api/stripe/onboarding');
+            if (res.data.url) {
+                window.location.href = res.data.url;
+            }
+        } catch (err) {
+            console.error("Error starting onboarding", err);
         }
     };
 
@@ -132,9 +147,12 @@ export const useCrewDashboard = () => {
         phoneNumber,
         position,
         address,
+        balance,
+        stripeAccountId,
         userId,
         avatar,
         theme,
+        handleStripeOnboarding,
         refresh: () => fetchData(true) // Le refresh est silencieux par défaut
     };
 };

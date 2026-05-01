@@ -79,8 +79,9 @@ const bookingSlice = createSlice({
 
             const nbDays = state.dates.nbDays;
             
-            // 1. Base Boat Price (without discount yet)
-            const boatBase = nbDays >= 7 ? state.selectedBoat.weekPrice : state.selectedBoat.dayPrice * nbDays;
+            const weeks = Math.floor(nbDays / 7);
+            const extraDays = nbDays % 7;
+            const boatBase = (weeks * state.selectedBoat.weekPrice) + (extraDays * state.selectedBoat.dayPrice);
 
             // 2. Formulas
             const formulasTotal = state.selectedFormula ? state.selectedFormula.formulaPrice : 0;

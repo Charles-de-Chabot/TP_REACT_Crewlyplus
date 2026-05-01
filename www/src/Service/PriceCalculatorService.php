@@ -104,15 +104,10 @@ class PriceCalculatorService
      */
     public function calculateBaseBoatPrice(Boat $boat, int $nbDays): float
     {
-        if ($nbDays >= 7) {
-            // If it's a week or more, we take the weekly price. 
-            // Note: This logic assumes a single week price for any duration >= 7 days.
-            // If the business logic requires (nbWeeks * weekPrice + extraDays * dayPrice), 
-            // it should be adjusted here.
-            return (float) $boat->getWeekPrice();
-        }
+        $weeks = (int) floor($nbDays / 7);
+        $extraDays = $nbDays % 7;
 
-        return (float) ($boat->getDayPrice() * $nbDays);
+        return (float) (($weeks * $boat->getWeekPrice()) + ($extraDays * $boat->getDayPrice()));
     }
 
     /**
@@ -133,8 +128,15 @@ class PriceCalculatorService
     public function calculateNbDays(\DateTimeInterface $start, \DateTimeInterface $end): int
     {
         $diff = $start->diff($end);
+        $days = (int) $diff->days;
         
-        // Use 'days' for absolute difference in days
-        return (int) $diff->days;
+        // Si c'est le même jour (0 jours de diff), on compte 1 jour de travail
+        if ($days === 0 && $start->format('Y-m-d') === $end->format('Y-m-d')) {
+            return 1;
+        }
+
+        // Si la différence est de 0 mais sur des jours différents (ex: 23h), 
+        // ou si on veut compter le jour de début et de fin inclusivement :
+        return $days > 0 ? $days : 1;
     }
 }
