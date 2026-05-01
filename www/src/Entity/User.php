@@ -11,6 +11,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,6 +24,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email')]
 #[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['user:list']]
+        ),
+        new Get(security: "is_granted('ROLE_ADMIN') or object == user"),
+        new Post(),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
+        new Delete(security: "is_granted('ROLE_ADMIN')"),
+    ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']]
 )]
@@ -33,15 +48,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read', 'rental:read', 'team:read', 'message:read'])]
+    #[Groups(['user:read', 'user:list', 'rental:read', 'team:read', 'message:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write', 'rental:read', 'team:read', 'message:read'])]
+    #[Groups(['user:read', 'user:list', 'user:write', 'rental:read', 'team:read', 'message:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:write', 'message:read'])]
+    #[Groups(['user:read', 'user:list', 'user:write', 'team:read', 'message:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -49,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $nickname = null;
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:list', 'user:write'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
@@ -61,24 +76,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $phoneNumber = null;
 
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'user:list'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'user:list'])]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\Column]
-    #[Groups(['user:read', 'user:write'])]
-    private ?bool $is_active = null;
+    #[ORM\Column(name: 'is_active')]
+    private ?bool $isActive = null;
+
+
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:read', 'user:write', 'message:read'])]
     private ?string $position = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:read', 'user:list'])]
+    private ?float $balance = 0.0;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
+    private ?string $stripeAccountId = null;
+
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:list', 'user:write'])]
     private ?Role $role = null;
 
     #[ORM\ManyToOne(inversedBy: 'users', cascade: ['persist'])]
@@ -190,7 +214,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // Initialisation des valeurs par défaut à la création
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
-        $this->is_active = true;
+        $this->isActive = true;
+
     }
 
     public function getId(): ?int
@@ -294,17 +319,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Groups(['user:read', 'user:list'])]
+    #[SerializedName('isActive')]
     public function isActive(): ?bool
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
-    public function setIsActive(bool $is_active): static
+
+    #[Groups(['user:write'])]
+    public function setIsActive(bool $isActive): static
     {
-        $this->is_active = $is_active;
+        $this->isActive = $isActive;
 
         return $this;
     }
+
+
 
     public function getPosition(): ?string
     {
@@ -330,7 +361,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[Groups(['user:read'])] // On l'ajoute au groupe de lecture
+    #[Groups(['user:read', 'user:list'])] // On l'ajoute au groupe de lecture
     public function getRoleLabel(): ?string
     {
         // On va chercher le label dans l'entité Role liée
@@ -577,5 +608,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMemberships(): Collection
     {
         return $this->memberships;
+    }
+
+    public function getBalance(): ?float
+    {
+        return $this->balance;
+    }
+
+    public function setBalance(?float $balance): static
+    {
+        $this->balance = $balance;
+
+        return $this;
+    }
+
+    public function getStripeAccountId(): ?string
+    {
+        return $this->stripeAccountId;
+    }
+
+    public function setStripeAccountId(?string $stripeAccountId): static
+    {
+        $this->stripeAccountId = $stripeAccountId;
+
+        return $this;
     }
 }

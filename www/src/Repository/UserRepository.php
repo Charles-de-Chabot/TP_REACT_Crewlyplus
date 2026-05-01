@@ -21,7 +21,8 @@ class UserRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('u')
             ->join('u.role', 'r')
             ->andWhere('r.label = :role')
-            ->andWhere('u.is_active = true')
+            ->andWhere('u.isActive = true')
+
             ->setParameter('role', $roleLabel)
             ->getQuery()
             ->getResult();

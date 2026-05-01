@@ -45,8 +45,8 @@ const NotificationModal = ({ isOpen, onClose, notifications, onDelete, onRead, o
                                     onClick={() => !notif.isOpen && onRead(notif.id)}
                                     className={`p-4 border rounded-2xl transition-all group relative cursor-pointer ${
                                         notif.isOpen 
-                                        ? 'bg-white/2 border-white/5 opacity-40 grayscale-[0.5]' 
-                                        : 'bg-white/5 hover:bg-white/10 border-white/10'
+                                        ? 'bg-white/[0.02] border-white/5 opacity-40 grayscale' 
+                                        : 'bg-white/5 hover:bg-white/10 border-white/10 shadow-lg shadow-black/20'
                                     }`}
                                 >
                                     {!notif.isOpen && (

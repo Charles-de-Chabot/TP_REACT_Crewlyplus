@@ -23,39 +23,39 @@ class BoatInfo
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?int $maxUser = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?float $length = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?float $width = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?float $draught = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?int $cabineNumber = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?int $bedsNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?string $fuel = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?string $powerEngine = null;
 
     #[ORM\Column]
-    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read'])]
+    #[Groups(['boatinfo:read', 'boatinfo:write', 'boat:read', 'boat:write'])]
     private ?float $irc = null;
 
     /**

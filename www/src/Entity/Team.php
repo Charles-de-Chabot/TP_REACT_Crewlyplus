@@ -11,6 +11,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
@@ -22,11 +24,11 @@ use App\Controller\JoinTeamController;
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
 #[ApiResource(
     operations: [
-        new \ApiPlatform\Metadata\GetCollection(),
+        new \ApiPlatform\Metadata\GetCollection(security: "is_granted('ROLE_ADMIN')"),
         new Get(security: "is_granted('TEAM_VIEW', object)"),
         new Post(),
-        new Patch(security: "is_granted('TEAM_EDIT', object)"),
-        new Delete(security: "is_granted('TEAM_EDIT', object)"),
+        new Patch(security: "is_granted('ROLE_ADMIN') or is_granted('TEAM_EDIT', object)"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or is_granted('TEAM_EDIT', object)"),
         new Post(
             uriTemplate: '/teams/join',
             controller: JoinTeamController::class,
@@ -130,8 +132,8 @@ class Team
     private ?string $inviteCode = null;
 
     #[ORM\Column]
-    #[Groups(['team:read', 'team:write'])]
     private ?bool $isActive = true;
+
 
     public function __construct()
     {
@@ -387,11 +389,15 @@ class Team
         return $this;
     }
 
+    #[Groups(['team:read'])]
+    #[SerializedName('isActive')]
     public function isActive(): ?bool
     {
         return $this->isActive;
     }
 
+
+    #[Groups(['team:write'])]
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;

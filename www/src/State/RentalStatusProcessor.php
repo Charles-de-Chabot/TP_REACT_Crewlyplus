@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Rental;
 use App\Entity\Notification;
 use App\Entity\User;
+use App\Service\PriceCalculatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -18,6 +19,7 @@ class RentalStatusProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly ProcessorInterface $persistProcessor,
         private readonly EntityManagerInterface $entityManager,
+        private readonly PriceCalculatorService $priceCalculator,
         #[Autowire('%env(STRIPE_SECRET_KEY)%')]
         private readonly string $stripeSecretKey
     ) {
@@ -68,6 +70,9 @@ class RentalStatusProcessor implements ProcessorInterface
                 $notification->setIsOpen(false);
                 $notification->setCreatedAt(new \DateTime());
                 $this->entityManager->persist($notification);
+
+                // --- NOUVEAU : Paiement de l'équipage ---
+                $this->handleCrewPayout($member, $data);
             }
             
         }
@@ -180,6 +185,69 @@ class RentalStatusProcessor implements ProcessorInterface
             // Log error or notify admin?
             // On ne bloque pas l'annulation si le remboursement Stripe échoue, 
             // mais on pourrait vouloir enregistrer l'erreur.
+        }
+    }
+
+    /**
+     * Calcule et effectue le virement vers le membre du staff
+     */
+    private function handleCrewPayout(User $member, Rental $rental): void
+    {
+        $nbDays = $this->priceCalculator->calculateNbDays($rental->getRentalStart(), $rental->getRentalEnd());
+        
+        // Tarifs journaliers
+        $crewPrices = [
+            'ROLE_CAPITAINE' => 250.0,
+            'ROLE_CHEF'      => 200.0,
+            'ROLE_HOTESSE'   => 150.0,
+        ];
+
+        $role = $member->getRoleLabel();
+        $dailyRate = $crewPrices[$role] ?? 0;
+        
+        if ($dailyRate > 0) {
+            $grossAmount = $dailyRate * $nbDays;
+            $netAmount = $grossAmount * 0.90; // Commission 10% de la plateforme
+            
+            // 1. Mise à jour de la balance virtuelle
+            $currentBalance = $member->getBalance() ?? 0.0;
+            $member->setBalance($currentBalance + $netAmount);
+            $this->entityManager->persist($member);
+            
+            // 2. Transfert Stripe (si configuré)
+            $stripeAccountId = $member->getStripeAccountId();
+            if ($stripeAccountId) {
+                try {
+                    \Stripe\Stripe::setApiKey($this->stripeSecretKey);
+                    \Stripe\Transfer::create([
+                        'amount' => (int) ($netAmount * 100), // Stripe attend des centimes
+                        'currency' => 'eur',
+                        'destination' => $stripeAccountId,
+                        'description' => sprintf('Paiement mission bateau %s (%d jours)', $rental->getBoat()->getName(), $nbDays),
+                        'metadata' => ['rental_id' => (string) $rental->getId()]
+                    ]);
+                    
+                    // Notification spécifique Stripe
+                    $notif = new Notification();
+                    $notif->setUser($member);
+                    $notif->setLabel(sprintf('Virement effectué : %.2f € ont été transférés vers votre compte Stripe Connect.', $netAmount));
+                    $notif->setIsOpen(false);
+                    $notif->setCreatedAt(new \DateTime());
+                    $this->entityManager->persist($notif);
+
+                } catch (\Exception $e) {
+                    // En cas d'erreur Stripe, la balance virtuelle reste à jour
+                    // On pourrait logger l'erreur ici.
+                }
+            } else {
+                // Notification simple de balance
+                $notif = new Notification();
+                $notif->setUser($member);
+                $notif->setLabel(sprintf('Mission confirmée ! %.2f € ont été ajoutés à votre solde CrewlyPlus.', $netAmount));
+                $notif->setIsOpen(false);
+                $notif->setCreatedAt(new \DateTime());
+                $this->entityManager->persist($notif);
+            }
         }
     }
 }

@@ -30,19 +30,19 @@ class Address
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read', 'user:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'boat:write', 'user:read', 'user:write'])]
     private ?string $houseNumber = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read', 'user:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'boat:write', 'user:read', 'user:write'])]
     private ?string $streetName = null;
 
     #[ORM\Column(length: 15)]
-    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read', 'user:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'boat:write', 'user:read', 'user:write'])]
     private ?string $postcode = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['address:read', 'address:write', 'boat:read', 'user:read', 'user:write'])]
+    #[Groups(['address:read', 'address:write', 'boat:read', 'boat:write', 'user:read', 'user:write'])]
     private ?string $city = null;
 
     /**

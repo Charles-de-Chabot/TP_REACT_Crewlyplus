@@ -14,8 +14,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(),
         new Get(),
+        new \ApiPlatform\Metadata\Post(security: "is_granted('ROLE_ADMIN')"),
+        new \ApiPlatform\Metadata\Patch(security: "is_granted('ROLE_ADMIN')"),
+        new \ApiPlatform\Metadata\Delete(security: "is_granted('ROLE_ADMIN')"),
     ],
     normalizationContext: ['groups' => ['position:read']],
+    denormalizationContext: ['groups' => ['position:write']],
 )]
 class Position
 {
@@ -26,19 +30,19 @@ class Position
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['position:read', 'membership:read', 'team:read'])]
+    #[Groups(['position:read', 'position:write', 'membership:read', 'team:read'])]
     private ?string $label = null;
 
     #[ORM\Column]
-    #[Groups(['position:read', 'membership:read', 'team:read'])]
+    #[Groups(['position:read', 'position:write', 'membership:read', 'team:read'])]
     private ?float $x = null;
 
     #[ORM\Column]
-    #[Groups(['position:read', 'membership:read', 'team:read'])]
+    #[Groups(['position:read', 'position:write', 'membership:read', 'team:read'])]
     private ?float $y = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['position:read', 'membership:read', 'team:read'])]
+    #[Groups(['position:read', 'position:write', 'membership:read', 'team:read'])]
     private ?string $zone = null;
 
     public function getId(): ?int

@@ -9,9 +9,27 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\Controller\BroadcastNotificationController;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ApiResource(
+    operations: [
+        new \ApiPlatform\Metadata\GetCollection(),
+        new \ApiPlatform\Metadata\Get(),
+        new \ApiPlatform\Metadata\Post(),
+        new \ApiPlatform\Metadata\Post(
+            uriTemplate: '/notifications/broadcast',
+            controller: BroadcastNotificationController::class,
+            name: 'broadcast_notification',
+            security: "is_granted('ROLE_ADMIN')",
+            openapi: new \ApiPlatform\OpenApi\Model\Operation(
+                summary: 'Envoie une notification à tous les utilisateurs',
+                description: 'Crée une notification pour chaque utilisateur actif selon l\'audience sélectionnée.'
+            )
+        ),
+        new \ApiPlatform\Metadata\Patch(),
+        new \ApiPlatform\Metadata\Delete()
+    ],
     normalizationContext: ['groups' => ['notification:read']],
     denormalizationContext: ['groups' => ['notification:write']]
 )]

@@ -108,7 +108,7 @@ const Topbar = () => {
       await api.patch(`/api/notifications/${notifId}`, { isOpen: true }, {
         headers: { 'Content-Type': 'application/merge-patch+json' }
       });
-      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isOpen: true } : n));
+      setNotifications(prev => prev.map(n => Number(n.id) === Number(notifId) ? { ...n, isOpen: true } : n));
       setUnreadNotifications(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error("Error marking notification as read", err);
@@ -158,8 +158,8 @@ const Topbar = () => {
                 </NavLink>
               ))}
 
-              {/* 💬 Onglet Messages (Global) - Réservé Premium */}
-              {isPremium && (
+              {/* 💬 Onglet Messages (Global) - Réservé Premium (Hors Admin) */}
+              {isPremium && roleLabel !== 'ROLE_ADMIN' && (
                 <button 
                   onClick={() => setIsChatOpen(true)}
                   className="text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-1.5 text-slate-500 hover:text-white relative"
@@ -209,6 +209,15 @@ const Topbar = () => {
                     className={`px-4 py-2 rounded-xl bg-accent-role/10 border border-accent-role/20 text-accent-role text-[10px] font-black uppercase tracking-widest hover:bg-accent-role/20 transition-all`}
                   >
                     Tableau de bord Pro
+                  </Link>
+                )}
+
+                {roleLabel === 'ROLE_ADMIN' && (
+                  <Link 
+                    to="/admin" 
+                    className={`px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all`}
+                  >
+                    Administration
                   </Link>
                 )}
 
@@ -276,8 +285,8 @@ const Topbar = () => {
                   </Link>
               ))}
               
-              {/* 💬 Messages Mobile - Réservé Premium */}
-              {isPremium && (
+              {/* 💬 Messages Mobile - Réservé Premium (Hors Admin) */}
+              {isPremium && roleLabel !== 'ROLE_ADMIN' && (
                 <button 
                   onClick={() => { setIsChatOpen(true); setIsMobileMenuOpen(false); }}
                   className="flex items-center gap-3 text-2xl font-black text-white hover:text-cyan-400 italic uppercase tracking-tighter"

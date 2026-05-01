@@ -11,16 +11,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 
 #[ORM\Entity(repositoryClass: RegattaRepository::class)]
 #[ApiResource(
     operations: [
-        new \ApiPlatform\Metadata\Get(),
-        new \ApiPlatform\Metadata\GetCollection(),
-        new \ApiPlatform\Metadata\Post(security: "is_granted('ROLE_PREMIUM')"),
-        new \ApiPlatform\Metadata\Patch(security: "is_granted('ROLE_PREMIUM')"),
-        new \ApiPlatform\Metadata\Put(security: "is_granted('ROLE_PREMIUM')"),
-        new \ApiPlatform\Metadata\Delete(security: "is_granted('ROLE_PREMIUM')")
+        new Get(),
+        new GetCollection(),
+        new Post(security: "is_granted('ROLE_ADMIN')"),
+        new Patch(security: "is_granted('ROLE_ADMIN')"),
+        new Put(security: "is_granted('ROLE_ADMIN')"),
+        new Delete(security: "is_granted('ROLE_ADMIN')")
     ],
     normalizationContext: ['groups' => ['regatta:read']],
     denormalizationContext: ['groups' => ['regatta:write']]

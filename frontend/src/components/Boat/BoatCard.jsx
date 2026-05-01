@@ -43,8 +43,8 @@ const BoatCard = memo(({ data }) => {
                 {isGhostBoat && (
                     <div className="absolute inset-0 bg-cyan-electric/10 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
                         <div className="bg-slate-950/80 px-4 py-2 rounded-xl border border-cyan-electric/50 flex items-center gap-2">
-                            <Clock className="text-cyan-electric animate-spin-slow" size={16} />
-                            <span className="text-cyan-electric text-[10px] font-black uppercase tracking-widest">Accès Prioritaire</span>
+                            <IconRenderer icon="🏆" size={16} className="text-cyan-electric" />
+                            <span className="text-cyan-electric text-[10px] font-black uppercase tracking-widest">Bateau de régate</span>
                         </div>
                     </div>
                 )}
@@ -58,7 +58,11 @@ const BoatCard = memo(({ data }) => {
                     <span className="block text-accent-role/80 text-[10px] font-black uppercase tracking-[0.3em]">
                         {data?.model?.label || data?.model?.name || 'Modèle inconnu'}
                     </span>
-                    {isGhostBoat && <PremiumBadge className="scale-75 origin-right" />}
+                    {isGhostBoat ? (
+                        <span className="bg-cyan-500/10 text-cyan-400 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-cyan-500/20">Régate</span>
+                    ) : (
+                        <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-emerald-500/20">Plaisance</span>
+                    )}
                 </div>
                 
                 <p className="text-slate-500 text-xs font-medium leading-relaxed mb-8 line-clamp-2 flex-grow">

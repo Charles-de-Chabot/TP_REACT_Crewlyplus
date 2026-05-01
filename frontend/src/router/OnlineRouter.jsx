@@ -21,12 +21,27 @@ const TeamHistoryDetail = lazy(() => import("../screens/OnlineScreens/TeamHistor
 
 import PaymentStatus from "../components/Stripe/PaymentStatus";
 
+// Admin Screens (Lazy loaded)
+const AdminDashboard = lazy(() => import("../screens/AdminScreens/AdminDashboard"));
+const AdminGuard = lazy(() => import("../components/Admin/AdminGuard"));
+const AdminLayout = lazy(() => import("../components/Admin/AdminLayout"));
+
+const AdminUsers = lazy(() => import("../screens/AdminScreens/AdminUsers"));
+
+const AdminTeams = lazy(() => import("../screens/AdminScreens/AdminTeams"));
+
+const AdminBoats = lazy(() => import("../screens/AdminScreens/AdminBoats"));
+const AdminModels = lazy(() => import("../screens/AdminScreens/AdminModels"));
+const AdminRegattas = lazy(() => import("../screens/AdminScreens/AdminRegattas"));
+const AdminPositions = lazy(() => import("../screens/AdminScreens/AdminPositions"));
+const AdminNotifications = lazy(() => import("../screens/AdminScreens/AdminNotifications"));
+
 const OnlineRouter = createBrowserRouter([
     {
         element: <App/>,
         errorElement: <ErrorPage />,
         children: [
-            // 1. Les routes publiques partagées
+            // ... (keep existing children)
             {
                 path: "/",
                 element: <Home />,
@@ -39,7 +54,6 @@ const OnlineRouter = createBrowserRouter([
             { path: "/configurator", element: <Configurator /> },
             { path: "/checkout", element: <CheckoutScreen /> },
             
-            // 2. Les routes privées
             { path: "/user", element: <User/> },
             { path: "/crew/dashboard", element: <Navigate to="/my-team" replace /> },
             { path: "/crew/register", element: <Navigate to="/my-team" replace /> },
@@ -48,9 +62,28 @@ const OnlineRouter = createBrowserRouter([
             { path: "/my-team/history/:id", element: <TeamHistoryDetail /> },
             { path: "/payment-success", element: <PaymentStatus /> },
 
-            // 3. Redirections pour les pages hors-ligne si l'utilisateur est déjà connecté
             { path: "/login", element: <Navigate to="/" replace /> },
             { path: "/register", element: <Navigate to="/" replace /> },
+        ]
+    },
+    // 4. Routes Administration
+    {
+        path: "/admin",
+        element: <AdminGuard />,
+        children: [
+            {
+                element: <AdminLayout />,
+                children: [
+                    { index: true, element: <AdminDashboard /> },
+                    { path: "users", element: <AdminUsers /> },
+                    { path: "teams", element: <AdminTeams /> },
+                    { path: "boats", element: <AdminBoats /> },
+                    { path: "catalog", element: <AdminModels /> },
+                    { path: "regattas", element: <AdminRegattas /> },
+                    { path: "positions", element: <AdminPositions /> },
+                    { path: "notifications", element: <AdminNotifications /> },
+                ]
+            }
         ]
     },
     {

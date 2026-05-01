@@ -13,17 +13,16 @@ export const useSidebar = (userRole) => {
         // 2. LIENS CONDITIONNELS (Selon le rôle)
         const roleLinks = [
             // --- PREMIUM UNIQUEMENT ---
-            { label: 'Régates', path: '/regattas', allowed: ['premium'] },
+            { label: 'Régates', path: '/regattas', allowed: ['premium', 'admin'] },
             { label: 'Ma Team', path: '/my-team', allowed: ['premium'] },
 
             // --- ADMIN UNIQUEMENT ---
-            { label: 'Gestion Utilisateurs', path: '/admin/users', allowed: ['admin'] },
-            { label: 'Gestion Flotte', path: '/admin/boats', allowed: ['admin'] },
+            { label: 'Espace Admin', path: '/admin', allowed: ['admin'] },
         ];
 
         // Filtrage
         const filteredRoleLinks = roleLinks.filter(link => 
-            role === 'admin' || link.allowed.includes(role)
+            link.allowed.includes(role)
         );
 
         return [...universalLinks, ...filteredRoleLinks];
