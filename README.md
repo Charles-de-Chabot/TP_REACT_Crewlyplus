@@ -1,612 +1,392 @@
-# Recipe Docker - Symfony 8
+<div align="center">
 
-Configuration Docker professionnelle pour un projet Symfony 8 avec Apache, PHP 8.3 et MariaDB.
+# 🌊 Crewly
 
-## 🚀 Stack Technique
+![Crewly Banner](./www/public/images/readme.jpg)
 
-- **Framework** : Symfony 8
-- **PHP** : 8.4+ avec Apache (mod_rewrite activé)
-- **Base de données** : MariaDB 11.3
-- **Extensions PHP** : GD, Intl, MySQLi, PDO, PDO_MySQL
-- **Outils** : Composer 2, Symfony CLI, Node.js 20 (via NVM), Xdebug
+### *Où le prestige rencontre la rigueur nautique*
 
-## 📋 Prérequis
-
-- Docker Engine 20.10+
-- Docker Compose 2.0+
-- Git
-
-## 🏗️ Structure du Projet
-
-```
-.
-├── apache/
-│   ├── Dockerfile          # Image Apache/PHP personnalisée
-│   └── custom-php.ini      # Configuration PHP personnalisée
-├── db/
-│   ├── backup.sh           # Script de sauvegarde
-│   ├── restore.sh          # Script de restauration
-│   └── init.sql            # Scripts SQL d'initialisation
-├── www/                    # Code source de l'application
-├── docker-compose.yml      # Configuration Docker Compose
-├── .dockerignore           # Fichiers exclus du build
-├── .env.example            # Modèle de configuration (à copier en .env)
-├── .env                    # Configuration locale (ignoré par Git)
-├── .htaccess              # Configuration Apache
-├── aliases.sh             # Aliases pour faciliter l'utilisation
-└── README.md              # Ce fichier
-```
-
-## 🚦 Démarrage Rapide
-
-### 1. Configuration de l'environnement
-
-**Étape importante** : Créez votre fichier `.env` à partir du modèle `.env.example` :
-
-```bash
-# Copier le fichier exemple vers .env
-cp .env.example .env
-
-# Éditer le fichier .env selon vos besoins
-nano .env
-# ou
-code .env
-```
-
-Le fichier `.env.example` contient toutes les variables nécessaires avec des valeurs par défaut pour le développement. **Modifiez les valeurs selon vos besoins**, notamment :
-
-- `APACHE_PORT` : Port d'Apache (par défaut `8000` si le port 80 est occupé)
-- `MYSQL_ROOT_PASSWORD` : Mot de passe root de MariaDB
-- `MYSQL_DATABASE` : Nom de votre base de données
-- `MYSQL_USER` : Utilisateur de l'application
-- `MYSQL_PASSWORD` : Mot de passe de l'utilisateur
-
-**⚠️ Important** : Le fichier `.env` est automatiquement ignoré par Git (voir `.gitignore`). Ne commitez **JAMAIS** le fichier `.env` dans Git car il contient des informations sensibles.
-
-**Structure du fichier `.env`** :
-
-```bash
-# Configuration Apache / PHP
-APACHE_PORT=8000
-PHP_ERROR_REPORTING=E_ALL
-PHP_DISPLAY_ERRORS=On
-
-# Configuration MariaDB
-MARIADB_PORT=3306
-MYSQL_ROOT_PASSWORD=changez_moi_en_production
-MYSQL_DATABASE=nom_de_votre_bdd
-MYSQL_USER=utilisateur_bdd
-MYSQL_PASSWORD=changez_moi_en_production
-MYSQL_ROOT_HOST=%
-
-# Noms des containers (pour aliases.sh)
-APACHE_CONTAINER=apache_vierge
-MARIADB_CONTAINER=mariadb_vierge
-```
-
-### 2. Construction et démarrage
-
-```bash
-# Construire les images et démarrer les containers
-docker compose up -d --build
-
-# Vérifier l'état des containers
-docker compose ps
-
-# Voir les logs
-docker compose logs -f
-```
-
-### 3. Accès aux services
-
-- **Application web** : http://localhost:8000 (ou le port défini dans `.env`)
-- **MariaDB** : localhost:3306
-  - Utilisateur root : `root` / Mot de passe : défini dans `.env`
-  - Utilisateur : défini dans `.env` (par défaut `utilisateur_bdd`)
-
-**Note** : Si le port 80 est déjà utilisé (par exemple par Traefik), le port par défaut est `8000`. Vous pouvez le modifier dans votre fichier `.env`.
-
-## 🎯 Configuration Symfony 8
-
-### Installation d'un nouveau projet
-
-Si vous n'avez pas encore de projet Symfony :
-
-```bash
-# Entrer dans le container Apache
-capache
-
-# Créer un nouveau projet Symfony 8 directement dans www
-cd /var/www/html
-composer create-project symfony/skeleton:"8.0.x" ./
-
-# Installer les dépendances supplémentaires
-composer require symfony/orm-pack
-composer require symfony/maker-bundle --dev
-```
-
-### Structure recommandée pour Symfony
-
-```
-www/
-├── public/
-│   └── index.php           # Point d'entrée de l'application
-├── src/
-│   ├── Controller/
-│   ├── Entity/
-│   ├── Repository/
-│   └── ...
-├── templates/
-├── migrations/
-├── config/
-│   ├── packages/
-│   └── routes.yaml
-├── .env                    # Variables d'environnement (à modifier)
-├── .env.local              # Variables locales (ignoré par Git)
-├── composer.json
-└── symfony.lock
-```
-
-### Configuration `.env` pour Symfony
-
-Modifiez les variables dans votre `.env` :
-
-```env
-# .env
-APP_ENV=dev
-APP_DEBUG=true
-APP_SECRET=ChangeMe
-
-# Database Configuration
-DATABASE_URL="mysql://utilisateur_bdd:changez_moi_en_production@mariadb:3306/nom_de_votre_bdd?serverVersion=11.3-MariaDB&charset=utf8mb4"
-
-# Mailer Configuration
-MAILER_DSN=null://null
-```
-
-### Initialisation de la base de données
-
-```bash
-# Entrer dans le container
-capache
-
-# Créer la base de données
-cconsole doctrine:database:create
-
-# Générer et exécuter les migrations
-cconsole make:migration
-cconsole doctrine:migrations:migrate
-```
-
-**Ou sans alias :**
-
-```bash
-# Créer la base de données
-docker compose exec apache_vierge php bin/console doctrine:database:create
-
-# Générer et exécuter les migrations
-docker compose exec apache_vierge php bin/console make:migration
-docker compose exec apache_vierge php bin/console doctrine:migrations:migrate
-```
-
-### Développement avec Symfony
-
-```bash
-# Créer une entité
-cconsole make:entity
-
-# Créer un contrôleur
-cconsole make:controller NomDuController
-
-# Générer un formulaire
-cconsole make:form
-
-# Lancer les tests
-composer test
-
-# Débogage avec Symfony profiler
-# Accéder à /_profiler pour analyser les requêtes
-```
-
-**Ou sans alias :**
-
-```bash
-# Créer une entité
-docker compose exec apache_vierge php bin/console make:entity
-
-# Créer un contrôleur
-docker compose exec apache_vierge php bin/console make:controller NomDuController
-
-# Générer un formulaire
-docker compose exec apache_vierge php bin/console make:form
-
-# Lancer les tests
-docker compose exec apache_vierge composer test
-
-# Débogage avec Symfony profiler
-# Accéder à /_profiler pour analyser les requêtes
-```
-
-**Note** : `.env.local` est ignoré par Git. Utilisez-le pour vos configurations spécifiques locales.
-
-
-
-### Charger les aliases
-
-```bash
-source aliases.sh
-```
-
-### Commandes utiles
-
-#### Avec les aliases (plus rapide)
-
-```bash
-# Composer (installation de dépendances)
-ccomposer install
-ccomposer require symfony/orm-pack
-
-# Symfony Console
-cconsole cache:clear
-cconsole doctrine:migrations:migrate
-cconsole doctrine:database:create
-cconsole doctrine:schema:update --force
-
-# Accéder aux containers
-capache    # Entrer dans le container Apache
-cmariadb   # Entrer dans le container MariaDB
-
-# Base de données
-db-export  # Sauvegarder la base de données
-db-import  # Restaurer la base de données
-```
-
-#### Sans aliases (avec docker compose exec)
-
-```bash
-# Composer (installation de dépendances)
-docker compose exec apache_vierge composer install
-docker compose exec apache_vierge composer require symfony/orm-pack
-
-# Symfony Console
-docker compose exec apache_vierge php bin/console cache:clear
-docker compose exec apache_vierge php bin/console doctrine:migrations:migrate
-docker compose exec apache_vierge php bin/console doctrine:database:create
-docker compose exec apache_vierge php bin/console doctrine:schema:update --force
-
-# Accéder aux containers
-docker compose exec apache_vierge bash     # Entrer dans le container Apache
-docker compose exec mariadb_vierge bash    # Entrer dans le container MariaDB
-
-# Base de données
-docker compose exec mariadb_vierge /docker-entrypoint-initdb.d/backup.sh   # Sauvegarder
-docker compose exec mariadb_vierge /docker-entrypoint-initdb.d/restore.sh  # Restaurer
-```
-
-### Commandes Docker Compose
-
-```bash
-# Démarrer les services
-docker compose up -d
-
-# Arrêter les services
-docker compose stop
-
-# Arrêter et supprimer les containers
-docker compose down
-
-# Reconstruire les images
-docker compose build --no-cache
-
-# Voir les logs
-docker compose logs -f apache_vierge
-docker compose logs -f mariadb_vierge
-
-# Exécuter une commande dans un container
-docker compose exec apache_vierge bash
-docker compose exec mariadb_vierge bash
-```
-
-## 🔒 Sécurité
-
-### Bonnes pratiques implémentées
-
-✅ **Réseau isolé** : Les services communiquent via un réseau Docker privé  
-✅ **Healthchecks** : Vérification automatique de la santé des containers  
-✅ **Variables d'environnement** : Mots de passe configurables via `.env`  
-✅ **Limites de ressources** : Contrôle de la mémoire et CPU  
-✅ **Versions fixées** : Images Docker versionnées pour la reproductibilité  
-✅ **.dockerignore** : Exclusion des fichiers inutiles du contexte de build  
-
-### Recommandations de sécurité
-
-1. **Toujours utiliser `.env.example` comme modèle** : Copiez-le en `.env` et modifiez les valeurs
-2. **Ne jamais commiter le fichier `.env`** dans Git (déjà configuré dans `.gitignore`)
-3. **Utiliser des mots de passe forts** en production
-4. **Limiter l'exposition des ports** en production (utiliser un reverse proxy)
-5. **Désactiver Xdebug** en production (modifier le Dockerfile)
-6. **Vérifier que `.env` est bien ignoré** : `git status` ne doit pas lister `.env`
-
-## 📊 Gestion de la Base de Données
-
-### Sauvegarde
-
-```bash
-# Via alias
-db-export
-
-# Ou directement
-docker compose exec mariadb_vierge /docker-entrypoint-initdb.d/backup.sh
-```
-
-Le fichier de sauvegarde sera créé dans `./db/init.sql` sur l'hôte.
-
-### Restauration
-
-```bash
-# Via alias
-db-import
-
-# Ou directement
-docker compose exec mariadb_vierge /docker-entrypoint-initdb.d/restore.sh
-```
-
-### Scripts SQL d'initialisation
-
-Placez vos scripts SQL dans le dossier `./db/`. Ils seront automatiquement exécutés au premier démarrage de MariaDB.
-
-## 🐛 Débogage avec Xdebug
-
-Xdebug est installé et configuré. Pour l'utiliser avec VSCode :
-
-1. Décommentez les lignes dans `apache/custom-php.ini` :
-```ini
-xdebug.client_host = host.docker.internal
-xdebug.client_port = 9003
-xdebug.start_with_request = yes
-xdebug.idekey = VSCODE
-```
-
-2. Configurez VSCode avec `.vscode/launch.json` :
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Listen for Xdebug",
-      "type": "php",
-      "request": "launch",
-      "port": 9003,
-      "pathMappings": {
-        "/var/www/html": "${workspaceFolder}/www"
-      }
-    }
-  ]
-}
-```
-
-## ⚙️ Configuration PHP
-
-Le fichier `apache/custom-php.ini` contient les paramètres personnalisés :
-
-- Limites d'upload : 100M
-- Mémoire : 256M
-- Timeout d'exécution : 300s
-- Timezone : Europe/Paris
-
-Modifiez selon vos besoins.
-
-## 🔧 Optimisations
-
-### Build optimisé
-
-- **Couches Docker réduites** : RUN combinés pour réduire la taille de l'image
-- **Cache apt nettoyé** : Réduction de la taille finale
-- **Compilation parallèle** : Utilisation de `-j$(nproc)` pour les extensions PHP
-- **.dockerignore** : Exclusion des fichiers inutiles
-
-### Performance
-
-- **Healthchecks** : Détection rapide des problèmes
-- **Limites de ressources** : Contrôle de la consommation
-- **Réseau isolé** : Communication optimisée entre services
-
-## 📝 Notes de Production
-
-Avant de déployer en production :
-
-1. **Desactiver le mode debug** :
-   ```env
-   APP_ENV=prod
-   APP_DEBUG=false
-   ```
-
-2. **Générer une clé secrète unique** :
-   ```bash
-   cconsole secrets:generate-keys
-   ```
-
-3. **Désactiver Xdebug** dans le Dockerfile
-
-4. **Modifier les variables PHP** : `PHP_DISPLAY_ERRORS=Off`
-
-5. **Utiliser un reverse proxy** (Nginx/Traefik) au lieu d'exposer directement le port 80
-
-6. **Configurer des sauvegardes automatiques** de la base de données
-
-7. **Mettre en place la surveillance** (logs, métriques)
-
-8. **Utiliser HTTPS** avec un certificat SSL
-
-9. **Optimiser le cache Symfony** :
-   ```bash
-   cconsole cache:warmup
-   ```
-
-10. **Vérifier les permissions des fichiers** :
-    ```bash
-    docker compose exec apache_vierge chown -R www-data:www-data /var/www/html
-    docker compose exec apache_vierge chmod -R 755 /var/www/html
-    ```
-
-## 🆘 Dépannage
-
-### Le container Apache ne démarre pas
-
-```bash
-# Vérifier les logs
-docker compose logs apache_vierge
-
-# Vérifier que le dossier www existe
-ls -la www/
-```
-
-### La base de données n'est pas accessible
-
-```bash
-# Vérifier que MariaDB est healthy
-docker compose ps
-
-# Vérifier les logs
-docker compose logs mariadb_vierge
-
-# Tester la connexion
-docker compose exec mariadb_vierge mariadb -uroot -p
-```
-
-### Problèmes de permissions
-
-```bash
-# Vérifier les permissions du dossier www
-ls -la www/
-
-# Si nécessaire, corriger les permissions dans le container
-docker compose exec apache_vierge chown -R www-data:www-data /var/www/html
-```
-
-### Erreur "Forbidden" ou "403"
-
-Si vous voyez une erreur "Forbidden" lors de l'accès à l'application :
-
-1. **Vérifier qu'un fichier `index.php` existe** dans `www/public/` :
-```bash
-ls -la www/public/index.php
-```
-
-2. **Créer un fichier index.php de test** si nécessaire :
-```bash
-echo "<?php phpinfo(); ?>" > www/public/index.php
-```
-
-3. **Vérifier les permissions** dans le container :
-```bash
-docker compose exec apache_vierge chown -R www-data:www-data /var/www/html
-docker compose exec apache_vierge chmod -R 755 /var/www/html
-```
-
-### Port déjà utilisé
-
-Si vous obtenez l'erreur "port is already allocated" :
-
-1. **Identifier quel service utilise le port** :
-```bash
-docker ps | grep :80
-# ou
-sudo lsof -i :80
-```
-
-2. **Changer le port dans `.env`** :
-```bash
-# Éditer .env et modifier APACHE_PORT
-APACHE_PORT=8000  # ou tout autre port libre
-```
-
-3. **Redémarrer les containers** :
-```bash
-docker compose down && docker compose up -d
-```
-
-### Problèmes spécifiques à Symfony
-
-#### Erreur "No route found"
-
-Si vous obtenez une erreur 404 "No route found" :
-
-1. **Vérifier que le fichier `.htaccess` existe** et que `mod_rewrite` est actif :
-```bash
-docker compose exec apache_vierge a2enmod rewrite
-```
-
-2. **Vérifier les routes configurées** :
-```bash
-cconsole debug:router
-```
-
-3. **Vérifier le fichier `.env`** et la configuration de l'application
-
-#### Erreur Doctrine/Base de données
-
-Si vous avez une erreur concernant la base de données :
-
-```bash
-# Vérifier la connexion
-cconsole dbal:run-sql "SELECT 1"
-
-# Créer la base de données
-cconsole doctrine:database:create
-
-# Exécuter les migrations
-cconsole doctrine:migrations:migrate
-```
-
-**Ou sans alias :**
-
-```bash
-# Vérifier la connexion
-docker compose exec apache_vierge php bin/console dbal:run-sql "SELECT 1"
-
-# Créer la base de données
-docker compose exec apache_vierge php bin/console doctrine:database:create
-
-# Exécuter les migrations
-docker compose exec apache_vierge php bin/console doctrine:migrations:migrate
-```
-
-#### Cache Symfony
-
-Si le cache pose problème :
-
-```bash
-# Vider le cache complètement
-cconsole cache:clear --no-warmup
-
-# Reconstruire le cache
-cconsole cache:warmup
-```
-
-**Ou sans alias :**
-
-```bash
-# Vider le cache complètement
-docker compose exec apache_vierge php bin/console cache:clear --no-warmup
-
-# Reconstruire le cache
-docker compose exec apache_vierge php bin/console cache:warmup
-```
-
-
-
-## 📚 Ressources
-
-- [Documentation Docker Compose](https://docs.docker.com/compose/)
-- [Documentation PHP](https://www.php.net/docs.php)
-- [Documentation MariaDB](https://mariadb.com/docs/)
-
-## 📄 Licence
-
-Ce template est fourni tel quel pour vos projets.
+> **Louez, Recrutez et Naviguez avec l'excellence**
 
 ---
 
-**Créé avec ❤️ pour Symfony 8**
+![Symfony](https://img.shields.io/badge/Symfony-8.0-black?style=for-the-badge&logo=symfony&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-Intégré-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-11.3-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 
+</div>
+
+---
+
+## 📖 Présentation
+
+**Crewly** est une plateforme nautique complète conçue pour réunir trois univers en un seul écosystème digital :
+
+- ⛵ **Location de bateaux** — Réservez des embarcations de prestige avec paiement sécurisé via Stripe
+- 👨‍✈️ **Job Board Maritime** — Recrutez ou postulez en tant que capitaine, hôtesse ou chef cuisinier à bord
+- 🏁 **Gestion de Régates** — Créez des équipages, inscrivez-les à des compétitions et gérez les courses en temps réel
+- 🌦️ **Météo Marine** — Consultez les conditions en mer via l'intégration de la carte interactive **Windy API**
+
+L'architecture repose sur une **API REST Symfony** (API Platform) consommée par un **frontend React** moderne, le tout orchestré par **Docker Compose**.
+
+---
+
+## 🗂️ Sommaire
+
+1. [✨ Fonctionnalités](#-fonctionnalités)
+2. [🏗️ Architecture Technique](#️-architecture-technique)
+3. [📋 Prérequis](#-prérequis)
+4. [🚀 Installation Pas à Pas](#-installation-pas-à-pas)
+   - [Étape 1 — Configuration de l'environnement](#étape-1--configuration-de-lenvironnement)
+   - [Étape 2 — Lancement des containers Docker](#étape-2--lancement-des-containers-docker)
+   - [Étape 3 — Initialisation du Backend Symfony](#étape-3--initialisation-du-backend-symfony)
+   - [Étape 4 — Chargement des Données de Démonstration](#étape-4--chargement-des-données-de-démonstration)
+   - [Étape 5 — Initialisation du Frontend React](#étape-5--initialisation-du-frontend-react)
+5. [⚙️ Configuration des Variables d'Environnement](#️-configuration-des-variables-denvironnement)
+6. [🌐 Accès aux Services](#-accès-aux-services)
+7. [📦 Stack Technique Détaillée](#-stack-technique-détaillée)
+
+---
+
+## ✨ Fonctionnalités
+
+### ⛵ Système de Location de Bateaux
+- Catalogue de bateaux avec galerie photo et fiches techniques détaillées
+- Système de réservation avec sélection de dates (Flatpickr)
+- **Paiement en ligne sécurisé via Stripe** (Stripe Elements intégré au frontend, webhooks Symfony côté backend)
+- Historique des réservations par utilisateur avec statuts visuels
+
+### 👨‍✈️ Job Board Maritime
+- Offres d'emploi à bord : capitaines, hôtesses, chefs cuisinier
+- Profils de compétences et système de candidature
+- Validation par les propriétaires / armateurs
+
+### 🏁 Gestion d'Équipes & Régates
+- Création et gestion d'équipages
+- Inscription des équipes aux régates disponibles
+- Tableau de bord de suivi des compétitions
+- Chat tactique en temps réel pour les membres d'équipe (**Mercure / SSE**)
+
+### 🌦️ Carte Météo Marine (Windy API)
+- Widget météo interactif intégré directement dans la plateforme
+- Visualisation des conditions de vent, vagues et température en mer
+- Powered by [Windy API](https://api.windy.com/)
+
+### 🔐 Authentification & Sécurité
+- Authentification JWT (LexikJWTAuthenticationBundle)
+- Rôles utilisateurs : `ROLE_USER`, `ROLE_ADMIN`
+- Tableau de bord d'administration dédié
+
+---
+
+## 🏗️ Architecture Technique
+
+```
+TP_API_CrewlyPlus/
+│
+├── 🐳 docker-compose.yml          # Orchestration des services
+│
+├── www/                           # 🔵 Backend Symfony (API)
+│   ├── src/
+│   │   ├── Entity/                # Entités Doctrine (Boat, Booking, Team, Regatta...)
+│   │   ├── Controller/            # Contrôleurs API Platform & custom
+│   │   ├── DataFixtures/          # Données de démonstration
+│   │   └── Security/              # Voters, JWT handlers
+│   ├── config/
+│   └── composer.json              # Dépendances PHP
+│
+├── frontend/                      # 🟢 Frontend React (Vite)
+│   ├── src/
+│   │   ├── components/            # Composants React réutilisables
+│   │   ├── pages/                 # Pages de l'application
+│   │   ├── store/                 # Redux Toolkit (state management)
+│   │   └── constants/             # Configuration globale
+│   └── package.json               # Dépendances Node.js
+│
+├── apache/                        # ⚙️ Config Apache + PHP
+└── db/                            # 🗄️ Scripts SQL d'initialisation
+```
+
+### Services Docker
+
+| Service | Image | Port | Rôle |
+|---------|-------|------|------|
+| `apache_crewlyplus` | PHP 8.4 + Apache (custom) | `8000` | Serveur Web + API Symfony |
+| `mariadb_crewlyplus` | `mariadb:11.3` | `3306` | Base de données relationnelle |
+| `frontend_crewlyplus` | `node:20-alpine` | `5173` | Serveur de dev Vite/React |
+| `mercure_crewlyplus` | `dunglas/mercure` | `3000` | SSE temps réel (chat tactique) |
+
+---
+
+## 📋 Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé et configuré les éléments suivants :
+
+| Outil | Version minimale | Lien |
+|-------|-----------------|------|
+| 🐳 **Docker Desktop** | 4.x | [Télécharger](https://www.docker.com/products/docker-desktop/) |
+| 🐙 **Docker Compose** | v2.x (inclus dans Docker Desktop) | — |
+| 💳 **Compte Stripe (test)** | Clé `votre_cle_...` | [dashboard.stripe.com](https://dashboard.stripe.com/register) |
+| 🌦️ **Clé API Windy** | Gratuite | [api.windy.com](https://api.windy.com/) |
+
+> [!IMPORTANT]
+> Docker Desktop doit être **démarré et actif** avant de lancer les commandes ci-dessous. Vérifiez que les ports **8000**, **3306**, **5173** et **3000** sont disponibles sur votre machine.
+
+---
+
+## 🚀 Installation Pas à Pas
+
+### Étape 1 — Configuration de l'Environnement
+
+Clonez le projet et préparez votre fichier de configuration :
+
+```bash
+# 1. Clonez le dépôt
+git clone <URL_DU_REPO> crewly
+cd crewly
+
+# 2. Copiez le fichier d'environnement exemple
+cp .env.example .env
+```
+
+Ouvrez le fichier `.env` nouvellement créé et **renseignez vos valeurs** (voir la section [Configuration](#️-configuration-des-variables-denvironnement) pour le détail de chaque variable).
+
+---
+
+### Étape 2 — Lancement des Containers Docker
+
+```bash
+# Démarrage de tous les services en arrière-plan
+docker-compose up -d
+```
+
+Attendez que tous les containers soient **healthy**. Vous pouvez vérifier leur état avec :
+
+```bash
+docker-compose ps
+```
+
+> [!NOTE]
+> Le container MariaDB peut prendre **30 à 60 secondes** pour être pleinement opérationnel (healthcheck). Le container Apache attend automatiquement que MariaDB soit prêt avant de démarrer.
+
+---
+
+### Étape 3 — Initialisation du Backend Symfony
+
+Toutes les commandes suivantes s'exécutent **à l'intérieur du container Apache** :
+
+```bash
+# Entrez dans le container Apache
+docker exec -it apache_crewlyplus bash
+```
+
+Une fois dans le container, exécutez les commandes dans l'ordre :
+
+```bash
+# 📦 1. Installer les dépendances PHP via Composer
+composer install
+
+# 🗄️ 2. Créer la base de données
+php bin/console doctrine:database:create
+
+# 🔄 3. Exécuter toutes les migrations (création des tables)
+php bin/console doctrine:migrations:migrate --no-interaction
+
+# 🔑 4. Générer les clés JWT (authentification)
+php bin/console lexik:jwt:generate-keypair
+
+# 🌱 5. ⚠️ IMPORTANT — Charger les DataFixtures (données de démonstration)
+php bin/console doctrine:fixtures:load --no-interaction
+```
+
+> [!IMPORTANT]
+> La commande `doctrine:fixtures:load` est **indispensable** pour peupler la base de données avec des bateaux, utilisateurs, régates et équipes de démonstration. Sans cette étape, l'application sera vide.
+
+> [!WARNING]
+> La commande `doctrine:fixtures:load` **supprime et recrée toutes les données** existantes. Ne l'exécutez jamais sur une base de données de production.
+
+Quittez le container une fois terminé :
+
+```bash
+exit
+```
+
+---
+
+### Étape 4 — Chargement des Données de Démonstration
+
+Les DataFixtures créent automatiquement :
+
+- 👤 Des utilisateurs (dont un compte **administrateur**)
+- ⛵ Des bateaux avec photos et caractéristiques
+- 🏁 Des régates avec inscriptions
+- 👥 Des équipes et membres d'équipage
+
+> [!TIP]
+> Consultez le fichier `www/src/DataFixtures/` pour connaître les identifiants des comptes de test créés (email / mot de passe).
+
+---
+
+### Étape 5 — Initialisation du Frontend React
+
+Le frontend tourne dans son propre container Docker et démarre automatiquement. Cependant, si les modules Node ne sont pas encore installés :
+
+```bash
+# Entrez dans le container frontend
+docker exec -it frontend_crewlyplus sh
+
+# 📦 Installer les dépendances Node.js
+npm install
+
+# Quittez le container
+exit
+```
+
+Le serveur de développement Vite redémarre automatiquement grâce à la commande définie dans `docker-compose.yml`.
+
+> [!TIP]
+> Si le frontend ne démarre pas, relancez le container avec `docker-compose restart frontend_crewlyplus`.
+
+---
+
+## ⚙️ Configuration des Variables d'Environnement
+
+### Fichier `.env` à la racine du projet (Docker Compose)
+
+```env
+# ─── Ports ────────────────────────────────────────
+APACHE_PORT=8000          # Port d'accès à l'API Symfony
+MARIADB_PORT=3306         # Port MariaDB
+
+# ─── Base de données ──────────────────────────────
+MYSQL_ROOT_PASSWORD=votre_mot_de_passe_root
+MYSQL_DATABASE=crewly_db
+MYSQL_USER=crewly_user
+MYSQL_PASSWORD=votre_mot_de_passe
+
+# ─── Noms des containers ──────────────────────────
+APACHE_CONTAINER=apache_crewlyplus
+MARIADB_CONTAINER=mariadb_crewlyplus
+```
+
+### Fichier `www/.env` (Symfony — variables critiques)
+
+> [!IMPORTANT]
+> Ce fichier doit être créé/configuré **à l'intérieur du dossier `www/`**, séparément du `.env` Docker racine.
+
+```env
+# ─── Base de données ──────────────────────────────────────────────────────────
+DATABASE_URL="mysql://crewly_user:votre_mot_de_passe@mariadb_crewlyplus:3306/crewly_db?serverVersion=11.3&charset=utf8mb4"
+
+# ─── JWT (Authentification) ───────────────────────────────────────────────────
+JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+JWT_PASSPHRASE=votre_passphrase_jwt
+
+# ─── Stripe (Paiement) ───────────────────────────────────────────────────────
+STRIPE_SECRET_KEY=votre_cle_secrete_stripe_test        # Clé secrète Stripe (mode TEST)
+STRIPE_WEBHOOK_SECRET=votre_secret_webhook_stripe    # Secret du webhook Stripe
+
+# ─── Mercure (Temps réel) ────────────────────────────────────────────────────
+MERCURE_URL=http://mercure_crewlyplus/.well-known/mercure
+MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure
+MERCURE_JWT_SECRET=!ChangeThisMercureHubJWTSecretKey!
+
+# ─── Application ─────────────────────────────────────────────────────────────
+APP_ENV=dev
+APP_SECRET=votre_app_secret_symfony
+```
+
+### Fichier `frontend/.env` (React / Vite)
+
+```env
+# ─── URL de l'API Backend ────────────────────────────────────────────────────
+VITE_API_URL=http://localhost:8000
+
+# ─── Stripe (Frontend) ───────────────────────────────────────────────────────
+VITE_STRIPE_PUBLIC_KEY=votre_cle_publique_stripe_test  # Clé publique Stripe
+
+# ─── Windy API (Carte Météo) ─────────────────────────────────────────────────
+VITE_WINDY_API_KEY=votre_cle_windy_api
+```
+
+---
+
+## 🌐 Accès aux Services
+
+Une fois l'installation terminée, accédez aux différents services via votre navigateur :
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| 🌊 **Application Crewly** | [http://localhost:5173](http://localhost:5173) | Frontend React |
+| 🔵 **API Symfony** | [http://localhost:8000/api](http://localhost:8000/api) | Endpoint REST principal |
+| 📚 **Documentation API** | [http://localhost:8000/api/docs](http://localhost:8000/api/docs) | Swagger UI (API Platform) |
+| 🗄️ **Base de données** | `localhost:3306` | MariaDB (via DBeaver, TablePlus…) |
+| 📡 **Mercure Hub** | [http://localhost:3000](http://localhost:3000) | Serveur SSE temps réel |
+
+---
+
+## 📦 Stack Technique Détaillée
+
+### 🔵 Backend — Symfony 8.0 (PHP 8.4)
+
+Les versions exactes de chaque bundle sont consultables dans [`www/composer.json`](./www/composer.json).
+
+| Bundle / Package | Rôle |
+|-----------------|------|
+| `symfony/framework-bundle ^8.0` | Cœur du framework Symfony |
+| `api-platform/symfony ^4.2` | Génération automatique de l'API REST |
+| `doctrine/orm ^3.6` | ORM (mapping objet-relationnel) |
+| `doctrine/doctrine-migrations-bundle ^4.0` | Versioning du schéma BDD |
+| `doctrine/doctrine-fixtures-bundle ^4.3` | Données de démonstration |
+| `lexik/jwt-authentication-bundle ^3.2` | Authentification par tokens JWT |
+| `stripe/stripe-php ^20.0` | SDK Stripe pour les paiements |
+| `symfony/mercure-bundle ^0.4.2` | Temps réel (Server-Sent Events) |
+| `symfony/messenger ^8.0` | Bus de messages asynchrones |
+| `nelmio/cors-bundle ^2.6` | Gestion des CORS (cross-origin) |
+
+### 🟢 Frontend — React 19 (Vite 7 + TailwindCSS 4)
+
+Les versions exactes sont consultables dans [`frontend/package.json`](./frontend/package.json).
+
+| Package | Rôle |
+|---------|------|
+| `react ^19` + `react-dom` | Bibliothèque UI principale |
+| `react-router-dom ^7` | Routage côté client (SPA) |
+| `@reduxjs/toolkit ^2` + `react-redux` | Gestion d'état global |
+| `@stripe/react-stripe-js ^6` | Composants Stripe Elements |
+| `axios ^1` | Client HTTP pour l'API |
+| `tailwindcss ^4` | Framework CSS utilitaire |
+| `lucide-react` + `react-icons` | Bibliothèques d'icônes |
+| `recharts ^3` | Graphiques (dashboard admin) |
+| `sonner ^2` | Notifications toast |
+| `flatpickr ^4` | Sélecteur de dates (réservations) |
+
+### 🐳 Infrastructure Docker
+
+| Service | Image | Rôle |
+|---------|-------|------|
+| Apache + PHP | Custom Dockerfile | Serveur web + interpréteur PHP |
+| MariaDB | `mariadb:11.3` | Base de données relationnelle |
+| Node.js | `node:20-alpine` | Serveur de dev frontend |
+| Mercure | `dunglas/mercure` | Hub SSE pour le temps réel |
+
+---
+
+<div align="center">
+
+**🌊 Crewly — Projet Académique**
+
+*Développé avec passion pour le secteur nautique*
+
+![Symfony](https://img.shields.io/badge/Symfony-8.0-black?style=flat-square&logo=symfony)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF?style=flat-square&logo=stripe&logoColor=white)
+
+</div>
