@@ -47,8 +47,8 @@ final class BoatAvailabilityFilter extends AbstractFilter
             ->select('r_sub')
             ->from('App\Entity\Rental', 'r_sub')
             ->where('r_sub.boat = ' . $rootAlias)
-            ->andWhere('r_sub.rentalStart < :endDate')
-            ->andWhere('r_sub.rentalEnd > :startDate')
+            ->andWhere('r_sub.rentalStart <= :endDate')
+            ->andWhere('r_sub.rentalEnd >= :startDate')
             ->andWhere('r_sub.status IN (:activeStatuses)');
 
         $queryBuilder

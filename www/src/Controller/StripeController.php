@@ -88,6 +88,12 @@ class StripeController extends AbstractController
                     return new JsonResponse(['error' => 'Utilisateur non connecté.'], 401);
                 }
 
+                // SECURITY FIX: Only upgrade to Premium if this is a subscription payment!
+                if (!isset($paymentIntent->metadata['subscription_id'])) {
+                    // It's a successful payment, but for a rental/booking, not a premium subscription.
+                    return new JsonResponse(['status' => 'success', 'message' => 'Paiement (non premium) vérifié.']);
+                }
+
                 $premiumRole = $roleRepository->findOneBy(['label' => 'ROLE_PREMIUM']);
                 if ($premiumRole) {
                     $user->setRole($premiumRole);

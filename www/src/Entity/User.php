@@ -26,7 +26,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_PREMIUM')",
             normalizationContext: ['groups' => ['user:list']]
         ),
         new Get(security: "is_granted('ROLE_ADMIN') or object == user"),
@@ -89,7 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:read', 'user:write', 'message:read'])]
+    #[Groups(['user:read', 'user:list', 'user:write', 'message:read'])]
     private ?string $position = null;
 
     #[ORM\Column(nullable: true)]
@@ -114,7 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?SailingProfile $sailingProfile = null;
 
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'members')]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups(['user:read', 'user:list', 'user:write'])]
     private ?Team $currentTeam = null;
 
     /**
@@ -135,7 +135,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Media>
      */
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
-    #[Groups(['user:read', 'team:read'])]
+    #[Groups(['user:read', 'user:list', 'team:read'])]
     private Collection $media;
 
 

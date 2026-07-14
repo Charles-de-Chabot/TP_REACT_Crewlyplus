@@ -40,9 +40,12 @@ class WebhookController extends AbstractController
         $sigHeader = $request->headers->get('Stripe-Signature');
         $secret    = $_ENV['STRIPE_WEBHOOK_SECRET'];
 
+        $event = null;
         try {
             $event  = Webhook::constructEvent($payload, $sigHeader, $secret);
             $type   = $event->type;
+            $paymentIntent = $event->data->object;
+            $metadata = $paymentIntent->metadata;
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
             return new JsonResponse(['error' => 'Signature invalide.'], 400);
         } catch (\Exception $e) {
@@ -52,11 +55,12 @@ class WebhookController extends AbstractController
                 return new JsonResponse(['error' => 'Payload invalide.'], 400);
             }
             $type = $data['type'] ?? null;
+            // Create a pseudo paymentIntent object
+            $paymentIntent = (object) ($data['data']['object'] ?? []);
+            $metadata = (object) ($paymentIntent->metadata ?? []);
         }
 
         if ($type === 'payment_intent.succeeded') {
-            $paymentIntent = $event->data->object;
-            $metadata = $paymentIntent->metadata;
 
             // --- Case A: Rental Confirmation ---
             if (isset($metadata->rental_id)) {
@@ -69,8 +73,7 @@ class WebhookController extends AbstractController
         }
 
         if ($type === 'payment_intent.payment_failed') {
-            $paymentIntent = $event->data->object;
-            $metadata = $paymentIntent->metadata;
+            // $paymentIntent and $metadata are already initialized above
 
             if (isset($metadata->rental_id)) {
                 $this->handleRentalFailure((int) $metadata->rental_id);

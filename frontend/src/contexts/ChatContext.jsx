@@ -20,24 +20,6 @@ export const ChatProvider = ({ children, teamId }) => {
     const [activeCategory, setActiveCategory] = useState('PASSERELLE');
     const [isChatOpen, setIsChatOpen] = useState(false);
 
-    // 🔄 RESET & REFRESH : Gérer la connexion/déconnexion
-    useEffect(() => {
-        if (!token || !userId) {
-            // Déconnexion : On vide tout
-            setMessages([]);
-            setIsChatOpen(false);
-            setUnreadCounts({ PASSERELLE: 0, TACTIQUE: 0, LOGISTIQUE: 0 });
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-                eventSourceRef.current = null;
-            }
-            processedIdsRef.current.clear();
-        } else if (teamId) {
-            // Connexion/Changement d'équipe : On recharge
-            fetchMessages();
-        }
-    }, [token, userId, teamId]); // Réagir aux changements d'auth et de team
-
     // Refs pour que Mercure puisse lire les états sans se reconnecter
     const chatOpenRef = useRef(isChatOpen);
     const activeCategoryRef = useRef(activeCategory);
@@ -82,7 +64,23 @@ export const ChatProvider = ({ children, teamId }) => {
         }
     }, [teamId, userId]);
 
-
+    // 🔄 RESET & REFRESH : Gérer la connexion/déconnexion
+    useEffect(() => {
+        if (!token || !userId || !teamId) {
+            // Déconnexion ou pas d'équipe : On vide tout
+            setMessages([]);
+            setIsChatOpen(false);
+            setUnreadCounts({ PASSERELLE: 0, TACTIQUE: 0, LOGISTIQUE: 0 });
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+                eventSourceRef.current = null;
+            }
+            processedIdsRef.current.clear();
+        } else {
+            // Connexion avec équipe / Changement d'équipe : On recharge
+            fetchMessages();
+        }
+    }, [token, userId, teamId, fetchMessages]); // Réagir aux changements d'auth et de team
 
     // Fonction pour ouvrir/fermer le chat et reset le compteur de l'onglet actif
     const setChatStatus = useCallback((open) => {

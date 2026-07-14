@@ -22,7 +22,7 @@ const ROLE_CONFIG = {
 };
 
 const Topbar = () => {
-  const { firstname, email, role, roleLabel, signOut, userId } = useAuthContext()
+  const { firstname, email, role, roleLabel, signOut, userId, teamId } = useAuthContext()
   const isPremium = roleLabel !== 'ROLE_USER';
   const { setIsChatOpen, totalUnreadCount } = useChat()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -159,7 +159,7 @@ const Topbar = () => {
               ))}
 
               {/* 💬 Onglet Messages (Global) - Réservé Premium (Hors Admin) */}
-              {isPremium && roleLabel !== 'ROLE_ADMIN' && (
+              {isPremium && roleLabel !== 'ROLE_ADMIN' && teamId && (
                 <button 
                   onClick={() => setIsChatOpen(true)}
                   className="text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-1.5 text-slate-500 hover:text-white relative"
@@ -286,7 +286,7 @@ const Topbar = () => {
               ))}
               
               {/* 💬 Messages Mobile - Réservé Premium (Hors Admin) */}
-              {isPremium && roleLabel !== 'ROLE_ADMIN' && (
+              {isPremium && roleLabel !== 'ROLE_ADMIN' && teamId && (
                 <button 
                   onClick={() => { setIsChatOpen(true); setIsMobileMenuOpen(false); }}
                   className="flex items-center gap-3 text-2xl font-black text-white hover:text-cyan-400 italic uppercase tracking-tighter"

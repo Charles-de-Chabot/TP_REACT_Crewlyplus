@@ -27,7 +27,8 @@ const DailyStatForm = ({ registration, onStatAdded, onCancel }) => {
         const existing = registration.dailyStats?.find(s => parseInt(s.dayNumber) === parseInt(formData.dayNumber));
         if (existing) {
             setIsEditing(true);
-            setExistingId(existing.id);
+            const extractedId = existing.id || (existing['@id'] ? existing['@id'].split('/').pop() : null);
+            setExistingId(extractedId);
             setFormData({
                 dayNumber: existing.dayNumber,
                 ranking: existing.ranking || '',

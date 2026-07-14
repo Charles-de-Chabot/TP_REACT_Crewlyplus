@@ -6,7 +6,7 @@ const ContactFields = ({ formData, handleChange, showNickname = true }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {showNickname && (
                 <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase text-slate-500 tracking-widest">Nom de Skipper (Nickname)</label>
+                    <label className="text-xs font-bold uppercase text-slate-500 tracking-widest">Nom d'utilisateur (Nickname)</label>
                     <input 
                         required 
                         name="nickname" 

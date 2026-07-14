@@ -88,10 +88,19 @@ export const fetchFilterData = () => async (dispatch) => {
         ]);
 
         const types = typesRes.data['hydra:member'] || typesRes.data.member || (Array.isArray(typesRes.data) ? typesRes.data : []);
-        const models = modelsRes.data['hydra:member'] || modelsRes.data.member || (Array.isArray(modelsRes.data) ? modelsRes.data : []);
+        const rawModels = modelsRes.data['hydra:member'] || modelsRes.data.member || (Array.isArray(modelsRes.data) ? modelsRes.data : []);
         const allBoats = boatsRes.data['hydra:member'] || boatsRes.data.member || (Array.isArray(boatsRes.data) ? boatsRes.data : []);
 
         const uniqueCities = [...new Set(allBoats.map(b => b.adress?.city).filter(Boolean))];
+
+        // Enrich models with typeId based on existing boats so that useBoatsFilter can filter models by type
+        const models = rawModels.map(m => {
+            const boat = allBoats.find(b => b.model?.id === m.id);
+            return {
+                ...m,
+                typeId: boat ? boat.type?.id : null
+            };
+        });
 
         dispatch(setFiltersData({ 
             types, 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RoleCard = ({ opt, isSelected, onSelect }) => {
+const RoleCard = ({ opt, isSelected, onSelect, onConfirm }) => {
     return (
         <div 
             onClick={() => onSelect(opt.role)}
@@ -11,7 +11,7 @@ const RoleCard = ({ opt, isSelected, onSelect }) => {
             }`}
         >
             <div className={`w-20 h-20 rounded-3xl flex items-center justify-center text-4xl mb-8 transition-transform group-hover:scale-110 ${
-                isSelected ? `bg-slate-950 border border-${opt.color}-500/30` : 'bg-slate-950 border border-white/5'
+                isSelected ? `bg-slate-950 border border-${opt.color}-500/30 text-${opt.color}-400` : 'bg-slate-950 border border-white/5 text-slate-400'
             }`}>
                 {opt.icon}
             </div>
@@ -33,13 +33,21 @@ const RoleCard = ({ opt, isSelected, onSelect }) => {
                 ))}
             </ul>
 
-            <div className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center transition-all ${
-                isSelected
-                ? `bg-${opt.color}-500 text-slate-950`
-                : 'bg-white/5 text-slate-400 group-hover:bg-white/10'
-            }`}>
-                {isSelected ? 'Rôle sélectionné' : 'Choisir ce métier'}
-            </div>
+            {isSelected ? (
+                <button 
+                    onClick={(e) => { 
+                        e.stopPropagation(); 
+                        onConfirm(); 
+                    }}
+                    className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center transition-all bg-${opt.color}-500 text-slate-950 hover:scale-105 shadow-lg shadow-${opt.color}-500/40`}
+                >
+                    Confirmer
+                </button>
+            ) : (
+                <div className="w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center transition-all bg-white/5 text-slate-400 group-hover:bg-white/10">
+                    Choisir ce métier
+                </div>
+            )}
         </div>
     );
 };

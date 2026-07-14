@@ -27,7 +27,7 @@ const App = () => {
           </React.Suspense>
         </main>
 
-        {isPremium && <TacticalChatDrawer />}
+        {isPremium && teamId && <TacticalChatDrawer />}
       </ChatProvider>
 
       <Footer />
